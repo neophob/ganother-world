@@ -20,6 +20,10 @@ build:
 	@echo "  >  BUILD"
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build $(SRC)
 
+## format: format code using go fmt
+format:
+	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go fmt $(SRC)
+
 ## build-cross: cross compile project in release mode (without debug symbols)
 build-cross:
 	@env GOOS=js GOARCH=wasm go build -o gaw.js $(RELEASE) $(SRC)
