@@ -1,11 +1,16 @@
+# GO
+
+- https://awesome-go.com/ - A curated list of awesome Go frameworks, libraries and software
+
 # ganother-world
 
 Reference: https://fabiensanglard.net/anotherWorld_code_review/
 
 # EPICS
 
+- Bootstrap (package.json of GO? unit test? linting? $GOPATH? Crosscompile? Github CI Integration)
 - Resource Management / read MEMLIST.BIN
-- Setup Video (SDL?)
+- Setup Video and Audio (SDL2? https://github.com/veandco/go-sdl2)
 - VM parser
 - implement VM op codes (Polygons drawing)
 - Audio / Sound FX
