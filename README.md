@@ -51,3 +51,4 @@ Reference: https://fabiensanglard.net/anotherWorld_code_review/
 - GO111MODULE and modules?
 - https://vincent.bernat.ch/en/blog/2019-makefile-build-golang
 - https://github.com/golang/go/wiki/WebAssembly
+- https://golang.org/doc/effective_go.html
