@@ -7,13 +7,14 @@ Reference: https://fabiensanglard.net/anotherWorld_code_review/
 
 # ARCHITECTURE
 
-- split backend (parsing, interpreting) and frontend (rendering audio & video).
-- backend should build as lib so it can be reusable in a web app (WASM target) and
-- local assets are here for dev purpose only - they will go away. thread them as they will be downloaded
+- Split Backend (parsing, interpreting) and Frontend (rendering audio & video).
+- Backend should build as lib so it can be reusable in a web app (WASM target) or SDL2 app
+- Local assets are here for dev purpose only - they will go away. thread them as they will be downloaded
 
 # EPICS
 
-- Bootstrap (Github CI Integration)
+- ✓ Basic Project Bootstrap
+- Design GO library
 - Resource Management / read MEMLIST.BIN
 - Setup Video and Audio
 - VM parser

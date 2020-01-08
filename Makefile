@@ -15,11 +15,12 @@ GOFILES := $(wildcard *.go)
 RELEASE := -ldflags "-s -w -X gaw.hello=world"
 SRC := src/hello.go
 
-## build: build go binary
+## build: build go binary in dev mode
 build:
 	@echo "  >  BUILD"
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build $(SRC)
 
+## build-cross: cross compile project in release mode (without debug symbols)
 build-cross:
 	@env GOOS=js GOARCH=wasm go build -o gaw.js $(RELEASE) $(SRC)
 	@env GOOS=linux GOARCH=arm GOARM=7 go build -o gaw.lnx $(RELEASE) $(SRC)
