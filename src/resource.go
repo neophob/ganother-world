@@ -75,13 +75,19 @@ func printStatisticsForMemlistBin(resourceMap map[int]MemlistEntry) {
 	entryCount := 0
 	sizeCompressed, sizeUncompressed, compressedEntries := 0, 0, 0
 
+	var resourceTypeCount [10]int
+
 	for index, entry := range resourceMap {
-		fmt.Println("entry", index, entry)
+		fmt.Println(" entry", index, entry)
 		entryCount++
 		sizeUncompressed += int(entry.size)
 		sizeCompressed += int(entry.packedSize)
 		if entry.size != entry.packedSize {
 			compressedEntries++
+		}
+		entryType := entry.resourceType
+		if int(entryType) < len(resourceTypeCount) {
+			resourceTypeCount[entryType] = resourceTypeCount[entryType] + 1
 		}
 	}
 
@@ -93,12 +99,17 @@ func printStatisticsForMemlistBin(resourceMap map[int]MemlistEntry) {
 	fmt.Printf("Note: %.0f%% of resources are compressed.\n", math.Round(compressionRatio))
 	fmt.Println("")
 	fmt.Println("")
-	fmt.Println("Total size (uncompressed) :", sizeUncompressed)
-	fmt.Println("Total size (compressed)   :", sizeCompressed)
+	fmt.Printf("Total size (uncompressed) : %d bytes.\n", sizeUncompressed)
+	fmt.Printf("Total size (compressed)   : %d bytes.\n", sizeCompressed)
 	var compressionGain float64 = 100 * (1 - float64(sizeCompressed)/float64(sizeUncompressed))
 	fmt.Printf("Note: Overall compression gain is : %.0f%%.\n", math.Round(compressionGain))
 	fmt.Println("")
 	fmt.Println("")
+	for i := 0; i < len(resourceTypeCount); i++ {
+		if resourceTypeCount[i] > 0 {
+			fmt.Printf("Total %d          files: %d\n", i, resourceTypeCount[i])
+		}
+	}
 }
 
 func unmarshallingMemlistBin(data []byte) map[int]MemlistEntry {
