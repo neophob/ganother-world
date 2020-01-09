@@ -8,47 +8,21 @@ import (
 	"math"
 )
 
-type ResourceType int
-
 const (
-	RT_SOUND          ResourceType = 0
-	RT_MUSIC          ResourceType = 1
-	RT_POLY_ANIM      ResourceType = 2
-	RT_PALETTE        ResourceType = 3
-	RT_BYTECODE       ResourceType = 4
-	RT_POLY_CINEMATIC ResourceType = 5
-	RT_TODO           ResourceType = 6
-	RT_END            ResourceType = 255
-	RT_UNKNOWN        ResourceType = -1
+	RT_SOUND          int = 0
+	RT_MUSIC          int = 1
+	RT_POLY_ANIM      int = 2
+	RT_PALETTE        int = 3
+	RT_BYTECODE       int = 4
+	RT_POLY_CINEMATIC int = 5
+	RT_TODO           int = 6
+	RT_END            int = 255
+	MemlistEntrySize  int = 20
 )
 
-// TODO this is somehow not so DRY. maybe use iota?
-func getResourceType(resourceType byte) ResourceType {
-	switch resourceType {
-	case 0:
-		return RT_SOUND
-	case 1:
-		return RT_MUSIC
-	case 2:
-		return RT_POLY_ANIM
-	case 3:
-		return RT_PALETTE
-	case 4:
-		return RT_BYTECODE
-	case 5:
-		return RT_POLY_CINEMATIC
-	case 6:
-		return RT_TODO
-	case 255:
-		return RT_END
-	}
-	fmt.Println("unknown", resourceType)
-	return RT_UNKNOWN
-}
-
 type MemlistEntry struct {
-	state        uint8 //ofs: 0
-	resourceType ResourceType
+	state        uint8  //ofs: 0
+	resourceType uint8  //ofs: 1
 	bufPtr       uint8  //ofs: 2
 	rankNum      uint8  //ofs: 6
 	bankId       uint8  //ofs: 7
@@ -57,8 +31,6 @@ type MemlistEntry struct {
 	size         uint16 //ofs: 18
 }
 
-const MemlistEntrySize int = 20
-
 func unmarshallingMemlistBin(data []byte) map[int]MemlistEntry {
 	resourceMap := make(map[int]MemlistEntry)
 	resourceId := 0
@@ -66,7 +38,7 @@ func unmarshallingMemlistBin(data []byte) map[int]MemlistEntry {
 	for i := 0; i < len(data); i += MemlistEntrySize {
 		entry := MemlistEntry{
 			state:        data[i],
-			resourceType: getResourceType(data[i+1]),
+			resourceType: data[i+1],
 			bufPtr:       data[i+2],
 			rankNum:      data[i+6],
 			bankId:       data[i+7],

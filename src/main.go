@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"io/ioutil"
+	"os"
 )
 
 func main() {
 	data := readFile("./assets/memlist.bin")
 	resourceMap := unmarshallingMemlistBin(data)
 	printStatisticsForMemlistBin(resourceMap)
+
+	//loadEntryFromBank(resourceMap, 21)
 }
 
 func readFile(filename string) []byte {
