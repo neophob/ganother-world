@@ -69,8 +69,8 @@ func main() {
 		return
 	}
 
-	var count int = 0
-	sizePacked, sizeUncompressed := int(0), 0
+	var entryCount int = 0
+	sizePacked, sizeUncompressed, compressedEntries := int(0), 0, 0
 
 	for i := 0; i < len(data); i += MemlistEntrySize {
 		var entry = MemlistEntry{
@@ -78,19 +78,28 @@ func main() {
 			resourceType: getResourceType(data[i+1]),
 			rankNum:      data[i+6],
 			bankId:       data[i+7],
-			//bankOffset:		data[i + 7],
-			packedSize: toUint16(data[i+14], data[i+15]),
-			size:       toUint16(data[i+18], data[i+19]),
+			bankOffset:   toUint32(data[i+8], data[i+9], data[i+10], data[i+11]),
+			packedSize:   toUint16(data[i+14], data[i+15]),
+			size:         toUint16(data[i+18], data[i+19]),
 		}
-		fmt.Println("entry", count, entry)
-		count++
+		fmt.Println("entry", entryCount, entry)
+		entryCount++
 		sizeUncompressed += int(entry.size)
 		sizePacked += int(entry.packedSize)
+		if entry.size != entry.packedSize {
+			compressedEntries++
+		}
+
 	}
 	fmt.Println("sizeUncompressed", sizeUncompressed)
 	fmt.Println("sizePacked", sizePacked)
+	fmt.Println("compressedEntries", compressedEntries)
 }
 
-func toUint16(lo byte, hi byte) uint16 {
+func toUint16(lo, hi byte) uint16 {
 	return uint16(hi) | uint16(lo)<<8
+}
+
+func toUint32(b1, b2, b3, b4 byte) uint32 {
+	return uint32(b4) | uint32(b3)<<8 | uint32(b2)<<16 | uint32(b1)<<24
 }
