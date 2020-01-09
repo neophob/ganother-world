@@ -59,3 +59,11 @@ Reference: https://fabiensanglard.net/anotherWorld_code_review/
 - range clause
 - defer
 - interface
+
+# Getting started
+
+- Install go 1.13 https://golang.org/dl/
+- Check out repo
+- Run tests with `make test` (from root)
+- If you see `ok ...` you're good to go
+- Run `make` to build and then `./hello` to start
