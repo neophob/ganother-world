@@ -59,6 +59,39 @@ type MemlistEntry struct {
 
 const MemlistEntrySize int = 20
 
+func unmarshallingMemlistBin(data []byte) map[int]MemlistEntry {
+	resourceMap := make(map[int]MemlistEntry)
+	resourceId := 0
+
+	for i := 0; i < len(data); i += MemlistEntrySize {
+		entry := MemlistEntry{
+			state:        data[i],
+			resourceType: getResourceType(data[i+1]),
+			bufPtr:       data[i+2],
+			rankNum:      data[i+6],
+			bankId:       data[i+7],
+			bankOffset:   toUint32(data[i+8], data[i+9], data[i+10], data[i+11]),
+			packedSize:   toUint16(data[i+14], data[i+15]),
+			size:         toUint16(data[i+18], data[i+19]),
+		}
+		resourceMap[resourceId] = entry
+		resourceId++
+	}
+	return resourceMap
+}
+
+func loadEntryFromBank() {
+	// TODO will have to read a MemlistEntry from the bank file 0x01 - 0x0d
+}
+
+func toUint16(lo, hi byte) uint16 {
+	return uint16(hi) | uint16(lo)<<8
+}
+
+func toUint32(b1, b2, b3, b4 byte) uint32 {
+	return uint32(b4) | uint32(b3)<<8 | uint32(b2)<<16 | uint32(b1)<<24
+}
+
 func printStatisticsForMemlistBin(resourceMap map[int]MemlistEntry) {
 	entryCount := 0
 	sizeCompressed, sizeUncompressed, compressedEntries := 0, 0, 0
@@ -94,33 +127,4 @@ func printStatisticsForMemlistBin(resourceMap map[int]MemlistEntry) {
 			fmt.Printf("Total %d          files: %d\n", i, resourceTypeCount[i])
 		}
 	}
-}
-
-func unmarshallingMemlistBin(data []byte) map[int]MemlistEntry {
-	resourceMap := make(map[int]MemlistEntry)
-	resourceId := 0
-
-	for i := 0; i < len(data); i += MemlistEntrySize {
-		entry := MemlistEntry{
-			state:        data[i],
-			resourceType: getResourceType(data[i+1]),
-			bufPtr:       data[i+2],
-			rankNum:      data[i+6],
-			bankId:       data[i+7],
-			bankOffset:   toUint32(data[i+8], data[i+9], data[i+10], data[i+11]),
-			packedSize:   toUint16(data[i+14], data[i+15]),
-			size:         toUint16(data[i+18], data[i+19]),
-		}
-		resourceMap[resourceId] = entry
-		resourceId++
-	}
-	return resourceMap
-}
-
-func toUint16(lo, hi byte) uint16 {
-	return uint16(hi) | uint16(lo)<<8
-}
-
-func toUint32(b1, b2, b3, b4 byte) uint32 {
-	return uint32(b4) | uint32(b3)<<8 | uint32(b2)<<16 | uint32(b1)<<24
 }
