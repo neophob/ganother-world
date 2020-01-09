@@ -6,6 +6,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"math"
 )
 
 type ResourceType int
@@ -66,23 +67,38 @@ func main() {
 		return
 	}
 
-	entryCount := 0
-	sizePacked, sizeUncompressed, compressedEntries := int(0), 0, 0
 	resourceMap := unmarshallingMemlistBin(data)
+	printStatisticsForMemlistBin(resourceMap)
+}
+
+func printStatisticsForMemlistBin(resourceMap map[int]MemlistEntry) {
+	entryCount := 0
+	sizeCompressed, sizeUncompressed, compressedEntries := 0, 0, 0
 
 	for index, entry := range resourceMap {
 		fmt.Println("entry", index, entry)
 		entryCount++
 		sizeUncompressed += int(entry.size)
-		sizePacked += int(entry.packedSize)
+		sizeCompressed += int(entry.packedSize)
 		if entry.size != entry.packedSize {
 			compressedEntries++
 		}
 	}
 
-	fmt.Println("sizeUncompressed", sizeUncompressed)
-	fmt.Println("sizePacked", sizePacked)
-	fmt.Println("compressedEntries", compressedEntries)
+	fmt.Println("===")
+	fmt.Println("Total # resources:", len(resourceMap))
+	fmt.Println("Compressed       :", compressedEntries)
+	fmt.Println("Uncompressed     :", len(resourceMap)-compressedEntries)
+	var compressionRatio float64 = 100 / float64(len(resourceMap)) * float64(compressedEntries)
+	fmt.Printf("Note: %.0f%% of resources are compressed.\n", math.Round(compressionRatio))
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println("Total size (uncompressed) :", sizeUncompressed)
+	fmt.Println("Total size (compressed)   :", sizeCompressed)
+	var compressionGain float64 = 100 * (1 - float64(sizeCompressed)/float64(sizeUncompressed))
+	fmt.Printf("Note: Overall compression gain is : %.0f%%.\n", math.Round(compressionGain))
+	fmt.Println("")
+	fmt.Println("")
 }
 
 func unmarshallingMemlistBin(data []byte) map[int]MemlistEntry {
