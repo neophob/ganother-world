@@ -66,11 +66,31 @@ func main() {
 		return
 	}
 
-	var entryCount int = 0
+	entryCount := 0
 	sizePacked, sizeUncompressed, compressedEntries := int(0), 0, 0
+	resourceMap := unmarshallingMemlistBin(data)
+
+	for index, entry := range resourceMap {
+		fmt.Println("entry", index, entry)
+		entryCount++
+		sizeUncompressed += int(entry.size)
+		sizePacked += int(entry.packedSize)
+		if entry.size != entry.packedSize {
+			compressedEntries++
+		}
+	}
+
+	fmt.Println("sizeUncompressed", sizeUncompressed)
+	fmt.Println("sizePacked", sizePacked)
+	fmt.Println("compressedEntries", compressedEntries)
+}
+
+func unmarshallingMemlistBin(data []byte) map[int]MemlistEntry {
+	resourceMap := make(map[int]MemlistEntry)
+	resourceId := 0
 
 	for i := 0; i < len(data); i += MemlistEntrySize {
-		var entry = MemlistEntry{
+		entry := MemlistEntry{
 			state:        data[i],
 			resourceType: getResourceType(data[i+1]),
 			bufPtr:       data[i+2],
@@ -80,18 +100,10 @@ func main() {
 			packedSize:   toUint16(data[i+14], data[i+15]),
 			size:         toUint16(data[i+18], data[i+19]),
 		}
-		fmt.Println("entry", entryCount, entry)
-		entryCount++
-		sizeUncompressed += int(entry.size)
-		sizePacked += int(entry.packedSize)
-		if entry.size != entry.packedSize {
-			compressedEntries++
-		}
-
+		resourceMap[resourceId] = entry
+		resourceId++
 	}
-	fmt.Println("sizeUncompressed", sizeUncompressed)
-	fmt.Println("sizePacked", sizePacked)
-	fmt.Println("compressedEntries", compressedEntries)
+	return resourceMap
 }
 
 func toUint16(lo, hi byte) uint16 {
