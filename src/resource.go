@@ -9,15 +9,7 @@ import (
 )
 
 const (
-	RT_SOUND          int = 0
-	RT_MUSIC          int = 1
-	RT_POLY_ANIM      int = 2
-	RT_PALETTE        int = 3
-	RT_BYTECODE       int = 4
-	RT_POLY_CINEMATIC int = 5
-	RT_TODO           int = 6
-	RT_END            int = 255
-	MemlistEntrySize  int = 20
+	MemlistEntrySize int = 20
 )
 
 type MemlistEntry struct {
@@ -96,6 +88,16 @@ func printStatisticsForMemlistBin(resourceMap map[int]MemlistEntry) {
 	fmt.Printf("Note: Overall compression gain is : %.0f%%.\n\n\n", math.Round(compressionGain))
 	for i := 0; i < len(resourceTypeCount); i++ {
 		if resourceTypeCount[i] > 0 {
+			// TODO name me:
+			/* 	RT_SOUND          int = 0
+			RT_MUSIC          int = 1
+			RT_POLY_ANIM      int = 2
+			RT_PALETTE        int = 3
+			RT_BYTECODE       int = 4
+			RT_POLY_CINEMATIC int = 5
+			RT_TODO           int = 6
+			RT_END            int = 255
+			*/
 			fmt.Printf("Total %d          files: %d\n", i, resourceTypeCount[i])
 		}
 	}
