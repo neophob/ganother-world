@@ -84,15 +84,11 @@ func printStatisticsForMemlistBin(resourceMap map[int]MemlistEntry) {
 	fmt.Println("Compressed       :", compressedEntries)
 	fmt.Println("Uncompressed     :", len(resourceMap)-compressedEntries)
 	var compressionRatio float64 = 100 / float64(len(resourceMap)) * float64(compressedEntries)
-	fmt.Printf("Note: %.0f%% of resources are compressed.\n", math.Round(compressionRatio))
-	fmt.Println("")
-	fmt.Println("")
+	fmt.Printf("Note: %.0f%% of resources are compressed.\n\n\n", math.Round(compressionRatio))
 	fmt.Printf("Total size (uncompressed) : %d bytes.\n", sizeUncompressed)
 	fmt.Printf("Total size (compressed)   : %d bytes.\n", sizeCompressed)
 	var compressionGain float64 = 100 * (1 - float64(sizeCompressed)/float64(sizeUncompressed))
-	fmt.Printf("Note: Overall compression gain is : %.0f%%.\n", math.Round(compressionGain))
-	fmt.Println("")
-	fmt.Println("")
+	fmt.Printf("Note: Overall compression gain is : %.0f%%.\n\n\n", math.Round(compressionGain))
 	for i := 0; i < len(resourceTypeCount); i++ {
 		if resourceTypeCount[i] > 0 {
 			fmt.Printf("Total %d          files: %d\n", i, resourceTypeCount[i])
