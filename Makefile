@@ -35,7 +35,7 @@ build-cross:
 
 ## test: run unit tests
 test:
-	@go test $(SRCDIR)
+	@go test -cover -v $(SRCDIR)
 
 ## doc: create project documentation
 doc:
