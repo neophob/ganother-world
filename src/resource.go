@@ -5,7 +5,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"math"
 )
 
@@ -59,17 +58,6 @@ type MemlistEntry struct {
 }
 
 const MemlistEntrySize int = 20
-
-func main() {
-	data, err := ioutil.ReadFile("./assets/memlist.bin")
-	if err != nil {
-		fmt.Println("File reading error", err)
-		return
-	}
-
-	resourceMap := unmarshallingMemlistBin(data)
-	printStatisticsForMemlistBin(resourceMap)
-}
 
 func printStatisticsForMemlistBin(resourceMap map[int]MemlistEntry) {
 	entryCount := 0
