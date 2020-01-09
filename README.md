@@ -59,3 +59,4 @@ Reference: https://fabiensanglard.net/anotherWorld_code_review/
 - range clause
 - defer
 - interface
+- Method (bound functions?)

@@ -60,18 +60,17 @@ type MemlistEntry struct {
 	size uint16 //ofs: 18
 }
 
-const MemlistEntrySize = 20
+const MemlistEntrySize int = 20
 
 func main() {
-	data, err := ioutil.ReadFile("../assets/memlist.bin")
+	data, err := ioutil.ReadFile("./assets/memlist.bin")
 	if err != nil {
 		fmt.Println("File reading error", err)
 		return
 	}
 
-	var count = 0
-	var sizePacked = 0
-	var sizeUncompressed = 0
+	var count int = 0
+	sizePacked, sizeUncompressed := int(0), 0
 
 	for i := 0; i < len(data); i += MemlistEntrySize {
 		var entry = MemlistEntry{

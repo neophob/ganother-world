@@ -39,7 +39,7 @@ test:
 
 ## doc: create project documentation
 doc:
-	@go doc $(SRCDIR)
+	@go doc -all $(SRCDIR)
 
 .PHONY: help
 all: help
