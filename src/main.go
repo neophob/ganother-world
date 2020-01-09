@@ -11,7 +11,7 @@ func main() {
 	resourceMap := unmarshallingMemlistBin(data)
 	printStatisticsForMemlistBin(resourceMap)
 
-	//loadEntryFromBank(resourceMap, 21)
+	loadEntryFromBank(resourceMap, 21)
 }
 
 func readFile(filename string) []byte {

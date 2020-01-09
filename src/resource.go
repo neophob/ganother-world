@@ -44,7 +44,7 @@ func unmarshallingMemlistBin(data []byte) map[int]MemlistEntry {
 	return resourceMap
 }
 
-func loadEntryFromBank() {
+func loadEntryFromBank(resourceMap map[int]MemlistEntry, index int) {
 	// TODO will have to read a MemlistEntry from the bank file 0x01 - 0x0d
 }
 
