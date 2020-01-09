@@ -14,6 +14,7 @@ GOFILES := $(wildcard *.go)
 # -X add string value definition of the form importpath.name=value
 RELEASE := -ldflags "-s -w -X gaw.hello=world"
 SRC := src/resource.go
+SRCDIR := ./src
 
 ## build: build go binary in dev mode
 build:
@@ -32,8 +33,13 @@ build-cross:
 	@env GOOS=darwin GOARCH=amd64 go build -o gaw.osx $(RELEASE) $(SRC)
 	#env GOOS=android GOARCH=arm64 go build -o gaw.and
 
+## test: run unit tests
 test:
-	@go test ./src
+	@go test $(SRCDIR)
+
+## doc: create project documentation
+doc:
+	@go doc $(SRCDIR)
 
 .PHONY: help
 all: help

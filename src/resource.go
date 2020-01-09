@@ -1,3 +1,6 @@
+/*
+This is the text used for go doc
+*/
 package main
 
 import (
