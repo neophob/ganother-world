@@ -49,15 +49,12 @@ func getResourceType(resourceType byte) ResourceType {
 type MemlistEntry struct {
 	state        uint8 //ofs: 0
 	resourceType ResourceType
-	bufPtr       uint8 //ofs: 2
-	//unknownOffset4  uint16 //ofs: 3
-	rankNum    uint8  //ofs: 6
-	bankId     uint8  //ofs: 7
-	bankOffset uint32 //ofs: 8
-	//unknownOffset8  uint16 //ofs: 11
-	packedSize uint16 //ofs: 14
-	//unknownOffset10 uint16 //ofs: 15
-	size uint16 //ofs: 18
+	bufPtr       uint8  //ofs: 2
+	rankNum      uint8  //ofs: 6
+	bankId       uint8  //ofs: 7
+	bankOffset   uint32 //ofs: 8
+	packedSize   uint16 //ofs: 14
+	size         uint16 //ofs: 18
 }
 
 const MemlistEntrySize int = 20
@@ -76,6 +73,7 @@ func main() {
 		var entry = MemlistEntry{
 			state:        data[i],
 			resourceType: getResourceType(data[i+1]),
+			bufPtr:       data[i+2],
 			rankNum:      data[i+6],
 			bankId:       data[i+7],
 			bankOffset:   toUint32(data[i+8], data[i+9], data[i+10], data[i+11]),
