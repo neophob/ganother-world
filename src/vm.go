@@ -1,6 +1,7 @@
 package main
 
 const (
+	//TODO rename me to channel
 	VM_NUM_THREADS   int = 64
 	VM_NUM_VARIABLES int = 256
 
@@ -41,7 +42,7 @@ type VMState struct {
 }
 
 func createNewState() VMState {
-	state := VMState{ gamePart: -1 }
+	state := VMState{gamePart: -1}
 	//WTF? whats this? -> create const
 	state.variables[0x54] = 0x81
 	state.variables[VM_VARIABLE_RANDOM_SEED] = 42
@@ -64,5 +65,8 @@ func setupGamePart(state VMState, newGamePart int) VMState {
 	for i := range state.threadData {
 		state.threadData[i] = 0xFF
 	}
+
+	//TODO WHY?
+	state.threadData[0] = 0
 	return state
 }

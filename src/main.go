@@ -41,7 +41,7 @@ func readFile(filename string) []byte {
 func createBankMap(assetPath string) map[int][]byte {
 	bankFilesMap := make(map[int][]byte)
 	for i := 0x01; i < 0x0e; i++ {
-		name := fmt.Sprintf("%sbank0%x", assetPath, i)
+		name := fmt.Sprintf("%sbank%02x", assetPath, i)
 		log.Println("- load file", name)
 		entry := readFile(name)
 		bankFilesMap[i] = entry
