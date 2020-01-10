@@ -19,7 +19,7 @@ Reference: https://fabiensanglard.net/anotherWorld_code_review/ and http://www.a
 - Setup Video and Audio
 - VM parser
 - implement VM op codes (Polygons drawing)
-- Audio / Sound FX
+- Audio / Sound FX (Protracker module)
 
 # GO
 

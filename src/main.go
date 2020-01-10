@@ -6,6 +6,7 @@ import (
 	"log"
 	"math"
 	"os"
+	"sort"
 )
 
 func main() {
@@ -53,13 +54,13 @@ func createBankMap(assetPath string) map[int][]byte {
 
 func printResourceStats(memlistStatistic MemlistStatistic) {
 	resourceNameMap := make(map[int]string)
-	resourceNameMap[0] = "RT_SOUND   "
-	resourceNameMap[1] = "RT_MUSIC   "
+	resourceNameMap[0] = "RT_SOUND"
+	resourceNameMap[1] = "RT_MUSIC"
 	resourceNameMap[2] = "RT_POLY_ANIM"
 	resourceNameMap[3] = "RT_PALETTE"
 	resourceNameMap[4] = "RT_BYTECODE"
 	resourceNameMap[5] = "RT_POLY_CINEMATIC"
-	resourceNameMap[6] = "RT_VIDEO2  "
+	resourceNameMap[6] = "RT_VIDEO2"
 
 	log.Println(memlistStatistic)
 	fmt.Println("Total # resources:", memlistStatistic.entryCount)
@@ -71,13 +72,25 @@ func printResourceStats(memlistStatistic MemlistStatistic) {
 	fmt.Printf("Total size (compressed)   : %d bytes.\n", memlistStatistic.sizeCompressed)
 	var compressionGain float64 = 100 * (1 - float64(memlistStatistic.sizeCompressed)/float64(memlistStatistic.sizeUncompressed))
 	fmt.Printf("Note: Overall compression gain is : %.0f%%.\n\n", math.Round(compressionGain))
-	for k := range memlistStatistic.resourceTypeCount {
-		if memlistStatistic.resourceTypeCount[k] > 0 {
-			resourceName := resourceNameMap[k]
-			if len(resourceName) < 1 {
-				resourceName = fmt.Sprintf("RT_UNKOWNN_%d", k)
-			}
-			fmt.Printf("Total %s\t\tfiles: %d\n", resourceName, memlistStatistic.resourceTypeCount[k])
+
+	sortedKeys := sortedKeys(memlistStatistic.resourceTypeMap)
+	for i := 0; i < len(sortedKeys); i++ {
+		k := sortedKeys[i]
+		resourceName := resourceNameMap[k]
+		if len(resourceName) < 1 {
+			resourceName = fmt.Sprintf("RT_UNKOWNN_%d", k)
 		}
+		fmt.Printf("Total %20s, files: %d\n", resourceName, memlistStatistic.resourceTypeMap[k])
 	}
+}
+
+func sortedKeys(m map[int]int) []int {
+	keys := make([]int, len(m))
+	i := 0
+	for k := range m {
+		keys[i] = k
+		i++
+	}
+	sort.Ints(keys)
+	return keys
 }

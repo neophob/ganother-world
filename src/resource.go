@@ -23,7 +23,7 @@ type MemlistEntry struct {
 }
 
 type MemlistStatistic struct {
-	resourceTypeCount map[int]int
+	resourceTypeMap   map[int]int
 	entryCount        int
 	sizeCompressed    int
 	sizeUncompressed  int
@@ -38,7 +38,7 @@ type Assets struct {
 
 func unmarshallingMemlistBin(data []byte) (map[int]MemlistEntry, MemlistStatistic) {
 	resourceMap := make(map[int]MemlistEntry)
-	memlistStatistic := MemlistStatistic{resourceTypeCount: make(map[int]int)}
+	memlistStatistic := MemlistStatistic{resourceTypeMap: make(map[int]int)}
 
 	for i := 0; i < len(data); i += MemlistEntrySize {
 		entry := MemlistEntry{
@@ -51,11 +51,12 @@ func unmarshallingMemlistBin(data []byte) (map[int]MemlistEntry, MemlistStatisti
 			packedSize:   toUint16BE(data[i+14], data[i+15]),
 			size:         toUint16BE(data[i+18], data[i+19]),
 		}
+		fmt.Println(memlistStatistic.entryCount, ":", entry)
 		resourceMap[memlistStatistic.entryCount] = entry
 		memlistStatistic.entryCount++
 		memlistStatistic.sizeCompressed += int(entry.packedSize)
 		memlistStatistic.sizeUncompressed += int(entry.size)
-		memlistStatistic.resourceTypeCount[int(entry.resourceType)]++
+		memlistStatistic.resourceTypeMap[int(entry.resourceType)]++
 		if entry.size != entry.packedSize {
 			memlistStatistic.compressedEntries++
 		}
