@@ -5,7 +5,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 )
 
 const (
@@ -22,15 +21,22 @@ type MemlistEntry struct {
 	size         uint16 //ofs: 18
 }
 
-type Assets struct {
-	memList map[int]MemlistEntry
-	bank  map[int][]byte
+type MemlistStatistic struct {
+	resourceTypeCount map[int]int
+	entryCount        int
+	sizeCompressed    int
+	sizeUncompressed  int
+	compressedEntries int
 }
 
-//TODO also return statistics here, get rid of printStatisticsForMemlistBin
-func unmarshallingMemlistBin(data []byte) map[int]MemlistEntry {
+type Assets struct {
+	memList map[int]MemlistEntry
+	bank    map[int][]byte
+}
+
+func unmarshallingMemlistBin(data []byte) (map[int]MemlistEntry, MemlistStatistic) {
 	resourceMap := make(map[int]MemlistEntry)
-	resourceId := 0
+	memlistStatistic := MemlistStatistic{ resourceTypeCount: make(map[int]int)}
 
 	for i := 0; i < len(data); i += MemlistEntrySize {
 		entry := MemlistEntry{
@@ -42,10 +48,16 @@ func unmarshallingMemlistBin(data []byte) map[int]MemlistEntry {
 			packedSize:   toUint16(data[i+14], data[i+15]),
 			size:         toUint16(data[i+18], data[i+19]),
 		}
-		resourceMap[resourceId] = entry
-		resourceId++
+		resourceMap[memlistStatistic.entryCount] = entry
+		memlistStatistic.entryCount++
+		memlistStatistic.sizeCompressed += int(entry.packedSize)
+		memlistStatistic.sizeUncompressed += int(entry.size)
+		memlistStatistic.resourceTypeCount[int(entry.resourceType)]++
+		if entry.size != entry.packedSize {
+			memlistStatistic.compressedEntries++
+		}
 	}
-	return resourceMap
+	return resourceMap, memlistStatistic
 }
 
 func loadEntryFromBank(assets Assets, index int) {
@@ -64,37 +76,3 @@ func toUint32(b1, b2, b3, b4 byte) uint32 {
 	return uint32(b4) | uint32(b3)<<8 | uint32(b2)<<16 | uint32(b1)<<24
 }
 
-func printStatisticsForMemlistBin(resourceMap map[int]MemlistEntry) {
-	var resourceTypeCount [10]int
-	entryCount, sizeCompressed, sizeUncompressed, compressedEntries := 0, 0, 0, 0
-
-	for index, entry := range resourceMap {
-		fmt.Println(" entry", index, entry)
-		entryCount++
-		sizeUncompressed += int(entry.size)
-		sizeCompressed += int(entry.packedSize)
-		if entry.size != entry.packedSize {
-			compressedEntries++
-		}
-		entryType := entry.resourceType
-		if int(entryType) < len(resourceTypeCount) {
-			resourceTypeCount[entryType] = resourceTypeCount[entryType] + 1
-		}
-	}
-
-	fmt.Println("===")
-	fmt.Println("Total # resources:", len(resourceMap))
-	fmt.Println("Compressed       :", compressedEntries)
-	fmt.Println("Uncompressed     :", len(resourceMap)-compressedEntries)
-	var compressionRatio float64 = 100 / float64(len(resourceMap)) * float64(compressedEntries)
-	fmt.Printf("Note: %.0f%% of resources are compressed.\n\n\n", math.Round(compressionRatio))
-	fmt.Printf("Total size (uncompressed) : %d bytes.\n", sizeUncompressed)
-	fmt.Printf("Total size (compressed)   : %d bytes.\n", sizeCompressed)
-	var compressionGain float64 = 100 * (1 - float64(sizeCompressed)/float64(sizeUncompressed))
-	fmt.Printf("Note: Overall compression gain is : %.0f%%.\n\n\n", math.Round(compressionGain))
-	for i := 0; i < len(resourceTypeCount); i++ {
-		if resourceTypeCount[i] > 0 {
-			fmt.Printf("Total %d          files: %d\n", i, resourceTypeCount[i])
-		}
-	}
-}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math"
 	"os"
 )
 
@@ -11,8 +12,8 @@ func main() {
 	log.SetFlags(log.Lshortfile | log.Lmicroseconds)
 	log.Println("- load memlist.bin")
 	data := readFile("./assets/memlist.bin")
-	resourceMap := unmarshallingMemlistBin(data)
-	printStatisticsForMemlistBin(resourceMap)
+	resourceMap, resourceStatistics := unmarshallingMemlistBin(data)
+	printResourceStats(resourceStatistics)
 
 	bankFilesMap := createBankMap("./assets/")
 	assets := Assets{resourceMap, bankFilesMap}
@@ -39,4 +40,22 @@ func createBankMap(assetPath string) map[int][]byte {
 		bankFilesMap[i] = entry
 	}
 	return bankFilesMap
+}
+
+func printResourceStats(memlistStatistic MemlistStatistic) {
+	log.Println(memlistStatistic)
+	fmt.Println("Total # resources:", memlistStatistic.entryCount)
+	fmt.Println("Compressed       :", memlistStatistic.compressedEntries)
+	fmt.Println("Uncompressed     :", memlistStatistic.entryCount-memlistStatistic.compressedEntries)
+	var compressionRatio float64 = 100 / float64(memlistStatistic.entryCount) * float64(memlistStatistic.compressedEntries)
+	fmt.Printf("Note: %.0f%% of resources are compressed.\n\n", math.Round(compressionRatio))
+	fmt.Printf("Total size (uncompressed) : %d bytes.\n", memlistStatistic.sizeUncompressed)
+	fmt.Printf("Total size (compressed)   : %d bytes.\n", memlistStatistic.sizeCompressed)
+	var compressionGain float64 = 100 * (1 - float64(memlistStatistic.sizeCompressed)/float64(memlistStatistic.sizeUncompressed))
+	fmt.Printf("Note: Overall compression gain is : %.0f%%.\n\n", math.Round(compressionGain))
+	for i := 0; i < len(memlistStatistic.resourceTypeCount); i++ {
+		if memlistStatistic.resourceTypeCount[i] > 0 {
+			fmt.Printf("Total %d          files: %d\n", i, memlistStatistic.resourceTypeCount[i])
+		}
+	}
 }
