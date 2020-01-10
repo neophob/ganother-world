@@ -54,9 +54,10 @@ func createNewState() VMState {
 	return state
 }
 
-func setupGamePart(state VMState, newGamePart int) VMState {
+//TODO using a pointer - its own state can be modified. using the value, state does not change!
+func (state *VMState) setupGamePart(newGamePart int) {
 	if state.gamePart == newGamePart {
-		return state
+		return
 	}
 	if newGamePart < GAME_PART_FIRST || newGamePart > GAME_PART_LAST {
 		panic("INVALID_GAME_PART")
@@ -73,7 +74,6 @@ func setupGamePart(state VMState, newGamePart int) VMState {
 
 	//TODO WHY?
 	state.channelData[0] = 0
-	return state
 }
 
 // Run the Virtual Machine for every active threads
@@ -92,5 +92,79 @@ func mainLoop(state VMState) {
 			//state.channelData[channelId] = _scriptPtr.pc - res->segBytecode;
 		}
 	}
+}
 
+func executeOp(code []byte) {
+	pc := 0
+	step(pc, code)
+}
+
+func step(pc int, code []byte) {
+	opcode := code[pc]
+	switch opcode {
+	case 0x00:
+		fmt.Println("op_movConst")
+		//		uint8 variableId = _scriptPtr.fetchByte();
+		//		int16 value = _scriptPtr.fetchWord();
+
+	case 0x01:
+		fmt.Println("op_mov")
+	case 0x02:
+		fmt.Println("op_add")
+	case 0x03:
+		fmt.Println("op_addConst")
+
+	case 0x04:
+		fmt.Println("op_call")
+	case 0x05:
+		fmt.Println("op_ret")
+	case 0x06:
+		fmt.Println("op_pauseThread")
+	case 0x07:
+		fmt.Println("op_jmp")
+
+	case 0x08:
+		fmt.Println("op_setSetVect")
+	case 0x09:
+		fmt.Println("op_jnz")
+	case 0x0A:
+		fmt.Println("op_condJmp")
+	case 0x0B:
+		fmt.Println("op_setPalette")
+
+	case 0x0C:
+		fmt.Println("op_resetThread")
+	case 0x0D:
+		fmt.Println("op_selectVideoPage")
+	case 0x0E:
+		fmt.Println("op_fillVideoPage")
+	case 0x0F:
+		fmt.Println("op_copyVideoPage")
+
+	case 0x10:
+		fmt.Println("op_blitFramebuffer")
+	case 0x11:
+		fmt.Println("op_killThread")
+	case 0x12:
+		fmt.Println("op_drawString")
+	case 0x13:
+		fmt.Println("op_sub")
+
+	case 0x14:
+		fmt.Println("op_and")
+	case 0x15:
+		fmt.Println("op_or")
+	case 0x16:
+		fmt.Println("op_shl")
+	case 0x17:
+		fmt.Println("op_shr")
+
+	case 0x18:
+		fmt.Println("op_playSound")
+	case 0x19:
+		fmt.Println("op_updateMemList")
+	case 0x1A:
+		fmt.Println("op_playMusic")
+
+	}
 }

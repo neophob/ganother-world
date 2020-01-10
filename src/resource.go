@@ -36,6 +36,17 @@ type Assets struct {
 	bank      map[int][]byte
 }
 
+// this is a function for the Assets struct
+func (assets Assets) loadEntryFromBank(index int) []byte {
+	memlistEntry := assets.memList[index]
+	bank := assets.bank[int(memlistEntry.bankId)]
+	fmt.Printf("Bank %d size %d, offset %v\n", index, len(bank), memlistEntry)
+	fmt.Println("slice", memlistEntry.bankOffset, memlistEntry.size)
+	ofs := int(memlistEntry.bankOffset)
+	result := bank[ofs : ofs+int(memlistEntry.size)]
+	return result
+}
+
 func unmarshallingMemlistBin(data []byte) (map[int]MemlistEntry, MemlistStatistic) {
 	resourceMap := make(map[int]MemlistEntry)
 	memlistStatistic := MemlistStatistic{resourceTypeMap: make(map[int]int)}
@@ -51,11 +62,12 @@ func unmarshallingMemlistBin(data []byte) (map[int]MemlistEntry, MemlistStatisti
 			packedSize:   toUint16BE(data[i+14], data[i+15]),
 			size:         toUint16BE(data[i+18], data[i+19]),
 		}
+		// Bail out when last entry is found
 		if entry.state == 0xFF {
-			// Bail out when last entry is found
 			break
 		}
-		fmt.Printf("R:%#02x, %-17s size=%5d  bank=%2d  offset=%6d\n", memlistStatistic.entryCount, getResourceTypeName(int(entry.resourceType)), entry.size, entry.bankId, entry.bankOffset)
+		fmt.Printf("R:%#02x, %-17s size=%5d  bank=%2d  offset=%6d\n", memlistStatistic.entryCount,
+			getResourceTypeName(int(entry.resourceType)), entry.size, entry.bankId, entry.bankOffset)
 		resourceMap[memlistStatistic.entryCount] = entry
 		memlistStatistic.entryCount++
 		memlistStatistic.sizeCompressed += int(entry.packedSize)
@@ -68,13 +80,6 @@ func unmarshallingMemlistBin(data []byte) (map[int]MemlistEntry, MemlistStatisti
 	return resourceMap, memlistStatistic
 }
 
-func loadEntryFromBank(assets Assets, index int) {
-	memlistEntry := assets.memList[index]
-	bank := assets.bank[int(memlistEntry.bankId)]
-	fmt.Printf("Bank %d size %d, offset %d\n", index, len(bank), memlistEntry.bankOffset)
-	fmt.Println(memlistEntry)
-}
-
 func toUint16BE(lo, hi byte) uint16 {
 	return uint16(hi) | uint16(lo)<<8
 }
@@ -85,7 +90,7 @@ func toUint32BE(b1, b2, b3, b4 byte) uint32 {
 
 func getResourceTypeName(id int) string {
 	resourceNames := [...]string{"RT_SOUND", "RT_MUSIC", "RT_POLY_ANIM", "RT_PALETTE", "RT_BYTECODE", "RT_POLY_CINEMATIC", "RT_VIDEO2"}
-	if id>=0 && id<len(resourceNames) {
+	if id >= 0 && id < len(resourceNames) {
 		return resourceNames[id]
 	}
 	return ""

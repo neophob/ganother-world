@@ -1,7 +1,5 @@
 package main
 
-// docs https://golang.org/pkg/testing/
-
 import (
 	"testing"
 )

@@ -21,15 +21,16 @@ func main() {
 	assets := Assets{resourceMap, gameParts, bankFilesMap}
 
 	log.Println("- load bytecode, resource 0x21")
-	loadEntryFromBank(assets, 21)
+	bytecode := assets.loadEntryFromBank(21)
 
 	log.Println("- create state")
 	vmState := createNewState()
-	vmState = setupGamePart(vmState, GAME_PART1)
+	vmState.setupGamePart(GAME_PART1)
 	log.Println(vmState)
 
 	//start endless loop
 	mainLoop(vmState)
+	executeOp(bytecode)
 }
 
 func readFile(filename string) []byte {
