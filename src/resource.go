@@ -55,7 +55,7 @@ func unmarshallingMemlistBin(data []byte) (map[int]MemlistEntry, MemlistStatisti
 			// Bail out when last entry is found
 			break
 		}
-		fmt.Printf("R:%#02x, %-17s size=%5d\n", memlistStatistic.entryCount, getResourceTypeName(int(entry.resourceType)), entry.size)
+		fmt.Printf("R:%#02x, %-17s size=%5d, bank=%d\n", memlistStatistic.entryCount, getResourceTypeName(int(entry.resourceType)), entry.size, entry.bankId)
 		resourceMap[memlistStatistic.entryCount] = entry
 		memlistStatistic.entryCount++
 		memlistStatistic.sizeCompressed += int(entry.packedSize)
