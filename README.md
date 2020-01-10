@@ -15,7 +15,7 @@ Reference: https://fabiensanglard.net/anotherWorld_code_review/
 
 - ✓ Basic Project Bootstrap
 - Design GO library
-- Resource Management / read MEMLIST.BIN
+- Resource Management: read MEMLIST.BIN, read resources
 - Setup Video and Audio
 - VM parser
 - implement VM op codes (Polygons drawing)
@@ -59,6 +59,7 @@ Reference: https://fabiensanglard.net/anotherWorld_code_review/
 - range clause
 - defer
 - interface
+- Method (bound functions?)
 
 # Getting started
 
