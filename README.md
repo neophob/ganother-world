@@ -62,8 +62,8 @@ Reference: https://fabiensanglard.net/anotherWorld_code_review/
 
 # Getting started
 
+- Install make (`brew install make`?)
 - Install go 1.13 https://golang.org/dl/
 - Check out repo
-- Run tests with `make test` (from root)
-- If you see `ok ...` you're good to go
-- Run `make` to build and then `./hello` to start
+- Run `make` to build, if it's green you're good
+- Use `make help` for more
