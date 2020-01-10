@@ -120,62 +120,107 @@ func step(pc int, code []byte) {
 		//		int16 value = _scriptPtr.fetchWord();
 	case 0x01:
 		fmt.Println("op_mov")
+		//uint8_t dstVariableId = _scriptPtr.fetchByte();
+		//uint8_t srcVariableId = _scriptPtr.fetchByte();
 	case 0x02:
 		fmt.Println("op_add")
+		//uint8_t dstVariableId = _scriptPtr.fetchByte();
+		//uint8_t srcVariableId = _scriptPtr.fetchByte();
 	case 0x03:
 		fmt.Println("op_addConst")
+		//uint8_t variableId = _scriptPtr.fetchByte();
+		//int16_t value = _scriptPtr.fetchWord();
 
 	case 0x04:
 		fmt.Println("op_call")
+		//uint16_t offset = _scriptPtr.fetchWord();
 	case 0x05:
 		fmt.Println("op_ret")
 	case 0x06:
 		fmt.Println("op_pauseThread")
 	case 0x07:
 		fmt.Println("op_jmp")
+		//		uint16_t pcOffset = _scriptPtr.fetchWord();
+		//		debug(DBG_VM, "VirtualMachine::op_jmp(0x%02X)", pcOffset);
+		//		_scriptPtr.pc = res->segBytecode + pcOffset;
 
 	case 0x08:
-		fmt.Println("op_setSetVect")
+		fmt.Println("op_setVect")
+		//		uint8_t threadId = _scriptPtr.fetchByte();
+		//		uint16_t pcOffsetRequested = _scriptPtr.fetchWord();
 	case 0x09:
 		fmt.Println("op_jnz")
+		//		uint8_t i = _scriptPtr.fetchByte();
+		//	  _scriptPtr.fetchWord();
 	case 0x0A:
 		fmt.Println("op_condJmp")
 	case 0x0B:
 		fmt.Println("op_setPalette")
+		//		uint16_t paletteId = _scriptPtr.fetchWord();
 
 	case 0x0C:
 		fmt.Println("op_resetThread")
+		//		uint8_t threadId = _scriptPtr.fetchByte();
+		//		uint8_t i =        _scriptPtr.fetchByte();
 	case 0x0D:
 		fmt.Println("op_selectVideoPage")
+		//		uint8_t frameBufferId = _scriptPtr.fetchByte();
 	case 0x0E:
 		fmt.Println("op_fillVideoPage")
+		//		uint8_t pageId = _scriptPtr.fetchByte();
+		//		uint8_t color = _scriptPtr.fetchByte()
 	case 0x0F:
 		fmt.Println("op_copyVideoPage")
+		//		uint8_t srcPageId = _scriptPtr.fetchByte();
+		//		uint8_t dstPageId = _scriptPtr.fetchByte();
 
 	case 0x10:
 		fmt.Println("op_blitFramebuffer")
+		//		uint8_t pageId = _scriptPtr.fetchByte();
 	case 0x11:
 		fmt.Println("op_killThread")
 	case 0x12:
 		fmt.Println("op_drawString")
+		//		uint16_t stringId = _scriptPtr.fetchWord();
+		//		uint16_t x = _scriptPtr.fetchByte();
+		//		uint16_t y = _scriptPtr.fetchByte();
+		//		uint16_t color = _scriptPtr.fetchByte();
 	case 0x13:
 		fmt.Println("op_sub")
+		//		uint8_t i = _scriptPtr.fetchByte();
+		//		uint8_t j = _scriptPtr.fetchByte();
 
 	case 0x14:
 		fmt.Println("op_and")
+		//		uint8_t variableId = _scriptPtr.fetchByte();
+		//		uint16_t n = _scriptPtr.fetchWord();
 	case 0x15:
 		fmt.Println("op_or")
+		//		uint8_t variableId = _scriptPtr.fetchByte();
+		//		uint16_t value = _scriptPtr.fetchWord();
 	case 0x16:
 		fmt.Println("op_shl")
+		//		uint8_t variableId = _scriptPtr.fetchByte();
+		//		uint16_t leftShiftValue = _scriptPtr.fetchWord();
 	case 0x17:
 		fmt.Println("op_shr")
+		//		uint8_t variableId = _scriptPtr.fetchByte();
+		//		uint16_t rightShiftValue = _scriptPtr.fetchWord();
 
 	case 0x18:
 		fmt.Println("op_playSound")
+		//		uint16_t resourceId = _scriptPtr.fetchWord();
+		//		uint8_t freq = _scriptPtr.fetchByte();
+		//		uint8_t vol = _scriptPtr.fetchByte();
+		//		uint8_t channel = _scriptPtr.fetchByte();
 	case 0x19:
-		fmt.Println("op_updateMemList")
+		fmt.Println("op_updateMemList aka load resource")
+		//		uint16_t resourceId = _scriptPtr.fetchWord();
 	case 0x1A:
 		fmt.Println("op_playMusic")
+		//		uint16_t resNum = _scriptPtr.fetchWord();
+		//		uint16_t delay = _scriptPtr.fetchWord();
+		//		uint8_t pos = _scriptPtr.fetchByte();
 	default:
 		fmt.Println("NO_OP", opcode)
 	}

@@ -30,7 +30,7 @@ func main() {
 
 	//start endless loop
 	mainLoop(vmState)
-	log.Println("- executeOp")
+	log.Println("- executeOp", bytecode[0:32])
 	executeOp(bytecode)
 }
 

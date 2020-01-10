@@ -30,6 +30,7 @@ Reference: https://fabiensanglard.net/anotherWorld_code_review/ and http://www.a
 - https://github.com/golang/go/wiki/WebAssembly
 - https://golang.org/doc/effective_go.html
 - https://goinbigdata.com/golang-pass-by-pointer-vs-pass-by-value/
+- https://fabiensanglard.net/another_world_polygons/index.html
 
 ## lang elements to check
 
