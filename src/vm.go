@@ -42,6 +42,8 @@ type VMState struct {
 	variables   [VM_NUM_VARIABLES]int
 	channelData [VM_NUM_THREADS]int
 	gamePart    int
+	sp          int
+	pc          int
 }
 
 func createNewState() VMState {
@@ -66,7 +68,7 @@ func setupGamePart(state VMState, newGamePart int) VMState {
 
 	//Set all thread to inactive (pc at 0xFFFF or 0xFFFE )
 	for i := range state.channelData {
-		state.channelData[i] = 0xFF
+		state.channelData[i] = VM_INACTIVE_THREAD
 	}
 
 	//TODO WHY?
@@ -77,10 +79,17 @@ func setupGamePart(state VMState, newGamePart int) VMState {
 // Run the Virtual Machine for every active threads
 func mainLoop(state VMState) {
 	for channelId := 0x00; channelId < VM_NUM_THREADS; channelId++ {
-		n := state.channelData[channelId]
-		fmt.Println("channel", channelId, n)
-		if n != VM_INACTIVE_THREAD {
+		channelPointerState := state.channelData[channelId]
 
+		// Inactive threads are marked with a thread instruction pointer set to 0xFFFF (VM_INACTIVE_THREAD).
+		if channelPointerState != VM_INACTIVE_THREAD {
+			fmt.Println("channel active!", channelId, channelPointerState)
+			//TODO load resource!
+			state.pc = 0 + channelPointerState
+			//			_scriptPtr.pc = res->segBytecode + n;
+			//		uint8_t opcode = _scriptPtr.fetchByte();
+			//  execute
+			//state.channelData[channelId] = _scriptPtr.pc - res->segBytecode;
 		}
 	}
 

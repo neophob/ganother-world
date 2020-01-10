@@ -31,6 +31,7 @@ Reference: https://fabiensanglard.net/anotherWorld_code_review/ and http://www.a
 - https://golang.org/doc/effective_go.html
 
 ## lang elements to check
+
 - iota
 - Channels
 - range clause
@@ -40,7 +41,7 @@ Reference: https://fabiensanglard.net/anotherWorld_code_review/ and http://www.a
 
 # Getting started
 
-- Install make (`brew install make`?)
+- Install make (autotools on linux, xcode on OSX)
 - Install go 1.13 https://golang.org/dl/
 - Check out repo
 - Run `make` to build, if it's green you're good
