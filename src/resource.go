@@ -44,7 +44,7 @@ func unmarshallingMemlistBin(data []byte) map[int]MemlistEntry {
 	return resourceMap
 }
 
-func loadEntryFromBank(resourceMap map[int]MemlistEntry, index int) {
+func loadEntryFromBank(resourceMap map[int]MemlistEntry, bankFilesMap map[int][]byte, index int) {
 	// TODO will have to read a MemlistEntry from the bank file 0x01 - 0x0d
 }
 
@@ -57,10 +57,8 @@ func toUint32(b1, b2, b3, b4 byte) uint32 {
 }
 
 func printStatisticsForMemlistBin(resourceMap map[int]MemlistEntry) {
-	entryCount := 0
-	sizeCompressed, sizeUncompressed, compressedEntries := 0, 0, 0
-
 	var resourceTypeCount [10]int
+	entryCount, sizeCompressed, sizeUncompressed, compressedEntries := 0, 0, 0, 0
 
 	for index, entry := range resourceMap {
 		fmt.Println(" entry", index, entry)
@@ -88,16 +86,6 @@ func printStatisticsForMemlistBin(resourceMap map[int]MemlistEntry) {
 	fmt.Printf("Note: Overall compression gain is : %.0f%%.\n\n\n", math.Round(compressionGain))
 	for i := 0; i < len(resourceTypeCount); i++ {
 		if resourceTypeCount[i] > 0 {
-			// TODO name me:
-			/* 	RT_SOUND          int = 0
-			RT_MUSIC          int = 1
-			RT_POLY_ANIM      int = 2
-			RT_PALETTE        int = 3
-			RT_BYTECODE       int = 4
-			RT_POLY_CINEMATIC int = 5
-			RT_TODO           int = 6
-			RT_END            int = 255
-			*/
 			fmt.Printf("Total %d          files: %d\n", i, resourceTypeCount[i])
 		}
 	}
