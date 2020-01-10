@@ -37,3 +37,11 @@ Reference: https://fabiensanglard.net/anotherWorld_code_review/ and http://www.a
 - defer
 - interface
 - Method (bound functions?)
+
+# Getting started
+
+- Install make (`brew install make`?)
+- Install go 1.13 https://golang.org/dl/
+- Check out repo
+- Run `make` to build, if it's green you're good
+- Use `make help` for more
