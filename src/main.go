@@ -16,7 +16,8 @@ func main() {
 	printResourceStats(resourceStatistics)
 
 	bankFilesMap := createBankMap("./assets/")
-	assets := Assets{resourceMap, bankFilesMap}
+	gameParts := getGameParts()
+	assets := Assets{resourceMap, gameParts, bankFilesMap}
 
 	log.Println("- load bytecode, resource 0x21")
 	loadEntryFromBank(assets, 21)
@@ -27,6 +28,7 @@ func main() {
 	log.Println(vmState)
 
 	//start endless loop
+	mainLoop(vmState)
 }
 
 func readFile(filename string) []byte {
@@ -57,6 +59,7 @@ func printResourceStats(memlistStatistic MemlistStatistic) {
 	resourceNameMap[3] = "RT_PALETTE"
 	resourceNameMap[4] = "RT_BYTECODE"
 	resourceNameMap[5] = "RT_POLY_CINEMATIC"
+	resourceNameMap[6] = "RT_VIDEO2  "
 
 	log.Println(memlistStatistic)
 	fmt.Println("Total # resources:", memlistStatistic.entryCount)

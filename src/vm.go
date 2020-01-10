@@ -1,5 +1,9 @@
 package main
 
+import (
+	"fmt"
+)
+
 const (
 	//TODO rename me to channel
 	VM_NUM_THREADS   int = 64
@@ -21,11 +25,10 @@ const (
 	VM_NO_SETVEC_REQUESTED int = 0xFFFF
 	VM_INACTIVE_THREAD     int = 0xFFFF
 
-	VM_VARIABLE_RANDOM_SEED      int = 0x3C
-	VM_VARIABLE_LAST_KEYCHAR     int = 0xDA
-	VM_VARIABLE_HERO_POS_UP_DOWN int = 0xE5
-	VM_VARIABLE_MUS_MARK         int = 0xF4
-
+	VM_VARIABLE_RANDOM_SEED          int = 0x3C
+	VM_VARIABLE_LAST_KEYCHAR         int = 0xDA
+	VM_VARIABLE_HERO_POS_UP_DOWN     int = 0xE5
+	VM_VARIABLE_MUS_MARK             int = 0xF4
 	VM_VARIABLE_SCROLL_Y             int = 0xF9
 	VM_VARIABLE_HERO_ACTION          int = 0xFA
 	VM_VARIABLE_HERO_POS_JUMP_DOWN   int = 0xFB
@@ -36,9 +39,9 @@ const (
 )
 
 type VMState struct {
-	variables  [VM_NUM_VARIABLES]int
-	threadData [VM_NUM_THREADS]int
-	gamePart   int
+	variables   [VM_NUM_VARIABLES]int
+	channelData [VM_NUM_THREADS]int
+	gamePart    int
 }
 
 func createNewState() VMState {
@@ -62,11 +65,23 @@ func setupGamePart(state VMState, newGamePart int) VMState {
 	state.variables[0xE4] = 0x14
 
 	//Set all thread to inactive (pc at 0xFFFF or 0xFFFE )
-	for i := range state.threadData {
-		state.threadData[i] = 0xFF
+	for i := range state.channelData {
+		state.channelData[i] = 0xFF
 	}
 
 	//TODO WHY?
-	state.threadData[0] = 0
+	state.channelData[0] = 0
 	return state
+}
+
+// Run the Virtual Machine for every active threads
+func mainLoop(state VMState) {
+	for channelId := 0x00; channelId < VM_NUM_THREADS; channelId++ {
+		n := state.channelData[channelId]
+		fmt.Println("channel", channelId, n)
+		if n != VM_INACTIVE_THREAD {
+
+		}
+	}
+
 }

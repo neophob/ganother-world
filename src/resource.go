@@ -31,8 +31,9 @@ type MemlistStatistic struct {
 }
 
 type Assets struct {
-	memList map[int]MemlistEntry
-	bank    map[int][]byte
+	memList   map[int]MemlistEntry
+	gameParts map[int]GamePartContent
+	bank      map[int][]byte
 }
 
 func unmarshallingMemlistBin(data []byte) (map[int]MemlistEntry, MemlistStatistic) {
