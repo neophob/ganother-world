@@ -20,6 +20,11 @@ func main() {
 
 	log.Println("- load bytecode, resource 0x21")
 	loadEntryFromBank(assets, 21)
+
+	vmState := createNewState()
+	log.Println(vmState)
+
+	setupGamePart(vmState, 0)
 }
 
 func readFile(filename string) []byte {

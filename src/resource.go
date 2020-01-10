@@ -36,7 +36,7 @@ type Assets struct {
 
 func unmarshallingMemlistBin(data []byte) (map[int]MemlistEntry, MemlistStatistic) {
 	resourceMap := make(map[int]MemlistEntry)
-	memlistStatistic := MemlistStatistic{ resourceTypeCount: make(map[int]int)}
+	memlistStatistic := MemlistStatistic{resourceTypeCount: make(map[int]int)}
 
 	for i := 0; i < len(data); i += MemlistEntrySize {
 		entry := MemlistEntry{
@@ -74,4 +74,3 @@ func toUint16BE(lo, hi byte) uint16 {
 func toUint32BE(b1, b2, b3, b4 byte) uint32 {
 	return uint32(b4) | uint32(b3)<<8 | uint32(b2)<<16 | uint32(b1)<<24
 }
-
