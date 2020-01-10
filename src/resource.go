@@ -15,7 +15,6 @@ const (
 type MemlistEntry struct {
 	state        uint8  //ofs: 0
 	resourceType uint8  //ofs: 1
-	bufPtr       uint8  //ofs: 2
 	rankNum      uint8  //ofs: 6
 	bankId       uint8  //ofs: 7
 	bankOffset   uint32 //ofs: 8
@@ -23,6 +22,12 @@ type MemlistEntry struct {
 	size         uint16 //ofs: 18
 }
 
+type Assets struct {
+	memList map[int]MemlistEntry
+	bank  map[int][]byte
+}
+
+//TODO also return statistics here, get rid of printStatisticsForMemlistBin
 func unmarshallingMemlistBin(data []byte) map[int]MemlistEntry {
 	resourceMap := make(map[int]MemlistEntry)
 	resourceId := 0
@@ -31,7 +36,6 @@ func unmarshallingMemlistBin(data []byte) map[int]MemlistEntry {
 		entry := MemlistEntry{
 			state:        data[i],
 			resourceType: data[i+1],
-			bufPtr:       data[i+2],
 			rankNum:      data[i+6],
 			bankId:       data[i+7],
 			bankOffset:   toUint32(data[i+8], data[i+9], data[i+10], data[i+11]),
@@ -44,10 +48,14 @@ func unmarshallingMemlistBin(data []byte) map[int]MemlistEntry {
 	return resourceMap
 }
 
-func loadEntryFromBank(resourceMap map[int]MemlistEntry, bankFilesMap map[int][]byte, index int) {
-	// TODO will have to read a MemlistEntry from the bank file 0x01 - 0x0d
+func loadEntryFromBank(assets Assets, index int) {
+	memlistEntry := assets.memList[index]
+	bank := assets.bank[int(memlistEntry.bankId)]
+	fmt.Printf("Bank %d size %d, offset %d\n", index, len(bank), memlistEntry.bankOffset)
+	fmt.Println(memlistEntry)
 }
 
+// BigEndian
 func toUint16(lo, hi byte) uint16 {
 	return uint16(hi) | uint16(lo)<<8
 }

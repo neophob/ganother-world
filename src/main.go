@@ -15,7 +15,10 @@ func main() {
 	printStatisticsForMemlistBin(resourceMap)
 
 	bankFilesMap := createBankMap("./assets/")
-	loadEntryFromBank(resourceMap, bankFilesMap, 21)
+	assets := Assets{resourceMap, bankFilesMap}
+
+	log.Println("- load bytecode, resource 0x21")
+	loadEntryFromBank(assets, 21)
 }
 
 func readFile(filename string) []byte {
