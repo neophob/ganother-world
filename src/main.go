@@ -53,15 +53,6 @@ func createBankMap(assetPath string) map[int][]byte {
 }
 
 func printResourceStats(memlistStatistic MemlistStatistic) {
-	resourceNameMap := make(map[int]string)
-	resourceNameMap[0] = "RT_SOUND"
-	resourceNameMap[1] = "RT_MUSIC"
-	resourceNameMap[2] = "RT_POLY_ANIM"
-	resourceNameMap[3] = "RT_PALETTE"
-	resourceNameMap[4] = "RT_BYTECODE"
-	resourceNameMap[5] = "RT_POLY_CINEMATIC"
-	resourceNameMap[6] = "RT_VIDEO2"
-
 	log.Println(memlistStatistic)
 	fmt.Println("Total # resources:", memlistStatistic.entryCount)
 	fmt.Println("Compressed       :", memlistStatistic.compressedEntries)
@@ -76,7 +67,7 @@ func printResourceStats(memlistStatistic MemlistStatistic) {
 	sortedKeys := sortedKeys(memlistStatistic.resourceTypeMap)
 	for i := 0; i < len(sortedKeys); i++ {
 		k := sortedKeys[i]
-		resourceName := resourceNameMap[k]
+		resourceName := getResourceTypeName(k)
 		if len(resourceName) < 1 {
 			resourceName = fmt.Sprintf("RT_UNKOWNN_%d", k)
 		}

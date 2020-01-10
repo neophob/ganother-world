@@ -51,7 +51,11 @@ func unmarshallingMemlistBin(data []byte) (map[int]MemlistEntry, MemlistStatisti
 			packedSize:   toUint16BE(data[i+14], data[i+15]),
 			size:         toUint16BE(data[i+18], data[i+19]),
 		}
-		fmt.Println(memlistStatistic.entryCount, ":", entry)
+		if entry.state == 0xFF {
+			// Bail out when last entry is found
+			break
+		}
+		fmt.Printf("R:%#02x, %-17s size=%5d\n", memlistStatistic.entryCount, getResourceTypeName(int(entry.resourceType)), entry.size)
 		resourceMap[memlistStatistic.entryCount] = entry
 		memlistStatistic.entryCount++
 		memlistStatistic.sizeCompressed += int(entry.packedSize)
@@ -77,4 +81,9 @@ func toUint16BE(lo, hi byte) uint16 {
 
 func toUint32BE(b1, b2, b3, b4 byte) uint32 {
 	return uint32(b4) | uint32(b3)<<8 | uint32(b2)<<16 | uint32(b1)<<24
+}
+
+func getResourceTypeName(id int) string {
+	resourceNames := [...]string{"RT_SOUND", "RT_MUSIC", "RT_POLY_ANIM", "RT_PALETTE", "RT_BYTECODE", "RT_POLY_CINEMATIC", "RT_VIDEO2"}
+	return resourceNames[id]
 }
