@@ -85,5 +85,8 @@ func toUint32BE(b1, b2, b3, b4 byte) uint32 {
 
 func getResourceTypeName(id int) string {
 	resourceNames := [...]string{"RT_SOUND", "RT_MUSIC", "RT_POLY_ANIM", "RT_PALETTE", "RT_BYTECODE", "RT_POLY_CINEMATIC", "RT_VIDEO2"}
-	return resourceNames[id]
+	if id>=0 && id<len(resourceNames) {
+		return resourceNames[id]
+	}
+	return ""
 }

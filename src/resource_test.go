@@ -33,3 +33,24 @@ func TestConvertUin32FF000000(t *testing.T) {
 		t.Errorf("The world will end: %d", result)
 	}
 }
+
+func TestResourceTypeName0(t *testing.T) {
+	result := getResourceTypeName(0)
+	if result != "RT_SOUND" {
+		t.Errorf("The world will end: %s", result)
+	}
+}
+
+func TestResourceTypeName4(t *testing.T) {
+	result := getResourceTypeName(4)
+	if result != "RT_BYTECODE" {
+		t.Errorf("The world will end: %s", result)
+	}
+}
+
+func TestResourceTypeName44(t *testing.T) {
+	result := getResourceTypeName(44)
+	if result != "" {
+		t.Errorf("The world will end: %s", result)
+	}
+}
