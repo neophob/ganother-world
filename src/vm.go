@@ -101,12 +101,23 @@ func executeOp(code []byte) {
 
 func step(pc int, code []byte) {
 	opcode := code[pc]
+	fmt.Println("step", opcode, pc)
+
+	if opcode > 0x7F {
+		fmt.Println("DRAW_POLY_BACKGROUND")
+		return
+	}
+	if opcode > 0x3F {
+		fmt.Println("DRAW_POLY_SPRITE")
+		return
+	}
+
 	switch opcode {
+
 	case 0x00:
 		fmt.Println("op_movConst")
 		//		uint8 variableId = _scriptPtr.fetchByte();
 		//		int16 value = _scriptPtr.fetchWord();
-
 	case 0x01:
 		fmt.Println("op_mov")
 	case 0x02:
@@ -165,6 +176,7 @@ func step(pc int, code []byte) {
 		fmt.Println("op_updateMemList")
 	case 0x1A:
 		fmt.Println("op_playMusic")
-
+	default:
+		fmt.Println("NO_OP", opcode)
 	}
 }
