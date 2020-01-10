@@ -35,13 +35,14 @@ const (
 )
 
 type VMState struct {
-	variables [VM_NUM_VARIABLES]int
-	gamePart  int
+	variables  [VM_NUM_VARIABLES]int
+	threadData [VM_NUM_THREADS]int
+	gamePart   int
 }
 
 func createNewState() VMState {
-	state := VMState{}
-	//WTF? whats this?
+	state := VMState{ gamePart: -1 }
+	//WTF? whats this? -> create const
 	state.variables[0x54] = 0x81
 	state.variables[VM_VARIABLE_RANDOM_SEED] = 42
 	return state
@@ -56,8 +57,12 @@ func setupGamePart(state VMState, newGamePart int) VMState {
 	}
 
 	state.gamePart = newGamePart
-	//WTF? whats this?
+	//WTF? whats this? -> create const
 	state.variables[0xE4] = 0x14
 
+	//Set all thread to inactive (pc at 0xFFFF or 0xFFFE )
+	for i := range state.threadData {
+		state.threadData[i] = 0xFF
+	}
 	return state
 }

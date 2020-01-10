@@ -12,8 +12,9 @@ const (
 )
 
 type MemlistEntry struct {
-	state        uint8  //ofs: 0
-	resourceType uint8  //ofs: 1
+	state        uint8 //ofs: 0
+	resourceType uint8 //ofs: 1
+	bufPtr       uint8
 	rankNum      uint8  //ofs: 6
 	bankId       uint8  //ofs: 7
 	bankOffset   uint32 //ofs: 8
@@ -42,6 +43,7 @@ func unmarshallingMemlistBin(data []byte) (map[int]MemlistEntry, MemlistStatisti
 		entry := MemlistEntry{
 			state:        data[i],
 			resourceType: data[i+1],
+			bufPtr:       data[i+2],
 			rankNum:      data[i+6],
 			bankId:       data[i+7],
 			bankOffset:   toUint32BE(data[i+8], data[i+9], data[i+10], data[i+11]),

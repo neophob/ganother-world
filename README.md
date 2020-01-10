@@ -1,6 +1,6 @@
 # ganother-world
 
-Reference: https://fabiensanglard.net/anotherWorld_code_review/
+Reference: https://fabiensanglard.net/anotherWorld_code_review/ and http://www.anotherworld.fr/anotherworld_uk/another_world.htm
 
 - GOAL: Learn GO and implement "something fun"
 - "something fun" - interpret the old game another world and create a web version!
