@@ -43,6 +43,14 @@ func createBankMap(assetPath string) map[int][]byte {
 }
 
 func printResourceStats(memlistStatistic MemlistStatistic) {
+	resourceNameMap := make(map[int]string)
+	resourceNameMap[0] = "RT_SOUND   "
+	resourceNameMap[1] = "RT_MUSIC   "
+	resourceNameMap[2] = "RT_POLY_ANIM"
+	resourceNameMap[3] = "RT_PALETTE"
+	resourceNameMap[4] = "RT_BYTECODE"
+	resourceNameMap[5] = "RT_POLY_CINEMATIC"
+
 	log.Println(memlistStatistic)
 	fmt.Println("Total # resources:", memlistStatistic.entryCount)
 	fmt.Println("Compressed       :", memlistStatistic.compressedEntries)
@@ -53,9 +61,13 @@ func printResourceStats(memlistStatistic MemlistStatistic) {
 	fmt.Printf("Total size (compressed)   : %d bytes.\n", memlistStatistic.sizeCompressed)
 	var compressionGain float64 = 100 * (1 - float64(memlistStatistic.sizeCompressed)/float64(memlistStatistic.sizeUncompressed))
 	fmt.Printf("Note: Overall compression gain is : %.0f%%.\n\n", math.Round(compressionGain))
-	for i := 0; i < len(memlistStatistic.resourceTypeCount); i++ {
-		if memlistStatistic.resourceTypeCount[i] > 0 {
-			fmt.Printf("Total %d          files: %d\n", i, memlistStatistic.resourceTypeCount[i])
+	for k := range memlistStatistic.resourceTypeCount {
+		if memlistStatistic.resourceTypeCount[k] > 0 {
+			resourceName := resourceNameMap[k]
+			if len(resourceName) < 1 {
+				resourceName = fmt.Sprintf("RT_UNKOWNN_%d", k)
+			}
+			fmt.Printf("Total %s\t\tfiles: %d\n", resourceName, memlistStatistic.resourceTypeCount[k])
 		}
 	}
 }
