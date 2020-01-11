@@ -33,11 +33,11 @@ type MemlistStatistic struct {
 type Assets struct {
 	memList   map[int]MemlistEntry
 	gameParts map[int]GamePartContent
-	bank      map[int][]byte
+	bank      map[int][]uint8
 }
 
 // this is a function for the Assets struct
-func (assets Assets) loadEntryFromBank(index int) []byte {
+func (assets Assets) loadEntryFromBank(index int) []uint8 {
 	memlistEntry := assets.memList[index]
 	bank := assets.bank[int(memlistEntry.bankId)]
 	fmt.Printf("Bank %d size %d, offset %v\n", index, len(bank), memlistEntry)
@@ -52,7 +52,7 @@ func (assets Assets) loadEntryFromBank(index int) []byte {
 	panic("NEED UNCOMPRESS!")
 }
 
-func unmarshallingMemlistBin(data []byte) (map[int]MemlistEntry, MemlistStatistic) {
+func unmarshallingMemlistBin(data []uint8) (map[int]MemlistEntry, MemlistStatistic) {
 	resourceMap := make(map[int]MemlistEntry)
 	memlistStatistic := MemlistStatistic{resourceTypeMap: make(map[int]int)}
 
@@ -85,11 +85,11 @@ func unmarshallingMemlistBin(data []byte) (map[int]MemlistEntry, MemlistStatisti
 	return resourceMap, memlistStatistic
 }
 
-func toUint16BE(lo, hi byte) uint16 {
+func toUint16BE(lo, hi uint8) uint16 {
 	return uint16(hi) | uint16(lo)<<8
 }
 
-func toUint32BE(b1, b2, b3, b4 byte) uint32 {
+func toUint32BE(b1, b2, b3, b4 uint8) uint32 {
 	return uint32(b4) | uint32(b3)<<8 | uint32(b2)<<16 | uint32(b1)<<24
 }
 
