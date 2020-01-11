@@ -18,8 +18,8 @@ type MemlistEntry struct {
 	rankNum      uint8  //ofs: 6
 	bankId       uint8  //ofs: 7
 	bankOffset   uint32 //ofs: 8
-	packedSize   uint16 //ofs: 14
-	size         uint16 //ofs: 18
+	packedSize   uint32 //ofs: 12
+	unpackedSize uint32 //ofs: 16
 }
 
 type MemlistStatistic struct {
@@ -41,9 +41,9 @@ func (assets Assets) loadEntryFromBank(index int) []byte {
 	memlistEntry := assets.memList[index]
 	bank := assets.bank[int(memlistEntry.bankId)]
 	fmt.Printf("Bank %d size %d, offset %v\n", index, len(bank), memlistEntry)
-	fmt.Println("slice", memlistEntry.bankOffset, memlistEntry.size)
+	fmt.Println("slice", memlistEntry.bankOffset, memlistEntry.unpackedSize)
 	ofs := int(memlistEntry.bankOffset)
-	result := bank[ofs : ofs+int(memlistEntry.size)]
+	result := bank[ofs : ofs+int(memlistEntry.unpackedSize)]
 	return result
 }
 
@@ -59,21 +59,21 @@ func unmarshallingMemlistBin(data []byte) (map[int]MemlistEntry, MemlistStatisti
 			rankNum:      data[i+6],
 			bankId:       data[i+7],
 			bankOffset:   toUint32BE(data[i+8], data[i+9], data[i+10], data[i+11]),
-			packedSize:   toUint16BE(data[i+14], data[i+15]),
-			size:         toUint16BE(data[i+18], data[i+19]),
+			packedSize:   toUint32BE(data[i+12], data[i+13], data[i+14], data[i+15]),
+			unpackedSize: toUint32BE(data[i+16], data[i+17], data[i+18], data[i+19]),
 		}
 		// Bail out when last entry is found
 		if entry.state == 0xFF {
 			break
 		}
 		fmt.Printf("R:%#02x, %-17s size=%5d  bank=%2d  offset=%6d\n", memlistStatistic.entryCount,
-			getResourceTypeName(int(entry.resourceType)), entry.size, entry.bankId, entry.bankOffset)
+			getResourceTypeName(int(entry.resourceType)), entry.unpackedSize, entry.bankId, entry.bankOffset)
 		resourceMap[memlistStatistic.entryCount] = entry
 		memlistStatistic.entryCount++
 		memlistStatistic.sizeCompressed += int(entry.packedSize)
-		memlistStatistic.sizeUncompressed += int(entry.size)
+		memlistStatistic.sizeUncompressed += int(entry.unpackedSize)
 		memlistStatistic.resourceTypeMap[int(entry.resourceType)]++
-		if entry.size != entry.packedSize {
+		if entry.unpackedSize != entry.packedSize {
 			memlistStatistic.compressedEntries++
 		}
 	}
@@ -89,7 +89,7 @@ func toUint32BE(b1, b2, b3, b4 byte) uint32 {
 }
 
 func getResourceTypeName(id int) string {
-	resourceNames := [...]string{"RT_SOUND", "RT_MUSIC", "RT_POLY_ANIM", "RT_PALETTE", "RT_BYTECODE", "RT_POLY_CINEMATIC", "RT_VIDEO2"}
+	resourceNames := [...]string{"RT_SOUND", "RT_MUSIC", "RT_POLY_ANIM", "RT_PALETTE", "RT_BYTECODE", "RT_POLY_CINEMATIC", "RT_COMMON_SHAPES"}
 	if id >= 0 && id < len(resourceNames) {
 		return resourceNames[id]
 	}

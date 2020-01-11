@@ -1,6 +1,10 @@
 # ganother-world
 
-Reference: https://fabiensanglard.net/anotherWorld_code_review/ and http://www.anotherworld.fr/anotherworld_uk/another_world.htm
+Reference:
+- https://fabiensanglard.net/anotherWorld_code_review/
+- https://fabiensanglard.net/another_world_polygons/index.html
+- https://github.com/cyxx/rawgl
+- http://www.anotherworld.fr/anotherworld_uk/another_world.htm
 
 - GOAL: Learn GO and implement "something fun"
 - "something fun" - interpret the old game another world and create a web version!
@@ -30,7 +34,6 @@ Reference: https://fabiensanglard.net/anotherWorld_code_review/ and http://www.a
 - https://github.com/golang/go/wiki/WebAssembly
 - https://golang.org/doc/effective_go.html
 - https://goinbigdata.com/golang-pass-by-pointer-vs-pass-by-value/
-- https://fabiensanglard.net/another_world_polygons/index.html
 
 ## lang elements to check
 
