@@ -41,10 +41,14 @@ func (assets Assets) loadEntryFromBank(index int) []byte {
 	memlistEntry := assets.memList[index]
 	bank := assets.bank[int(memlistEntry.bankId)]
 	fmt.Printf("Bank %d size %d, offset %v\n", index, len(bank), memlistEntry)
-	fmt.Println("slice", memlistEntry.bankOffset, memlistEntry.unpackedSize)
+	fmt.Println("slice", memlistEntry.bankOffset, memlistEntry.packedSize)
 	ofs := int(memlistEntry.bankOffset)
-	result := bank[ofs : ofs+int(memlistEntry.unpackedSize)]
-	return result
+	result := bank[ofs : ofs+int(memlistEntry.packedSize)]
+	if (memlistEntry.packedSize == memlistEntry.unpackedSize) {
+		return result
+	}
+	//TODO unpack here
+	panic("NEED UNCOMPRESS!")
 }
 
 func unmarshallingMemlistBin(data []byte) (map[int]MemlistEntry, MemlistStatistic) {
@@ -66,8 +70,8 @@ func unmarshallingMemlistBin(data []byte) (map[int]MemlistEntry, MemlistStatisti
 		if entry.state == 0xFF {
 			break
 		}
-		fmt.Printf("R:%#02x, %-17s size=%5d  bank=%2d  offset=%6d\n", memlistStatistic.entryCount,
-			getResourceTypeName(int(entry.resourceType)), entry.unpackedSize, entry.bankId, entry.bankOffset)
+		fmt.Printf("R:%#02x, %-17s size=%5d (%5d)  bank=%2d  offset=%6d\n", memlistStatistic.entryCount,
+			getResourceTypeName(int(entry.resourceType)), entry.unpackedSize, entry.packedSize, entry.bankId, entry.bankOffset)
 		resourceMap[memlistStatistic.entryCount] = entry
 		memlistStatistic.entryCount++
 		memlistStatistic.sizeCompressed += int(entry.packedSize)
