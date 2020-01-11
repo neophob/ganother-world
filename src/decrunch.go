@@ -76,7 +76,7 @@ func (unpackCtx *UnpackCtx) copyReference(bitsCount int, count int) {
 
 // unpack crunched data
 // last 4 bytes of the data junk contains the unpacked data lenght (uint32 BE)
-func unpack(data []uint8) {
+func unpack(data []uint8) []uint8 {
 	dataLen := len(data)
 	unpackCtx := UnpackCtx{source: data, sourceOffset: dataLen - 1}
 	unpackCtx.size = unpackCtx.readUInt32BE()
@@ -115,4 +115,5 @@ func unpack(data []uint8) {
 	}
 	//crc should be 0!
 	fmt.Println("CRC", unpackCtx.crc)
+	return unpackCtx.dest
 }

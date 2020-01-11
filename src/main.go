@@ -28,6 +28,8 @@ func main() {
 	vmState.setupGamePart(GAME_PART1)
 	log.Println(vmState)
 
+	//TODO use vmState to start loop
+
 	//start endless loop
 	mainLoop(vmState)
 	log.Println("- executeOp", bytecode[0:32])
