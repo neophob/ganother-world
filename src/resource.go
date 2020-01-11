@@ -44,9 +44,10 @@ func (assets Assets) loadEntryFromBank(index int) []byte {
 	fmt.Println("slice", memlistEntry.bankOffset, memlistEntry.packedSize)
 	ofs := int(memlistEntry.bankOffset)
 	result := bank[ofs : ofs+int(memlistEntry.packedSize)]
-	if (memlistEntry.packedSize == memlistEntry.unpackedSize) {
+	if memlistEntry.packedSize == memlistEntry.unpackedSize {
 		return result
 	}
+	unpack(result)
 	//TODO unpack here
 	panic("NEED UNCOMPRESS!")
 }
