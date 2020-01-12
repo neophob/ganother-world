@@ -8,6 +8,15 @@ type GamePartContent struct {
 }
 
 // The game is divided in 10 parts - each part has its own code, palette and videos
+// kPartCopyProtection
+// kPartIntro
+// kPartWater
+// kPartPrison
+// kPartCite
+// kPartArene
+// kPartLuxe
+// kPartFinal
+// kPartPassword
 func getGameParts() map[int]GamePartContent {
 	GP_PALETTE := [10]int{0x14, 0x17, 0x1A, 0x1D, 0x20, 0x23, 0x26, 0x29, 0x7D, 0x7D}
 	GP_BYTECODE := [10]int{0x15, 0x18, 0x1B, 0x1E, 0x21, 0x24, 0x27, 0x2A, 0x7E, 0x7E}

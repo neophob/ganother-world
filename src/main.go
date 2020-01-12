@@ -11,6 +11,7 @@ import (
 
 func main() {
 	log.SetFlags(log.Lshortfile | log.Lmicroseconds)
+
 	log.Println("- load memlist.bin")
 	data := readFile("./assets/memlist.bin")
 	resourceMap, resourceStatistics := unmarshallingMemlistBin(data)
@@ -20,20 +21,20 @@ func main() {
 	gameParts := getGameParts()
 	assets := Assets{resourceMap, gameParts, bankFilesMap}
 
-	log.Println("- load bytecode, resource 0x21")
-	bytecode := assets.loadEntryFromBank(21)
+	//log.Println("- load bytecode, resource 0x21")
+	//bytecode := assets.loadEntryFromBank(21)
 
 	log.Println("- create state")
-	vmState := createNewState()
+	vmState := createNewState(assets)
 	vmState.setupGamePart(GAME_PART1)
-	log.Println(vmState)
+	//log.Println(vmState)
 
 	//TODO use vmState to start loop
 
 	//start endless loop
-	mainLoop(vmState)
-	log.Println("- executeOp", bytecode[0:32])
-	executeOp(bytecode)
+	//mainLoop(vmState)
+	//log.Println("- executeOp", bytecode[0:32])
+	vmState.executeOp()
 }
 
 func readFile(filename string) []byte {

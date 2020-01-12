@@ -39,15 +39,17 @@ const (
 )
 
 type VMState struct {
+	assets      Assets
 	variables   [VM_NUM_VARIABLES]int
 	channelData [VM_NUM_THREADS]int
 	gamePart    int
 	sp          int
 	pc          int
+	bytecode    []uint8
 }
 
-func createNewState() VMState {
-	state := VMState{gamePart: -1}
+func createNewState(assets Assets) VMState {
+	state := VMState{gamePart: -1, assets: assets}
 	//WTF? whats this? -> create const
 	state.variables[0x54] = 0x81
 	state.variables[VM_VARIABLE_RANDOM_SEED] = 42
@@ -63,6 +65,11 @@ func (state *VMState) setupGamePart(newGamePart int) {
 		panic("INVALID_GAME_PART")
 	}
 
+	//TODO get bytecode from current game part and add it to the VMstate
+	gamePartAsset := state.assets.gameParts[newGamePart - GAME_PART_FIRST]
+	fmt.Println("- load bytecode, resource", gamePartAsset.bytecode)
+	state.bytecode = state.assets.loadEntryFromBank(gamePartAsset.bytecode)
+
 	state.gamePart = newGamePart
 	//WTF? whats this? -> create const
 	state.variables[0xE4] = 0x14
@@ -76,32 +83,17 @@ func (state *VMState) setupGamePart(newGamePart int) {
 	state.channelData[0] = 0
 }
 
-// Run the Virtual Machine for every active threads
-func mainLoop(state VMState) {
-	for channelId := 0x00; channelId < VM_NUM_THREADS; channelId++ {
-		channelPointerState := state.channelData[channelId]
-
-		// Inactive threads are marked with a thread instruction pointer set to 0xFFFF (VM_INACTIVE_THREAD).
-		if channelPointerState != VM_INACTIVE_THREAD {
-			fmt.Println("channel active!", channelId, channelPointerState)
-			//TODO load resource!
-			state.pc = 0 + channelPointerState
-			//			_scriptPtr.pc = res->segBytecode + n;
-			//		uint8_t opcode = _scriptPtr.fetchByte();
-			//  execute
-			//state.channelData[channelId] = _scriptPtr.pc - res->segBytecode;
-		}
-	}
+func (state *VMState) fetchByte() uint8 {
+	return 0
 }
 
-func executeOp(code []byte) {
-	pc := 0
-	step(pc, code)
+func (state *VMState) fetchWord() uint16 {
+	return 0
 }
 
-func step(pc int, code []byte) {
-	opcode := code[pc]
-	fmt.Println("step", opcode, pc)
+func (state *VMState) executeOp() {
+	opcode := state.bytecode[state.pc]
+	fmt.Println("step", opcode, state.pc)
 
 	if opcode > 0x7F {
 		fmt.Println("DRAW_POLY_BACKGROUND")
@@ -112,12 +104,14 @@ func step(pc int, code []byte) {
 		return
 	}
 
+	//var offset uint16
+
 	switch opcode {
 
 	case 0x00:
 		fmt.Println("op_movConst")
-		//		uint8 variableId = _scriptPtr.fetchByte();
-		//		int16 value = _scriptPtr.fetchWord();
+		//uint8 variableId = state.fetchByte()
+		//uint16 value = state.fetchWord()
 	case 0x01:
 		fmt.Println("op_mov")
 		//uint8_t dstVariableId = _scriptPtr.fetchByte();
@@ -133,7 +127,7 @@ func step(pc int, code []byte) {
 
 	case 0x04:
 		fmt.Println("op_call")
-		//uint16_t offset = _scriptPtr.fetchWord();
+		//offset = state.fetchWord()
 	case 0x05:
 		fmt.Println("op_ret")
 	case 0x06:
@@ -223,5 +217,23 @@ func step(pc int, code []byte) {
 		//		uint8_t pos = _scriptPtr.fetchByte();
 	default:
 		fmt.Println("NO_OP", opcode)
+	}
+}
+
+// Run the Virtual Machine for every active threads
+func mainLoop(state VMState) {
+	for channelId := 0x00; channelId < VM_NUM_THREADS; channelId++ {
+		channelPointerState := state.channelData[channelId]
+
+		// Inactive threads are marked with a thread instruction pointer set to 0xFFFF (VM_INACTIVE_THREAD).
+		if channelPointerState != VM_INACTIVE_THREAD {
+			fmt.Println("channel active!", channelId, channelPointerState)
+			//TODO load resource!
+			state.pc = 0 + channelPointerState
+			//			_scriptPtr.pc = res->segBytecode + n;
+			//		uint8_t opcode = _scriptPtr.fetchByte();
+			//  execute
+			//state.channelData[channelId] = _scriptPtr.pc - res->segBytecode;
+		}
 	}
 }
