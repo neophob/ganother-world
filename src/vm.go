@@ -112,11 +112,25 @@ func (state *VMState) executeOp() {
 	fmt.Println("> step", opcode, state.pc)
 
 	if opcode > 0x7F {
-		fmt.Println("DRAW_POLY_BACKGROUND")
+		offset := ((opcode << 8) | state.fetchByte()) << 1
+		posX := state.fetchByte()
+		posY := state.fetchByte()
+		height := posY - 199
+		if (height > 0) {
+			posY = 199;
+			posX += height;
+		}
+		fmt.Println("DRAW_POLY_BACKGROUND", posX, posY, offset)
 		return
 	}
 	if opcode > 0x3F {
-		fmt.Println("DRAW_POLY_SPRITE")
+		offsetHi := state.fetchByte()
+		offset := ((offsetHi << 8) | state.fetchByte()) << 1
+		posX := state.fetchByte()
+		posY := state.fetchByte()
+		zoom := state.fetchByte()
+
+		fmt.Println("DRAW_POLY_SPRITE", posX, posY, offset, zoom)
 		return
 	}
 
