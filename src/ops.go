@@ -17,6 +17,13 @@ func (state *VMState) opMovConst() {
 	state.variables[index] = value
 }
 
+func (state *VMState) opMov() {
+	dest := int(state.fetchByte())
+	source := int(state.fetchByte())
+	fmt.Println("#op_mov", source, dest)
+	state.variables[dest] = state.variables[source]
+}
+
 func (state *VMState) opCall() {
 	offset := state.fetchWord()
 	state.saveCurrentSP()
