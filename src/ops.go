@@ -20,7 +20,7 @@ func (state *VMState) opMovConst() {
 func (state *VMState) opMov() {
 	dest := int(state.fetchByte())
 	source := int(state.fetchByte())
-	fmt.Println("#op_mov", source, dest)
+	fmt.Println("#op_mov", source, dest, state.variables[source])
 	state.variables[dest] = state.variables[source]
 }
 
