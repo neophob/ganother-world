@@ -47,7 +47,8 @@ func (assets Assets) loadEntryFromBank(index int) []uint8 {
 	if memlistEntry.packedSize == memlistEntry.unpackedSize {
 		return result
 	}
-	return unpack(result)
+	returnValue, _ := unpack(result)
+	return returnValue
 }
 
 func unmarshallingMemlistBin(data []uint8) (map[int]MemlistEntry, MemlistStatistic) {
