@@ -125,9 +125,10 @@ func (state *VMState) executeOp() {
 	switch opcode {
 
 	case 0x00:
-		fmt.Println("op_movConst")
-		//uint8 variableId = state.fetchByte()
-		//uint16 value = state.fetchWord()
+		index := state.fetchByte()
+		value := int(state.fetchWord())
+		fmt.Println("#op_movConst", index, value)
+		state.variables[index] = value
 	case 0x01:
 		fmt.Println("op_mov")
 		//uint8_t dstVariableId = _scriptPtr.fetchByte();
@@ -145,7 +146,7 @@ func (state *VMState) executeOp() {
 		offset := state.fetchWord()
 		state.saveCurrentSP()
 		state.pc = int(offset)
-		fmt.Println("Script::op_call() jump to", state.pc)
+		fmt.Println("#op_call() jump to", state.pc)
 	case 0x05:
 		fmt.Println("op_ret")
 	case 0x06:
@@ -153,7 +154,7 @@ func (state *VMState) executeOp() {
 	case 0x07:
 		offset := state.fetchWord()
 		state.pc = int(offset)
-		fmt.Println("Script::op_jmp() jump to", state.pc)
+		fmt.Println("#op_jmp() jump to", state.pc)
 	case 0x08:
 		fmt.Println("op_setVect")
 		//		uint8_t threadId = _scriptPtr.fetchByte();
@@ -163,7 +164,18 @@ func (state *VMState) executeOp() {
 		//		uint8_t i = _scriptPtr.fetchByte();
 		//	  _scriptPtr.fetchWord();
 	case 0x0A:
-		fmt.Println("op_condJmp")
+		op := state.fetchByte()
+		variableId := state.fetchByte()
+		currentVariable := state.variables[variableId]
+		var newVariable uint16
+		if op&0x80 > 0 {
+			newVariable = uint16(state.variables[state.fetchByte()])
+		} else if op&0x40 > 0 {
+			newVariable = state.fetchWord()
+		} else {
+			newVariable = uint16(state.fetchByte())
+		}
+		fmt.Printf("#op_condJmp op=%d, variableId=%d, currentVariable=%d, newVariable=%d\n", op, variableId, currentVariable, newVariable)
 	case 0x0B:
 		fmt.Println("op_setPalette")
 		//		uint16_t paletteId = _scriptPtr.fetchWord();
