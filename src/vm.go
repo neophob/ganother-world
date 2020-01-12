@@ -44,6 +44,7 @@ type VMState struct {
 	channelData [VM_NUM_THREADS]int
 	gamePart    int
 	sp          int
+	stackCalls  [64]int
 	pc          int
 	bytecode    []uint8
 }
@@ -56,6 +57,28 @@ func createNewState(assets Assets) VMState {
 	return state
 }
 
+func (state *VMState) saveCurrentSP() {
+	if state.sp >= 0x40 {
+		panic("Script::op_call() sp>0x40 stack overflow")
+	}
+
+	state.stackCalls[state.sp] = state.pc
+	state.sp++
+}
+
+func (state *VMState) fetchByte() uint8 {
+	result := state.bytecode[state.pc]
+	state.pc++
+	return result
+}
+
+func (state *VMState) fetchWord() uint16 {
+	b1 := state.bytecode[state.pc]
+	b2 := state.bytecode[state.pc+1]
+	state.pc += 2
+	return toUint16BE(b1, b2)
+}
+
 //TODO using a pointer - its own state can be modified. using the value, state does not change!
 func (state *VMState) setupGamePart(newGamePart int) {
 	if state.gamePart == newGamePart {
@@ -66,9 +89,10 @@ func (state *VMState) setupGamePart(newGamePart int) {
 	}
 
 	//TODO get bytecode from current game part and add it to the VMstate
-	gamePartAsset := state.assets.gameParts[newGamePart - GAME_PART_FIRST]
+	gamePartAsset := state.assets.gameParts[newGamePart-GAME_PART_FIRST]
 	fmt.Println("- load bytecode, resource", gamePartAsset.bytecode)
 	state.bytecode = state.assets.loadEntryFromBank(gamePartAsset.bytecode)
+	fmt.Println("- executeOp", state.bytecode[0:32])
 
 	state.gamePart = newGamePart
 	//WTF? whats this? -> create const
@@ -83,17 +107,9 @@ func (state *VMState) setupGamePart(newGamePart int) {
 	state.channelData[0] = 0
 }
 
-func (state *VMState) fetchByte() uint8 {
-	return 0
-}
-
-func (state *VMState) fetchWord() uint16 {
-	return 0
-}
-
 func (state *VMState) executeOp() {
 	opcode := state.bytecode[state.pc]
-	fmt.Println("step", opcode, state.pc)
+	fmt.Println("> step", opcode, state.pc)
 
 	if opcode > 0x7F {
 		fmt.Println("DRAW_POLY_BACKGROUND")
@@ -126,18 +142,18 @@ func (state *VMState) executeOp() {
 		//int16_t value = _scriptPtr.fetchWord();
 
 	case 0x04:
-		fmt.Println("op_call")
-		//offset = state.fetchWord()
+		offset := state.fetchWord()
+		state.saveCurrentSP()
+		state.pc = int(offset)
+		fmt.Println("Script::op_call() jump to", state.pc)
 	case 0x05:
 		fmt.Println("op_ret")
 	case 0x06:
 		fmt.Println("op_pauseThread")
 	case 0x07:
-		fmt.Println("op_jmp")
-		//		uint16_t pcOffset = _scriptPtr.fetchWord();
-		//		debug(DBG_VM, "VirtualMachine::op_jmp(0x%02X)", pcOffset);
-		//		_scriptPtr.pc = res->segBytecode + pcOffset;
-
+		offset := state.fetchWord()
+		state.pc = int(offset)
+		fmt.Println("Script::op_jmp() jump to", state.pc)
 	case 0x08:
 		fmt.Println("op_setVect")
 		//		uint8_t threadId = _scriptPtr.fetchByte();
@@ -169,8 +185,8 @@ func (state *VMState) executeOp() {
 		//		uint8_t dstPageId = _scriptPtr.fetchByte();
 
 	case 0x10:
-		fmt.Println("op_blitFramebuffer")
-		//		uint8_t pageId = _scriptPtr.fetchByte();
+		page := state.fetchByte()
+		fmt.Println("Script::op_blitFramebuffer(), page", page)
 	case 0x11:
 		fmt.Println("op_killThread")
 	case 0x12:

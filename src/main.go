@@ -21,20 +21,14 @@ func main() {
 	gameParts := getGameParts()
 	assets := Assets{resourceMap, gameParts, bankFilesMap}
 
-	//log.Println("- load bytecode, resource 0x21")
-	//bytecode := assets.loadEntryFromBank(21)
-
 	log.Println("- create state")
 	vmState := createNewState(assets)
 	vmState.setupGamePart(GAME_PART1)
-	//log.Println(vmState)
-
-	//TODO use vmState to start loop
 
 	//start endless loop
-	//mainLoop(vmState)
-	//log.Println("- executeOp", bytecode[0:32])
-	vmState.executeOp()
+	for i := 0; i < 10; i++ {
+		vmState.executeOp()
+	}
 }
 
 func readFile(filename string) []byte {
