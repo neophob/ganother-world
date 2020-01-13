@@ -81,7 +81,7 @@ func (state *VMState) opCall() {
 	offset := state.fetchWord()
 	state.saveSP()
 	state.pc = int(offset)
-	fmt.Println("#op_call()l, jump to pc:", state.pc)
+	fmt.Println("#op_call(), jump to pc:", state.pc)
 }
 
 func (state *VMState) opRet() {
@@ -101,6 +101,21 @@ func (state *VMState) opInstallTask() {
 func (state *VMState) opYieldTask() {
 	//TODO 	_scriptPaused = true;
 	fmt.Println("#opYieldTask TODO")
+}
+
+func (state *VMState) opRemoveTask() {
+	fmt.Println("#opRemoveTask TODO")
+	//TODO _scriptPtr.pc = _res->_segCode + 0xFFFF;
+	//TODO _scriptPaused = true;
+}
+
+func (state *VMState) opChangeTaskState() {
+	j := state.fetchByte()
+	i := state.fetchByte()
+	a := state.fetchByte()
+	fmt.Println("#opChangeTaskState TODO", j, i, a)
+	//TODO _scriptPtr.pc = _res->_segCode + 0xFFFF;
+	//TODO _scriptPaused = true;
 }
 
 func (state *VMState) opJmpIfVar() {
@@ -150,6 +165,21 @@ func (state *VMState) opCondJmp() {
 	} else {
 		state.fetchWord()
 	}
+}
+
+func (state *VMState) opVidSetPalette() {
+	index := state.fetchWord()
+	fmt.Println("#opVidSetPalette", index)
+	//TODO	_vid->_nextPal = num >> 8
+}
+
+func (state *VMState) opVidDrawString() {
+	stringId := state.fetchWord()
+	x := state.fetchByte()
+	y := state.fetchByte()
+	col := state.fetchByte()
+	fmt.Println("#opVidDrawString", stringId, x, y, col)
+	//TODO _vid->drawString(col, x, y, strId);
 }
 
 func (state *VMState) opVidSelectPage() {
@@ -238,4 +268,18 @@ func (state *VMState) opPlaySound() {
 	channel := int(state.fetchByte())
 	fmt.Printf("op_playSound(0x%X, %d, %d, %d)\n", resNum, freq, vol, channel)
 	//TODO snd_playSound(resNum, freq, vol, channel);
+}
+
+func (state *VMState) opUpdateResource() {
+	number := int(state.fetchWord())
+	fmt.Println("opUpdateResource", number)
+	/*
+	if (num == 0) {
+			_ply->stop();
+			_mix->stopAll();
+			_res->invalidateRes();
+		} else {
+			_res->update(num);
+		}*/
+	//TODO _res->update(num);
 }

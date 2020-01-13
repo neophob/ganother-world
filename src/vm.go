@@ -149,6 +149,7 @@ func (state *VMState) executeOp() {
 		state.opYieldTask()
 	case 0x07:
 		state.opJmp()
+
 	case 0x08:
 		state.opInstallTask()
 	case 0x09:
@@ -156,13 +157,10 @@ func (state *VMState) executeOp() {
 	case 0x0A:
 		state.opCondJmp()
 	case 0x0B:
-		fmt.Println("XXXop_setPalette")
-		//		uint16_t paletteId = _scriptPtr.fetchWord();
+		state.opVidSetPalette()
 
 	case 0x0C:
-		fmt.Println("XXXop_changeTasksState")
-		//		uint8_t threadId = _scriptPtr.fetchByte();
-		//		uint8_t i =        _scriptPtr.fetchByte();
+		state.opChangeTaskState()
 	case 0x0D:
 		state.opVidSelectPage()
 	case 0x0E:
@@ -173,13 +171,9 @@ func (state *VMState) executeOp() {
 	case 0x10:
 		state.opVidUpdatePage()
 	case 0x11:
-		fmt.Println("XXXop_removeTask")
+		state.opRemoveTask()
 	case 0x12:
-		fmt.Println("XXXop_drawString")
-		//		uint16_t stringId = _scriptPtr.fetchWord();
-		//		uint16_t x = _scriptPtr.fetchByte();
-		//		uint16_t y = _scriptPtr.fetchByte();
-		//		uint16_t color = _scriptPtr.fetchByte();
+		state.opVidDrawString()
 	case 0x13:
 		state.opSub()
 
@@ -195,8 +189,7 @@ func (state *VMState) executeOp() {
 	case 0x18:
 		state.opPlaySound()
 	case 0x19:
-		fmt.Println("XXXop_updateMemList aka load resource")
-		//		uint16_t resourceId = _scriptPtr.fetchWord();
+		state.opUpdateResource()
 	case 0x1A:
 		state.opPlayMusic()
 	default:
