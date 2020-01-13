@@ -112,51 +112,14 @@ func (state *VMState) executeOp() {
 	fmt.Println("> step", opcode, state.pc)
 
 	if opcode > 0x7F {
-		offset := ((opcode << 8) | state.fetchByte()) << 1
-		posX := state.fetchByte()
-		posY := state.fetchByte()
-		height := posY - 199
-		if height > 0 {
-			posY = 199
-			posX += height
-		}
-		fmt.Println("DRAW_POLY_BACKGROUND", posX, posY, offset)
-		//			_vid->setDataBuffer(_res->_segVideo1, off);
-		//			_vid->drawShape(0xFF, 0x40, &pt);
+		state.opVidDrawPolyBackground(opcode)
 		return
 	}
+
 	if opcode > 0x3F {
-		offsetHi := state.fetchByte()
-		offset := ((offsetHi << 8) | state.fetchByte()) << 1
-		posX := int(state.fetchByte())
-
-		if opcode&0x20 == 0 {
-			if opcode&0x10 == 0 {
-				posX = (posX << 8) | int(state.fetchByte())
-			} else {
-				posX = state.variables[posX]
-			}
-		} else {
-			if opcode&0x10 > 0 {
-				posX += 0x100
-			}
-		}
-		posY := int(state.fetchByte())
-		if opcode&8 == 0 {
-			if opcode&4 == 0 {
-				posY = (posY << 8) | int(state.fetchByte())
-			} else {
-				posY = state.variables[posY]
-			}
-		}
-
-		zoom := state.fetchByte()
-
-		fmt.Printf("DRAW_POLY_SPRITE x:%d, y:%d, offset:%d, zoom:%d\n", posX, posY, offset, zoom)
+		state.opVidDrawPolySprite(opcode)
 		return
 	}
-
-	//var offset uint16
 
 	switch opcode {
 

@@ -1,13 +1,14 @@
 # ganother-world
 
+GOAL:
+- Learn GO and implement "something fun"
+- "something fun" - interpret the old game another world and create a web version!
+
 Reference:
+- https://github.com/cyxx/rawgl
 - https://fabiensanglard.net/anotherWorld_code_review/
 - https://fabiensanglard.net/another_world_polygons/index.html
-- https://github.com/cyxx/rawgl
 - http://www.anotherworld.fr/anotherworld_uk/another_world.htm
-
-- GOAL: Learn GO and implement "something fun"
-- "something fun" - interpret the old game another world and create a web version!
 
 # ARCHITECTURE
 
