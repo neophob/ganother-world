@@ -12,9 +12,7 @@ const (
 )
 
 type MemlistEntry struct {
-	state        uint8 //ofs: 0
-	resourceType uint8 //ofs: 1
-	data         []uint8
+	resourceType uint8  //ofs: 1
 	rankNum      uint8  //ofs: 6
 	bankId       uint8  //ofs: 7
 	bankOffset   uint32 //ofs: 8
@@ -36,7 +34,6 @@ func unmarshallingMemlistBin(data []uint8) (map[int]MemlistEntry, MemlistStatist
 
 	for i := 0; i < len(data); i += MemlistEntrySize {
 		entry := MemlistEntry{
-			state:        data[i],
 			resourceType: data[i+1],
 			rankNum:      data[i+6],
 			bankId:       data[i+7],
@@ -45,11 +42,11 @@ func unmarshallingMemlistBin(data []uint8) (map[int]MemlistEntry, MemlistStatist
 			unpackedSize: toUint32BE(data[i+16], data[i+17], data[i+18], data[i+19]),
 		}
 		// Bail out when last entry is found
-		if entry.state == 0xFF {
+		if entry.resourceType == 0xFF {
 			break
 		}
-		fmt.Printf("R:%#02x, %-17s size=%5d (%5d)  bank=%2d  offset=%6d __%d\n", memlistStatistic.entryCount,
-			getResourceTypeName(int(entry.resourceType)), entry.unpackedSize, entry.packedSize, entry.bankId, entry.bankOffset, len(entry.data))
+		fmt.Printf("R:%#02x, %-17s size=%5d (%5d)  bank=%2d  offset=%6d\n", memlistStatistic.entryCount,
+			getResourceTypeName(int(entry.resourceType)), entry.unpackedSize, entry.packedSize, entry.bankId, entry.bankOffset)
 		resourceMap[memlistStatistic.entryCount] = entry
 		memlistStatistic.entryCount++
 		memlistStatistic.sizeCompressed += int(entry.packedSize)
@@ -76,14 +73,4 @@ func getResourceTypeName(id int) string {
 		return resourceNames[id]
 	}
 	return ""
-}
-
-func (assets *Assets) loadResource(id int) {
-	if id >= GAME_PART_ID_1 {
-		fmt.Println("should load next part", id)
-		//vmState.setupGamePart(GAME_PART1 + 1)
-		return
-	}
-	fmt.Println("loadResource", id)
-	fmt.Println("->", assets.memList[id])
 }

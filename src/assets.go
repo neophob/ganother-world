@@ -5,9 +5,10 @@ import (
 )
 
 type Assets struct {
-	memList   map[int]MemlistEntry
-	gameParts map[int]GamePartContent
-	bank      map[int][]uint8
+	memList         map[int]MemlistEntry
+	gameParts       map[int]GamePartContent
+	bank            map[int][]uint8
+	loadedResources map[int][]uint8
 }
 
 // this is a function for the Assets struct
@@ -23,4 +24,14 @@ func (assets Assets) loadEntryFromBank(index int) []uint8 {
 	}
 	returnValue, _ := unpack(result)
 	return returnValue
+}
+
+func (assets *Assets) loadResource(id int) {
+	fmt.Println("->", assets.memList[id])
+	if len(assets.loadedResources[id]) > 0 {
+		fmt.Println("resource already loaded", id)
+		return
+	}
+	fmt.Println("loadResource", id)
+	assets.loadedResources[id] = assets.loadEntryFromBank(id)
 }

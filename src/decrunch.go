@@ -1,9 +1,5 @@
 package main
 
-import (
-	"fmt"
-)
-
 type UnpackCtx struct {
 	size         uint32
 	crc          uint32
@@ -82,11 +78,8 @@ func unpack(data []uint8) ([]uint8, uint32) {
 	unpackCtx.size = unpackCtx.readUInt32BE()
 	unpackCtx.crc = unpackCtx.readUInt32BE()
 	unpackCtx.bits = unpackCtx.readUInt32BE()
-
 	unpackCtx.dest = make([]uint8, unpackCtx.size)
 	unpackCtx.destOffset = int(unpackCtx.size - 1)
-
-	fmt.Println("XXX", dataLen, unpackCtx.size, unpackCtx.crc, unpackCtx.bits, unpackCtx.sourceOffset)
 
 	// put current pointer to file end minus the 3 read uint32 values..
 	unpackCtx.sourceOffset = dataLen - 1 - 4*3

@@ -19,7 +19,12 @@ func main() {
 
 	bankFilesMap := createBankMap("./assets/")
 	gameParts := getGameParts()
-	assets := Assets{resourceMap, gameParts, bankFilesMap}
+	assets := Assets{
+		memList:         resourceMap,
+		gameParts:       gameParts,
+		bank:            bankFilesMap,
+		loadedResources: make(map[int][]uint8),
+	}
 
 	log.Println("- create state")
 	vmState := createNewState(assets)
