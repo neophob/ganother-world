@@ -15,23 +15,21 @@ type Assets struct {
 func (assets Assets) loadEntryFromBank(index int) []uint8 {
 	memlistEntry := assets.memList[index]
 	bank := assets.bank[int(memlistEntry.bankId)]
-	fmt.Printf("Bank %d size %d, offset %v\n", index, len(bank), memlistEntry)
-	fmt.Println("slice", memlistEntry.bankOffset, memlistEntry.packedSize)
+	fmt.Printf("loadResource on bank %d size %d, offset %v\n", index, len(bank), memlistEntry)
 	ofs := int(memlistEntry.bankOffset)
 	result := bank[ofs : ofs+int(memlistEntry.packedSize)]
 	if memlistEntry.packedSize == memlistEntry.unpackedSize {
 		return result
 	}
+	fmt.Println("unpack data")
 	returnValue, _ := unpack(result)
 	return returnValue
 }
 
 func (assets *Assets) loadResource(id int) {
-	fmt.Println("->", assets.memList[id])
 	if len(assets.loadedResources[id]) > 0 {
 		fmt.Println("resource already loaded", id)
 		return
 	}
-	fmt.Println("loadResource", id)
 	assets.loadedResources[id] = assets.loadEntryFromBank(id)
 }

@@ -13,7 +13,7 @@ GOFILES := $(wildcard *.go)
 
 # -X add string value definition of the form importpath.name=value
 RELEASE := -ldflags "-s -w -X gaw.hello=world"
-SRC := src/main.go src/resource.go src/vm.go src/parts.go src/decrunch.go src/ops.go src/assets.go
+SRC := src/main.go src/resource.go src/vm.go src/parts.go src/decrunch.go src/ops.go src/assets.go src/video.go
 SRCDIR := ./src
 
 ## build: build go binary in dev mode

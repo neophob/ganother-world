@@ -173,25 +173,22 @@ func (state *VMState) opVidSetPalette() {
 }
 
 func (state *VMState) opVidDrawString() {
-	stringId := state.fetchWord()
-	x := state.fetchByte()
-	y := state.fetchByte()
-	col := state.fetchByte()
-	fmt.Println("#opVidDrawString", stringId, x, y, col)
-	//TODO _vid->drawString(col, x, y, strId);
+	stringId := int(state.fetchWord())
+	x := int(state.fetchByte())
+	y := int(state.fetchByte())
+	col := int(state.fetchByte())
+	drawString(col, x, y, stringId)
 }
 
 func (state *VMState) opVidSelectPage() {
-	page := state.fetchByte()
-	fmt.Println("#opVidSelectPage", page)
-	//TODO	_vid->setWorkPagePtr(i);
+	page := int(state.fetchByte())
+	setWorkPagePtr(page)
 }
 
 func (state *VMState) opVidFillPage() {
-	page := state.fetchByte()
-	color := state.fetchByte()
-	fmt.Println("#opVidFillPage", page, color)
-	//TODO _vid->fillPage(i, color);
+	page := int(state.fetchByte())
+	color := int(state.fetchByte())
+	fillPage(page, color)
 }
 
 func (state *VMState) opVidCopyPage() {
@@ -211,16 +208,15 @@ func (state *VMState) opVidUpdatePage() {
 
 func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
 	offset := ((int(opcode) << 8) | int(state.fetchByte())) << 1
-	posX := state.fetchByte()
-	posY := state.fetchByte()
+	posX := int(state.fetchByte())
+	posY := int(state.fetchByte())
 	height := posY - 199
 	if height > 0 {
 		posY = 199
 		posX += height
 	}
-	fmt.Println("DRAW_POLY_BACKGROUND", posX, posY, offset)
-	//			_vid->setDataBuffer(_res->_segVideo1, off);
-	//			_vid->drawShape(0xFF, 0x40, &pt);
+	setDataBuffer(offset)
+	drawShape(0xFF, 0x40, posX, posY)
 }
 
 func (state *VMState) opVidDrawPolySprite(opcode uint8) {
@@ -248,8 +244,26 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 		}
 	}
 
-	zoom := state.fetchByte()
-	fmt.Printf("DRAW_POLY_SPRITE x:%d, y:%d, offset:%d, zoom:%d\n", posX, posY, offset, zoom)
+	zoom := int(state.fetchByte())
+	if opcode&2 == 0 {
+		if opcode&1 == 0 {
+			//TODO hmm interesting...
+			state.pc--
+			fmt.Println("zoom decreased PC", state.pc)
+			zoom = 0x40
+		} else {
+			zoom = state.variables[zoom]
+		}
+	} else {
+		if opcode&1 > 0 {
+			//_res->_useSegVideo2 = true;
+			state.pc--
+			fmt.Println("zoom decreased PC", state.pc)
+			zoom = 0x40
+		}
+	}
+	setDataBuffer(offset)
+	drawShape(0xFF, zoom, posX, posY)
 }
 
 func (state *VMState) opPlayMusic() {
