@@ -28,10 +28,10 @@ func main() {
 
 	log.Println("- create state")
 	vmState := createNewState(assets)
-	vmState.setupGamePart(GAME_PART_ID_1)
+	vmState.setupGamePart(GAME_PART_ID_1 + 2)
 
 	//start endless loop
-	for i := 0; i < 128; i++ {
+	for i := 0; i < 9128; i++ {
 		//vmState.executeOp()
 		vmState.mainLoop()
 	}

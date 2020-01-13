@@ -107,7 +107,7 @@ func (state *VMState) setupGamePart(newGamePart int) {
 
 func (state *VMState) executeOp() {
 	opcode := state.bytecode[state.pc]
-	fmt.Println("> step", opcode, state.pc)
+	fmt.Printf("> step: opcode[%2d], pc[%5d], channel[%2d] >>> ", opcode, state.pc, state.channelId)
 	state.pc++
 
 	if opcode > 0x7F {
@@ -193,13 +193,8 @@ func (state *VMState) mainLoop() {
 
 		// Inactive threads are marked with a thread instruction pointer set to 0xFFFF (VM_INACTIVE_THREAD).
 		if channelPointerState != VM_INACTIVE_THREAD {
-			fmt.Println("channel active!", channelId, channelPointerState)
-			//TODO load resource!
 			state.channelId = channelId
 			state.executeOp()
-			//			_scriptPtr.pc = res->segBytecode + n;
-			//		uint8_t opcode = _scriptPtr.fetchByte();
-			//  execute
 			//state.channelData[channelId] = _scriptPtr.pc - res->segBytecode;
 		}
 	}
