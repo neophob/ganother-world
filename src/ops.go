@@ -24,11 +24,69 @@ func (state *VMState) opMov() {
 	state.variables[dest] = state.variables[source]
 }
 
+func (state *VMState) opAdd() {
+	dest := state.fetchByte()
+	source := state.fetchByte()
+	fmt.Println("#op_add()", dest, state.variables[source])
+	state.variables[dest] += state.variables[source]
+}
+
+func (state *VMState) opSub() {
+	dest := state.fetchByte()
+	source := state.fetchByte()
+	fmt.Println("#op_sub()", dest, state.variables[source])
+	state.variables[dest] -= state.variables[source]
+}
+
+func (state *VMState) opAnd() {
+	index := state.fetchByte()
+	value := int(state.fetchWord())
+	fmt.Println("#op_and()", index, value)
+	state.variables[index] = state.variables[index] & value
+}
+
+func (state *VMState) opOr() {
+	index := state.fetchByte()
+	value := int(state.fetchWord())
+	fmt.Println("#op_or()", index, value)
+	state.variables[index] = state.variables[index] | value
+}
+
+func (state *VMState) opShl() {
+	index := state.fetchByte()
+	value := int(state.fetchWord())
+	fmt.Println("#op_shl()", index, value)
+	state.variables[index] = state.variables[index] << value
+}
+
+func (state *VMState) opShr() {
+	index := state.fetchByte()
+	value := int(state.fetchWord())
+	fmt.Println("#op_shr()", index, value)
+	state.variables[index] = state.variables[index] >> value
+}
+
+func (state *VMState) opAddConst() {
+	//TODO add workaround for vm bug
+	//		if (_res->_currentPart == 16006 && _scriptPtr.pc == _res->_segCode + 0x6D48) {
+	//	warning("Script::op_addConst() workaround for infinite looping gun sound");
+	//snd_playSound(0x5B, 1, 64, 1);
+	index := state.fetchByte()
+	value := int(state.fetchWord())
+	fmt.Println("#op_addConst()", index, value)
+	state.variables[index] += value
+}
+
 func (state *VMState) opCall() {
 	offset := state.fetchWord()
-	state.saveCurrentSP()
+	state.saveSP()
 	state.pc = int(offset)
-	fmt.Println("#op_call() jump to", state.pc)
+	fmt.Println("#op_call()l, jump to pc:", state.pc)
+}
+
+func (state *VMState) opRet() {
+	state.pc = state.restoreSP()
+	fmt.Println("#op_ret(), pc:", state.pc)
 }
 
 func (state *VMState) opInstallTask() {
@@ -38,6 +96,11 @@ func (state *VMState) opInstallTask() {
 	//	assert(i < 0x40);
 	// TODO validate me: 	_scriptTasks[1][i] = n;
 	state.channelData[index] = value
+}
+
+func (state *VMState) opYieldTask() {
+	//TODO 	_scriptPaused = true;
+	fmt.Println("#opYieldTask TODO")
 }
 
 func (state *VMState) opJmpIfVar() {
@@ -89,6 +152,34 @@ func (state *VMState) opCondJmp() {
 	}
 }
 
+func (state *VMState) opVidSelectPage() {
+	page := state.fetchByte()
+	fmt.Println("#opVidSelectPage", page)
+	//TODO	_vid->setWorkPagePtr(i);
+}
+
+func (state *VMState) opVidFillPage() {
+	page := state.fetchByte()
+	color := state.fetchByte()
+	fmt.Println("#opVidFillPage", page, color)
+	//TODO _vid->fillPage(i, color);
+}
+
+func (state *VMState) opVidCopyPage() {
+	source := state.fetchByte()
+	dest := state.fetchByte()
+	fmt.Println("#opVidCopyPage", source, dest)
+	//TODO _vid->copyPage(i, j, _scriptVars[VAR_SCROLL_Y]);
+}
+
+func (state *VMState) opVidUpdatePage() {
+	page := state.fetchByte()
+	fmt.Println("#opVidUpdatePage", page)
+	//TODO inp_handleSpecialKeys();
+	//TODO bypass protection, handle pause
+	//_vid->updateDisplay(page, _stub);
+}
+
 func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
 	offset := ((int(opcode) << 8) | int(state.fetchByte())) << 1
 	posX := state.fetchByte()
@@ -136,6 +227,15 @@ func (state *VMState) opPlayMusic() {
 	resNum := int(state.fetchWord())
 	delay := int(state.fetchWord())
 	pos := int(state.fetchByte())
-	fmt.Printf("op_playMusic(0x%X, %d, %d)\n", resNum, delay, pos);
+	fmt.Printf("op_playMusic(0x%X, %d, %d)\n", resNum, delay, pos)
 	//TODO snd_playMusic(resNum, delay, pos);
+}
+
+func (state *VMState) opPlaySound() {
+	resNum := int(state.fetchWord())
+	freq := int(state.fetchByte())
+	vol := int(state.fetchByte())
+	channel := int(state.fetchByte())
+	fmt.Printf("op_playSound(0x%X, %d, %d, %d)\n", resNum, freq, vol, channel)
+	//TODO snd_playSound(resNum, freq, vol, channel);
 }

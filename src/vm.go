@@ -59,13 +59,20 @@ func createNewState(assets Assets) VMState {
 	return state
 }
 
-func (state *VMState) saveCurrentSP() {
+func (state *VMState) saveSP() {
 	if state.sp >= VM_MAX_STACK_SIZE {
 		panic("SaveSP, stack overflow")
 	}
-
 	state.stackCalls[state.sp] = state.pc
 	state.sp++
+}
+
+func (state *VMState) restoreSP() int {
+	if state.sp == 0 {
+		panic("restoreSP, stack underflow")
+	}
+	state.sp--
+	return state.stackCalls[state.sp]
 }
 
 func (state *VMState) fetchByte() uint8 {
@@ -112,6 +119,7 @@ func (state *VMState) setupGamePart(newGamePart int) {
 func (state *VMState) executeOp() {
 	opcode := state.bytecode[state.pc]
 	fmt.Println("> step", opcode, state.pc)
+	state.pc++
 
 	if opcode > 0x7F {
 		state.opVidDrawPolyBackground(opcode)
@@ -129,20 +137,16 @@ func (state *VMState) executeOp() {
 	case 0x01:
 		state.opMov()
 	case 0x02:
-		fmt.Println("op_add")
-		//uint8_t dstVariableId = _scriptPtr.fetchByte();
-		//uint8_t srcVariableId = _scriptPtr.fetchByte();
+		state.opAdd()
 	case 0x03:
-		fmt.Println("op_addConst")
-		//uint8_t variableId = _scriptPtr.fetchByte();
-		//int16_t value = _scriptPtr.fetchWord();
+		state.opAddConst()
 
 	case 0x04:
 		state.opCall()
 	case 0x05:
-		fmt.Println("op_ret")
+		state.opRet()
 	case 0x06:
-		fmt.Println("op_yieldTask")
+		state.opYieldTask()
 	case 0x07:
 		state.opJmp()
 	case 0x08:
@@ -152,66 +156,46 @@ func (state *VMState) executeOp() {
 	case 0x0A:
 		state.opCondJmp()
 	case 0x0B:
-		fmt.Println("op_setPalette")
+		fmt.Println("XXXop_setPalette")
 		//		uint16_t paletteId = _scriptPtr.fetchWord();
 
 	case 0x0C:
-		fmt.Println("op_changeTasksState")
+		fmt.Println("XXXop_changeTasksState")
 		//		uint8_t threadId = _scriptPtr.fetchByte();
 		//		uint8_t i =        _scriptPtr.fetchByte();
 	case 0x0D:
-		fmt.Println("op_selectVideoPage")
-		//		uint8_t frameBufferId = _scriptPtr.fetchByte();
+		state.opVidSelectPage()
 	case 0x0E:
-		fmt.Println("op_fillVideoPage")
-		//		uint8_t pageId = _scriptPtr.fetchByte();
-		//		uint8_t color = _scriptPtr.fetchByte()
+		state.opVidFillPage()
 	case 0x0F:
-		fmt.Println("op_copyVideoPage")
-		//		uint8_t srcPageId = _scriptPtr.fetchByte();
-		//		uint8_t dstPageId = _scriptPtr.fetchByte();
+		state.opVidCopyPage()
 
 	case 0x10:
-		page := state.fetchByte()
-		fmt.Println("op_updateDisplay(), page", page)
+		state.opVidUpdatePage()
 	case 0x11:
-		fmt.Println("op_removeTask")
+		fmt.Println("XXXop_removeTask")
 	case 0x12:
-		fmt.Println("op_drawString")
+		fmt.Println("XXXop_drawString")
 		//		uint16_t stringId = _scriptPtr.fetchWord();
 		//		uint16_t x = _scriptPtr.fetchByte();
 		//		uint16_t y = _scriptPtr.fetchByte();
 		//		uint16_t color = _scriptPtr.fetchByte();
 	case 0x13:
-		fmt.Println("op_sub")
-		//		uint8_t i = _scriptPtr.fetchByte();
-		//		uint8_t j = _scriptPtr.fetchByte();
+		state.opSub()
 
 	case 0x14:
-		fmt.Println("op_and")
-		//		uint8_t variableId = _scriptPtr.fetchByte();
-		//		uint16_t n = _scriptPtr.fetchWord();
+		state.opAnd()
 	case 0x15:
-		fmt.Println("op_or")
-		//		uint8_t variableId = _scriptPtr.fetchByte();
-		//		uint16_t value = _scriptPtr.fetchWord();
+		state.opOr()
 	case 0x16:
-		fmt.Println("op_shl")
-		//		uint8_t variableId = _scriptPtr.fetchByte();
-		//		uint16_t leftShiftValue = _scriptPtr.fetchWord();
+		state.opShl()
 	case 0x17:
-		fmt.Println("op_shr")
-		//		uint8_t variableId = _scriptPtr.fetchByte();
-		//		uint16_t rightShiftValue = _scriptPtr.fetchWord();
+		state.opShr()
 
 	case 0x18:
-		fmt.Println("op_playSound")
-		//		uint16_t resourceId = _scriptPtr.fetchWord();
-		//		uint8_t freq = _scriptPtr.fetchByte();
-		//		uint8_t vol = _scriptPtr.fetchByte();
-		//		uint8_t channel = _scriptPtr.fetchByte();
+		state.opPlaySound()
 	case 0x19:
-		fmt.Println("op_updateMemList aka load resource")
+		fmt.Println("XXXop_updateMemList aka load resource")
 		//		uint16_t resourceId = _scriptPtr.fetchWord();
 	case 0x1A:
 		state.opPlayMusic()
