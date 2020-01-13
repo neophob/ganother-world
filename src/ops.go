@@ -113,7 +113,6 @@ func (state *VMState) opChangeTaskState() {
 	a := state.fetchByte()
 	fmt.Println("#opChangeTaskState TODO", j, i, a)
 	//TODO _scriptPtr.pc = _res->_segCode + 0xFFFF;
-	//TODO _scriptPaused = true;
 }
 
 func (state *VMState) opJmpIfVar() {
