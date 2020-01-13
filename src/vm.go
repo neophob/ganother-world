@@ -15,6 +15,7 @@ const (
 	VM_INACTIVE_THREAD     int = 0xFFFF
 
 	VM_VARIABLE_RANDOM_SEED          int = 0x3C
+	VM_VARIABLE_SCREEN_NUM           int = 0x67
 	VM_VARIABLE_LAST_KEYCHAR         int = 0xDA
 	VM_VARIABLE_HERO_POS_UP_DOWN     int = 0xE5
 	VM_VARIABLE_MUS_MARK             int = 0xF4
@@ -36,6 +37,7 @@ type VMState struct {
 	stackCalls  [VM_MAX_STACK_SIZE]int
 	pc          int
 	bytecode    []uint8
+	channelId   int
 }
 
 func createNewState(assets Assets) VMState {
@@ -185,7 +187,7 @@ func (state *VMState) executeOp() {
 }
 
 // Run the Virtual Machine for every active threads
-func mainLoop(state VMState) {
+func (state *VMState) mainLoop() {
 	for channelId := 0x00; channelId < VM_NUM_THREADS; channelId++ {
 		channelPointerState := state.channelData[channelId]
 
@@ -193,7 +195,8 @@ func mainLoop(state VMState) {
 		if channelPointerState != VM_INACTIVE_THREAD {
 			fmt.Println("channel active!", channelId, channelPointerState)
 			//TODO load resource!
-			state.pc = 0 + channelPointerState
+			state.channelId = channelId
+			state.executeOp()
 			//			_scriptPtr.pc = res->segBytecode + n;
 			//		uint8_t opcode = _scriptPtr.fetchByte();
 			//  execute

@@ -32,8 +32,10 @@ func main() {
 
 	//start endless loop
 	for i := 0; i < 128; i++ {
-		vmState.executeOp()
+		//vmState.executeOp()
+		vmState.mainLoop()
 	}
+
 }
 
 func readFile(filename string) []byte {

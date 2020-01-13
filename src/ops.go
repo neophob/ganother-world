@@ -103,8 +103,8 @@ func (state *VMState) opYieldTask() {
 }
 
 func (state *VMState) opRemoveTask() {
-	fmt.Println("#opRemoveTask TODO")
-	//TODO _scriptPtr.pc = _res->_segCode + 0xFFFF;
+	fmt.Println("#opRemoveTask", state.channelId)
+	state.channelData[state.channelId] = VM_INACTIVE_THREAD
 	//TODO _scriptPaused = true;
 }
 
