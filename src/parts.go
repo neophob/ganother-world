@@ -7,8 +7,23 @@ type GamePartContent struct {
 	video2    int
 }
 
+const (
+	GAME_PART_FIRST int = 0x3E80
+	GAME_PART_LAST  int = 0x3E89
+	GAME_PART_ID_1  int = 0x3E80
+	GAME_PART_ID_2  int = 0x3E81 //Introductino
+	GAME_PART_ID_3  int = 0x3E82
+	GAME_PART_ID_4  int = 0x3E83 //Wake up in the suspended jail
+	GAME_PART_ID_5  int = 0x3E84
+	GAME_PART_ID_6  int = 0x3E85 //BattleChar sequence
+	GAME_PART_ID_7  int = 0x3E86
+	GAME_PART_ID_8  int = 0x3E87
+	GAME_PART_ID_9  int = 0x3E88
+	GAME_PART_ID_10 int = 0x3E89
+)
+
 // The game is divided in 10 parts - each part has its own code, palette and videos
-// kPartCopyProtection
+// kPartCopyProtection 16000
 // kPartIntro
 // kPartWater
 // kPartPrison

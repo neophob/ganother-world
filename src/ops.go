@@ -270,9 +270,14 @@ func (state *VMState) opPlaySound() {
 }
 
 func (state *VMState) opUpdateResource() {
-	number := int(state.fetchWord())
-	fmt.Println("opUpdateResource", number)
-	state.assets.loadResource(number)
+	id := int(state.fetchWord())
+	fmt.Println("opUpdateResource", id)
+	if id >= GAME_PART_ID_1 {
+		fmt.Println("should load next part", id)
+		state.setupGamePart(id)
+		return
+	}
+	state.assets.loadResource(id)
 	/*
 		if (num == 0) {
 				_ply->stop();

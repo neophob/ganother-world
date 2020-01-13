@@ -11,19 +11,6 @@ const (
 
 	VM_MAX_STACK_SIZE int = 64
 
-	GAME_PART_FIRST int = 0x3E80
-	GAME_PART_LAST  int = 0x3E89
-	GAME_PART1      int = 0x3E80
-	GAME_PART2      int = 0x3E81 //Introductino
-	GAME_PART3      int = 0x3E82
-	GAME_PART4      int = 0x3E83 //Wake up in the suspended jail
-	GAME_PART5      int = 0x3E84
-	GAME_PART6      int = 0x3E85 //BattleChar sequence
-	GAME_PART7      int = 0x3E86
-	GAME_PART8      int = 0x3E87
-	GAME_PART9      int = 0x3E88
-	GAME_PART10     int = 0x3E89
-
 	VM_NO_SETVEC_REQUESTED int = 0xFFFF
 	VM_INACTIVE_THREAD     int = 0xFFFF
 
