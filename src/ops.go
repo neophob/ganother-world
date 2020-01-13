@@ -31,6 +31,25 @@ func (state *VMState) opCall() {
 	fmt.Println("#op_call() jump to", state.pc)
 }
 
+func (state *VMState) opInstallTask() {
+	index := state.fetchByte()
+	value := int(state.fetchWord())
+	fmt.Println("#opInstallTask", index, value)
+	//	assert(i < 0x40);
+	// TODO validate me: 	_scriptTasks[1][i] = n;
+	state.channelData[index] = value
+}
+
+func (state *VMState) opJmpIfVar() {
+	index := state.fetchByte()
+	state.variables[index]--
+	if state.variables[index] != 0 {
+		state.opJmp()
+	} else {
+		state.fetchWord()
+	}
+}
+
 func (state *VMState) opCondJmp() {
 	op := state.fetchByte()
 	variableId := uint16(state.fetchByte())
@@ -111,4 +130,12 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 
 	zoom := state.fetchByte()
 	fmt.Printf("DRAW_POLY_SPRITE x:%d, y:%d, offset:%d, zoom:%d\n", posX, posY, offset, zoom)
+}
+
+func (state *VMState) opPlayMusic() {
+	resNum := int(state.fetchWord())
+	delay := int(state.fetchWord())
+	pos := int(state.fetchByte())
+	fmt.Printf("op_playMusic(0x%X, %d, %d)\n", resNum, delay, pos);
+	//TODO snd_playMusic(resNum, delay, pos);
 }

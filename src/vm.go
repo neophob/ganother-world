@@ -9,6 +9,8 @@ const (
 	VM_NUM_THREADS   int = 64
 	VM_NUM_VARIABLES int = 256
 
+	VM_MAX_STACK_SIZE int = 64
+
 	GAME_PART_FIRST int = 0x3E80
 	GAME_PART_LAST  int = 0x3E89
 	GAME_PART1      int = 0x3E80
@@ -44,7 +46,7 @@ type VMState struct {
 	channelData [VM_NUM_THREADS]int
 	gamePart    int
 	sp          int
-	stackCalls  [64]int
+	stackCalls  [VM_MAX_STACK_SIZE]int
 	pc          int
 	bytecode    []uint8
 }
@@ -58,8 +60,8 @@ func createNewState(assets Assets) VMState {
 }
 
 func (state *VMState) saveCurrentSP() {
-	if state.sp >= 0x40 {
-		panic("Script::op_call() sp>0x40 stack overflow")
+	if state.sp >= VM_MAX_STACK_SIZE {
+		panic("SaveSP, stack overflow")
 	}
 
 	state.stackCalls[state.sp] = state.pc
@@ -115,7 +117,6 @@ func (state *VMState) executeOp() {
 		state.opVidDrawPolyBackground(opcode)
 		return
 	}
-
 	if opcode > 0x3F {
 		state.opVidDrawPolySprite(opcode)
 		return
@@ -141,17 +142,13 @@ func (state *VMState) executeOp() {
 	case 0x05:
 		fmt.Println("op_ret")
 	case 0x06:
-		fmt.Println("op_pauseThread")
+		fmt.Println("op_yieldTask")
 	case 0x07:
 		state.opJmp()
 	case 0x08:
-		fmt.Println("op_setVect")
-		//		uint8_t threadId = _scriptPtr.fetchByte();
-		//		uint16_t pcOffsetRequested = _scriptPtr.fetchWord();
+		state.opInstallTask()
 	case 0x09:
-		fmt.Println("op_jnz")
-		//		uint8_t i = _scriptPtr.fetchByte();
-		//	  _scriptPtr.fetchWord();
+		state.opJmpIfVar()
 	case 0x0A:
 		state.opCondJmp()
 	case 0x0B:
@@ -159,7 +156,7 @@ func (state *VMState) executeOp() {
 		//		uint16_t paletteId = _scriptPtr.fetchWord();
 
 	case 0x0C:
-		fmt.Println("op_resetThread")
+		fmt.Println("op_changeTasksState")
 		//		uint8_t threadId = _scriptPtr.fetchByte();
 		//		uint8_t i =        _scriptPtr.fetchByte();
 	case 0x0D:
@@ -176,9 +173,9 @@ func (state *VMState) executeOp() {
 
 	case 0x10:
 		page := state.fetchByte()
-		fmt.Println("Script::op_blitFramebuffer(), page", page)
+		fmt.Println("op_updateDisplay(), page", page)
 	case 0x11:
-		fmt.Println("op_killThread")
+		fmt.Println("op_removeTask")
 	case 0x12:
 		fmt.Println("op_drawString")
 		//		uint16_t stringId = _scriptPtr.fetchWord();
@@ -217,10 +214,7 @@ func (state *VMState) executeOp() {
 		fmt.Println("op_updateMemList aka load resource")
 		//		uint16_t resourceId = _scriptPtr.fetchWord();
 	case 0x1A:
-		fmt.Println("op_playMusic")
-		//		uint16_t resNum = _scriptPtr.fetchWord();
-		//		uint16_t delay = _scriptPtr.fetchWord();
-		//		uint8_t pos = _scriptPtr.fetchByte();
+		state.opPlayMusic()
 	default:
 		fmt.Println("NO_OP", opcode)
 	}
