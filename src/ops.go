@@ -56,14 +56,14 @@ func (state *VMState) opShl() {
 	index := state.fetchByte()
 	value := int(state.fetchWord())
 	fmt.Println("#op_shl()", index, value)
-	state.variables[index] = state.variables[index] << value
+	state.variables[index] = state.variables[index] << uint(value)
 }
 
 func (state *VMState) opShr() {
 	index := state.fetchByte()
 	value := int(state.fetchWord())
 	fmt.Println("#op_shr()", index, value)
-	state.variables[index] = state.variables[index] >> value
+	state.variables[index] = state.variables[index] >> uint(value)
 }
 
 func (state *VMState) opAddConst() {
