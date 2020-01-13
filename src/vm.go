@@ -33,11 +33,12 @@ type VMState struct {
 	variables   [VM_NUM_VARIABLES]int
 	channelData [VM_NUM_THREADS]int
 	gamePart    int
-	sp          int
 	stackCalls  [VM_MAX_STACK_SIZE]int
+	sp          int
 	pc          int
 	bytecode    []uint8
 	channelId   int
+	paused      bool
 }
 
 func createNewState(assets Assets) VMState {
@@ -194,7 +195,12 @@ func (state *VMState) mainLoop() {
 		// Inactive threads are marked with a thread instruction pointer set to 0xFFFF (VM_INACTIVE_THREAD).
 		if channelPointerState != VM_INACTIVE_THREAD {
 			state.channelId = channelId
-			state.executeOp()
+			state.paused = false
+			state.pc = state.channelData[channelId]
+			for state.paused == false {
+				state.executeOp()
+			}
+			state.channelData[channelId] = state.pc
 			//state.channelData[channelId] = _scriptPtr.pc - res->segBytecode;
 		}
 	}

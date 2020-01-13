@@ -92,20 +92,19 @@ func (state *VMState) opInstallTask() {
 	index := state.fetchByte()
 	value := int(state.fetchWord())
 	fmt.Println("#opInstallTask", index, value)
-	//	assert(i < 0x40);
 	// TODO validate me: 	_scriptTasks[1][i] = n;
 	state.channelData[index] = value
 }
 
 func (state *VMState) opYieldTask() {
-	//TODO 	_scriptPaused = true;
-	fmt.Println("#opYieldTask TODO")
+	fmt.Println("#opYieldTask")
+	state.paused = true
 }
 
 func (state *VMState) opRemoveTask() {
 	fmt.Println("#opRemoveTask", state.channelId)
 	state.channelData[state.channelId] = VM_INACTIVE_THREAD
-	//TODO _scriptPaused = true;
+	state.paused = true
 }
 
 func (state *VMState) opChangeTaskState() {
