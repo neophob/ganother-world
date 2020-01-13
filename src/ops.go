@@ -199,11 +199,10 @@ func (state *VMState) opVidCopyPage() {
 }
 
 func (state *VMState) opVidUpdatePage() {
-	page := state.fetchByte()
-	fmt.Println("#opVidUpdatePage", page)
+	page := int(state.fetchByte())
 	//TODO inp_handleSpecialKeys();
 	//TODO bypass protection, handle pause
-	//_vid->updateDisplay(page, _stub);
+	updateDisplay(page)
 }
 
 func (state *VMState) opVidDrawPolyBackground(opcode uint8) {

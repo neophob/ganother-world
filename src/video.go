@@ -1,4 +1,6 @@
 //tripple buffering video buffers
+//this mock implementation needs to be implemented for
+//cli and web/wasm) - using an interface?
 package main
 
 import (
@@ -23,8 +25,8 @@ func copyPage() {
 }
 
 // blit
-func updateDisplay() {
-	fmt.Println(">VID: UPDATEDISPLAY")
+func updateDisplay(page int) {
+	fmt.Println(">VID: UPDATEDISPLAY", page)
 }
 
 //TODO gimme a better name
