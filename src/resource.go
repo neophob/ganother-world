@@ -99,3 +99,23 @@ func getResourceTypeName(id int) string {
 	}
 	return ""
 }
+
+/* TODO
+enum {
+	kPartCopyProtection = 16000,
+	kPartIntro = 16001,
+	kPartWater = 16002,
+	kPartPrison = 16003,
+	kPartCite = 16004,
+	kPartArene = 16005,
+	kPartLuxe = 16006,
+	kPartFinal = 16007,
+	kPartPassword = 16008
+};*/
+func (assets *Assets) loadResource(id int) {
+	if id > 16000 {
+		fmt.Println("should load next part", id)
+		return
+	}
+	fmt.Println("loadResource", id)
+}

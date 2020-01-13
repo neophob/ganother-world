@@ -78,14 +78,13 @@ func (state *VMState) opAddConst() {
 }
 
 func (state *VMState) opCall() {
-	offset := state.fetchWord()
 	state.saveSP()
-	state.pc = int(offset)
+	state.pc = int(state.fetchWord())
 	fmt.Println("#op_call(), jump to pc:", state.pc)
 }
 
 func (state *VMState) opRet() {
-	state.pc = state.restoreSP()
+	state.restoreSP()
 	fmt.Println("#op_ret(), pc:", state.pc)
 }
 
@@ -273,13 +272,14 @@ func (state *VMState) opPlaySound() {
 func (state *VMState) opUpdateResource() {
 	number := int(state.fetchWord())
 	fmt.Println("opUpdateResource", number)
+	state.assets.loadResource(number)
 	/*
-	if (num == 0) {
-			_ply->stop();
-			_mix->stopAll();
-			_res->invalidateRes();
-		} else {
-			_res->update(num);
-		}*/
+		if (num == 0) {
+				_ply->stop();
+				_mix->stopAll();
+				_res->invalidateRes();
+			} else {
+				_res->update(num);
+			}*/
 	//TODO _res->update(num);
 }

@@ -67,12 +67,12 @@ func (state *VMState) saveSP() {
 	state.sp++
 }
 
-func (state *VMState) restoreSP() int {
+func (state *VMState) restoreSP() {
 	if state.sp == 0 {
 		panic("restoreSP, stack underflow")
 	}
 	state.sp--
-	return state.stackCalls[state.sp]
+	state.pc = state.stackCalls[state.sp]
 }
 
 func (state *VMState) fetchByte() uint8 {
