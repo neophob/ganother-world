@@ -5,14 +5,14 @@ import (
 	"testing"
 )
 
-const STEPS_TO_RUN int = 2048
+const STEPS_TO_RUN int = 4096
 
 var data = readFile("../assets/memlist.bin")
 var resourceMap, _ = unmarshallingMemlistBin(data)
 var bankFilesMap = createBankMap("../assets/")
 var gameParts = getGameParts()
 
-func run(gamepart, steps int) {
+func run(gamepart, steps int) VMState {
 	assets := Assets{
 		memList:         resourceMap,
 		gameParts:       gameParts,
@@ -25,12 +25,20 @@ func run(gamepart, steps int) {
 	for i := 0; i < steps; i++ {
 		vmState.mainLoop()
 	}
+	return vmState
 }
 
 func TestRunGameparts(t *testing.T) {
 	for part := 0; part < 9; part++ {
 		fmt.Println("### RUN PART", part)
-		run(part, STEPS_TO_RUN)
+		vmState := run(part, STEPS_TO_RUN)
+		//TODO should be 0, there is one case!
+		if vmState.countNoOps > 1 {
+			t.Errorf("countNoOps > 0: part %d %d", part, vmState.countNoOps)
+		}
+		if vmState.countSPNotZero > 1 {
+			t.Errorf("countSPNotZero > 1: part %d %d", part, vmState.countSPNotZero)
+		}
 	}
 }
 

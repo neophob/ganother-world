@@ -114,6 +114,28 @@ func (state *VMState) setupGamePart(newGamePart int) {
 	state.channelPC[0] = 0
 }
 
+// Run the Virtual Machine for every active threads
+func (state *VMState) mainLoop() {
+	for channelId := 0; channelId < VM_NUM_THREADS; channelId++ {
+		channelPC := state.channelPC[channelId]
+		channelPaused := state.channelPaused[channelId]
+		// Inactive threads are marked with a thread instruction pointer set to 0xFFFF (VM_INACTIVE_THREAD).
+		if channelPC != VM_INACTIVE_THREAD && !channelPaused {
+			state.channelId = channelId
+			state.paused = false
+			state.pc = channelPC
+			state.sp = 0
+			for state.paused == false {
+				state.executeOp()
+			}
+			if state.sp > 0 {
+				state.countSPNotZero++
+			}
+			state.channelPC[channelId] = state.pc
+		}
+	}
+}
+
 func (state *VMState) executeOp() {
 	lastPc := state.pc
 	opcode := state.fetchByte()
@@ -195,30 +217,5 @@ func (state *VMState) executeOp() {
 	default:
 		state.countNoOps++
 		fmt.Println("NO_OP", opcode)
-	}
-}
-
-// Run the Virtual Machine for every active threads
-func (state *VMState) mainLoop() {
-	for channelId := 0x00; channelId < VM_NUM_THREADS; channelId++ {
-		channelPC := state.channelPC[channelId]
-		channelPaused := state.channelPaused[channelId]
-		if channelPaused {
-			fmt.Println("IIIKKKSSS!!!!!!!!!!", channelId, channelPC)
-		}
-		// Inactive threads are marked with a thread instruction pointer set to 0xFFFF (VM_INACTIVE_THREAD).
-		if channelPC != VM_INACTIVE_THREAD && !channelPaused {
-			state.channelId = channelId
-			state.paused = false
-			state.pc = channelPC
-			state.sp = 0
-			for state.paused == false {
-				state.executeOp()
-			}
-			if state.sp > 0 {
-				countSPNotZero++
-			}
-			state.channelPC[channelId] = state.pc
-		}
 	}
 }

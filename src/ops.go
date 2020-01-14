@@ -321,7 +321,7 @@ func (state *VMState) opPlaySound() {
 }
 
 func (state *VMState) opUpdateResource() {
-	id := int(state.fetchWord())
+	id := uint16(state.fetchWord())
 	fmt.Println("opUpdateResource", id)
 	if id >= GAME_PART_ID_1 {
 		fmt.Println("should load next part", id)
