@@ -8,5 +8,5 @@ type Renderer interface {
 	updateDisplay(page int)
 	setDataBuffer(offset int)
 	setWorkPagePtr(page int)
+	setPalette(index int)
 }
-

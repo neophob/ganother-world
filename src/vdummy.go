@@ -6,7 +6,6 @@ import (
 )
 
 type DummyRenderer struct {
-	
 }
 
 //TODO where is the stringId defined?
@@ -39,4 +38,9 @@ func (render DummyRenderer) setDataBuffer(offset int) {
 
 func (render DummyRenderer) setWorkPagePtr(page int) {
 	fmt.Println(">VID: SETWORKPAGEPTR", page)
+}
+
+func (render DummyRenderer) setPalette(index int) {
+	fmt.Println(">VID: SETPALETTE", index>>8)
+	//TODO	_vid->_nextPal = num >> 8
 }

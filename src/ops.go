@@ -195,9 +195,8 @@ func (state *VMState) opCondJmp() {
 
 // Fade "palette number" - Changes of colour palette
 func (state *VMState) opVidSetPalette() {
-	index := state.fetchWord()
-	fmt.Println("#opVidSetPalette", index)
-	//TODO	_vid->_nextPal = num >> 8
+	index := int(state.fetchWord())
+	renderer.setPalette(index)
 }
 
 //Text "text number", x, y, color - Displays in the work screen the specified text for the coordinates x,y.
