@@ -9,7 +9,8 @@ import (
 
 //TODO where is the stringId defined?
 func drawString(color, posX, posY, stringId int) {
-	fmt.Printf(">VID: DRAWSTRING color:%d, x:%d, y:%d, stringId:%d\n", color, posX, posY, stringId)
+	text := getText(stringId)
+	fmt.Printf(">VID: DRAWSTRING color:%d, x:%d, y:%d, text:%s\n", color, posX, posY, text)
 }
 
 func drawShape(color, zoom, posX, posY int) {
