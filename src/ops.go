@@ -93,7 +93,7 @@ func (state *VMState) opInstallTask() {
 	value := int(state.fetchWord())
 	fmt.Println("#opInstallTask", index, value)
 	// TODO validate me: 	_scriptTasks[1][i] = n;
-	state.channelData[index] = value
+	state.channelPC[index] = value
 }
 
 func (state *VMState) opYieldTask() {
