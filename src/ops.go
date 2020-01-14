@@ -74,7 +74,7 @@ func (state *VMState) opOr() {
 //Makes a N bit rotation to the left on the variable. Zeros on the right.
 func (state *VMState) opShl() {
 	index := state.fetchByte()
-	value := int(state.fetchWord())
+	value := state.fetchWord()
 	state.variables[index] <<= uint(value)
 	fmt.Println("#op_shl()", index, value, state.variables[index])
 }
@@ -82,15 +82,16 @@ func (state *VMState) opShl() {
 //Makes a N bit rotation to the right on the variable.
 func (state *VMState) opShr() {
 	index := state.fetchByte()
-	value := int(state.fetchWord())
+	value := state.fetchWord()
 	state.variables[index] >>= uint(value)
 	fmt.Println("#op_shr()", index, value, state.variables[index])
 }
 
 //Jsr Adress - Executes the subroutine located at the indicated address.
 func (state *VMState) opCall() {
+	newPC := state.fetchWord()
 	state.saveSP()
-	state.pc = uint16(state.fetchWord())
+	state.pc = newPC
 	fmt.Println("#op_call(), jump to pc:", state.pc, len(state.bytecode))
 }
 
@@ -103,7 +104,7 @@ func (state *VMState) opRet() {
 //Setvec "numéro de canal", address - Initialises a channel with a code address to execute
 func (state *VMState) opInstallTask() {
 	channelID := state.fetchByte()
-	address := uint16(state.fetchWord())
+	address := state.fetchWord()
 	fmt.Println("#opInstallTask", channelID, address)
 	// TODO validate me: 	_scriptTasks[1][i] = n;
 	state.channelPC[channelID] = address

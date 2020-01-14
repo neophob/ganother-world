@@ -16,6 +16,7 @@ const (
 
 	VM_VARIABLE_RANDOM_SEED          int = 0x3C
 	VM_VARIABLE_SCREEN_NUM           int = 0x67
+	VM_VARIABLE_TITLESCREEN          int = 0x54
 	VM_VARIABLE_LAST_KEYCHAR         int = 0xDA
 	VM_VARIABLE_HERO_POS_UP_DOWN     int = 0xE5
 	VM_VARIABLE_MUS_MARK             int = 0xF4
@@ -48,9 +49,9 @@ type VMState struct {
 
 func createNewState(assets Assets) VMState {
 	state := VMState{gamePart: -1, assets: assets}
-	//WTF? whats this? -> create const
-	state.variables[0x54] = 0x81
 	state.variables[VM_VARIABLE_RANDOM_SEED] = 42
+	//WTF? whats this? -> create const
+	state.variables[0xE4] = 0x14
 	return state
 }
 
@@ -91,16 +92,15 @@ func (state *VMState) setupGamePart(newGamePart int) {
 	if newGamePart < GAME_PART_FIRST || newGamePart > GAME_PART_LAST {
 		panic("INVALID_GAME_PART")
 	}
+	if newGamePart == GAME_PART_FIRST {
+		// VAR(0x54) indicates if the "Out of this World" title screen should be presented
+		state.variables[VM_VARIABLE_TITLESCREEN] = 0x81
+	}
 
-	//TODO get bytecode from current game part and add it to the VMstate
 	gamePartAsset := state.assets.gameParts[newGamePart-GAME_PART_FIRST]
 	fmt.Println("- load bytecode, resource", gamePartAsset.bytecode)
 	state.bytecode = state.assets.loadEntryFromBank(gamePartAsset.bytecode)
-	fmt.Println("- executeOp", state.bytecode[0:32])
-
 	state.gamePart = newGamePart
-	//WTF? whats this? -> create const
-	state.variables[0xE4] = 0x14
 
 	//Set all thread to inactive (pc at 0xFFFF or 0xFFFE )
 	for i := range state.channelPC {
