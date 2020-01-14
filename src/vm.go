@@ -29,12 +29,13 @@ const (
 )
 
 type VMState struct {
-	assets     Assets
-	variables  [VM_NUM_VARIABLES]int
-	channelPC  [VM_NUM_THREADS]int
-	gamePart   int
-	stackCalls [VM_MAX_STACK_SIZE]int
-	bytecode   []uint8
+	assets        Assets
+	variables     [VM_NUM_VARIABLES]int
+	channelPC     [VM_NUM_THREADS]int
+	channelPaused [VM_NUM_THREADS]bool
+	gamePart      int
+	stackCalls    [VM_MAX_STACK_SIZE]int
+	bytecode      []uint8
 
 	//TODO rename channel specific data, sp -> spIndex
 	sp        int
@@ -192,13 +193,16 @@ func (state *VMState) executeOp() {
 // Run the Virtual Machine for every active threads
 func (state *VMState) mainLoop() {
 	for channelId := 0x00; channelId < VM_NUM_THREADS; channelId++ {
-		channelPointerState := state.channelPC[channelId]
-
+		channelPC := state.channelPC[channelId]
+		channelPaused := state.channelPaused[channelId]
+		if channelPaused {
+			fmt.Println("IIIKKKSSS!!!!!!!!!!", channelId, channelPC)
+		}
 		// Inactive threads are marked with a thread instruction pointer set to 0xFFFF (VM_INACTIVE_THREAD).
-		if channelPointerState != VM_INACTIVE_THREAD {
+		if channelPC != VM_INACTIVE_THREAD && !channelPaused {
 			state.channelId = channelId
 			state.paused = false
-			state.pc = channelPointerState
+			state.pc = channelPC
 			state.sp = 0
 			for state.paused == false {
 				state.executeOp()

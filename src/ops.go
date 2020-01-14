@@ -130,7 +130,8 @@ func (state *VMState) opChangeTaskState() {
 	fmt.Println("#opChangeTaskState", channelIdStart, channelIdEnd, changeType)
 	for i := channelIdStart; i <= channelIdEnd; i++ {
 		if changeType == 2 {
-			fmt.Println("#opChangeTaskState UNBLOCK? TODO", i)
+			state.channelPaused[i] = false
+			//fmt.Println("#opChangeTaskState UNBLOCK? TODO", i)
 		} else {
 			fmt.Println("#opChangeTaskState TODO", i, changeType)
 		}
@@ -247,6 +248,7 @@ func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
 	drawShape(0xFF, 0x40, posX, posY)
 }
 
+//Spr "'object name" , x, y, z - In the work screen, draws the graphics tool at the coordinates x,y and the zoom factor z. A polygon, a group of polygons...
 func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 	offsetHi := state.fetchByte()
 	offset := ((int(offsetHi) << 8) | int(state.fetchByte())) << 1
