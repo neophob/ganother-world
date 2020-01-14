@@ -27,8 +27,8 @@ func run(gamepart, steps int) {
 	}
 }
 
-func TestRunGamepart2(t *testing.T) {
-	for part := 1; part < 9; part++ {
+func TestRunGameparts(t *testing.T) {
+	for part := 0; part < 9; part++ {
 		fmt.Println("### RUN PART", part)
 		run(part, STEPS_TO_RUN)
 	}

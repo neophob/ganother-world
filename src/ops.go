@@ -3,41 +3,11 @@ package main
 import (
 	"fmt"
 )
-/*
-# ranges - should be a int16 type!
-> step: opcode[78], pc[20170], channel[16] >>> >VID: SETDATABUFFER 114708
->VID: DRAWSHAPE color:255, x:17193, y:32, zoom:0
-> step: opcode[78], pc[20177], channel[16] >>> >VID: SETDATABUFFER 123440
->VID: DRAWSHAPE color:255, x:95, y:28, zoom:64
-
-> step: opcode[ 4], pc[    0], channel[ 0] >>> #op_call(), jump to pc: 17119 62683
-> step: opcode[14], pc[17119], channel[ 0] >>> >VID: FILLPAGE 1 0
-> step: opcode[14], pc[17122], channel[ 0] >>> >VID: FILLPAGE 2 0
-> step: opcode[13], pc[17125], channel[ 0] >>> >VID: SETWORKPAGEPTR 1
-> step: opcode[16], pc[17127], channel[ 0] >>> >VID: UPDATEDISPLAY 1
-> step: opcode[16], pc[17129], channel[ 0] >>> >VID: UPDATEDISPLAY 255
-> step: opcode[16], pc[17131], channel[ 0] >>> >VID: UPDATEDISPLAY 2
-> step: opcode[ 5], pc[17133], channel[ 0] >>> #op_ret(), pc: 1
-> step: opcode[66], pc[    1], channel[ 0] >>> >VID: SETDATABUFFER 114192
->VID: DRAWSHAPE color:255, x:15423, y:23552, zoom:255
-> step: opcode[ 0], pc[    9], channel[ 0] >>> #op_movConst 4 246
-> step: opcode[ 0], pc[   13], channel[ 0] >>> #op_movConst 1 50
-> step: opcode[ 0], pc[   17], channel[ 0] >>> #op_movConst 0 1560
-> step: opcode[ 0], pc[   21], channel[ 0] >>> #op_movConst 106 5120
-> step: opcode[ 2], pc[   25], channel[ 0] >>> #op_add() index=24, var1=0, var2=1560
-> step: opcode[106], pc[   28], channel[ 0] >>> >VID: SETDATABUFFER 10240
->VID: DRAWSHAPE color:255, x:3, y:24, zoom:0
-> step: opcode[106], pc[   34], channel[ 0] >>> >VID: SETDATABUFFER 10240
->VID: DRAWSHAPE color:255, x:1, y:24, zoom:0
-> step: opcode[106], pc[   40], channel[ 0] >>> >VID: SETDATABUFFER 10240
->VID: DRAWSHAPE color:255, x:0, y:4, zoom:71
-> step: opcode[56], pc[   46], channel[ 0] >>> NO_OP 56
-*/
 
 //Continues the code execution at the indicated address.
 func (state *VMState) opJmp() {
 	offset := state.fetchWord()
-	state.pc = int(offset)
+	state.pc = uint16(offset)
 	fmt.Println("#op_jmp() jump to", state.pc)
 }
 
@@ -120,7 +90,7 @@ func (state *VMState) opShr() {
 //Jsr Adress - Executes the subroutine located at the indicated address.
 func (state *VMState) opCall() {
 	state.saveSP()
-	state.pc = int(state.fetchWord())
+	state.pc = uint16(state.fetchWord())
 	fmt.Println("#op_call(), jump to pc:", state.pc, len(state.bytecode))
 }
 
@@ -133,7 +103,7 @@ func (state *VMState) opRet() {
 //Setvec "numéro de canal", address - Initialises a channel with a code address to execute
 func (state *VMState) opInstallTask() {
 	channelID := state.fetchByte()
-	address := int(state.fetchWord())
+	address := uint16(state.fetchWord())
 	fmt.Println("#opInstallTask", channelID, address)
 	// TODO validate me: 	_scriptTasks[1][i] = n;
 	state.channelPC[channelID] = address

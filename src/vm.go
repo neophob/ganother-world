@@ -11,8 +11,8 @@ const (
 
 	VM_MAX_STACK_SIZE int = 64
 
-	VM_NO_SETVEC_REQUESTED int = 0xFFFF
-	VM_INACTIVE_THREAD     int = 0xFFFF
+	VM_NO_SETVEC_REQUESTED uint16 = 0xFFFF
+	VM_INACTIVE_THREAD     uint16 = 0xFFFF
 
 	VM_VARIABLE_RANDOM_SEED          int = 0x3C
 	VM_VARIABLE_SCREEN_NUM           int = 0x67
@@ -29,19 +29,19 @@ const (
 )
 
 type VMState struct {
-	assets        Assets
-	variables     [VM_NUM_VARIABLES]int16
-	channelPC     [VM_NUM_THREADS]int
+	assets    Assets
+	variables [VM_NUM_VARIABLES]int16
+	channelPC [VM_NUM_THREADS]uint16
+	//TODO not sure if this is used!
 	channelPaused [VM_NUM_THREADS]bool
 	gamePart      int
-	stackCalls    [VM_MAX_STACK_SIZE]int
+	stackCalls    [VM_MAX_STACK_SIZE]uint16
 	bytecode      []uint8
 
-	countNoOps    int
-
+	countNoOps int
 	//TODO rename channel specific data, sp -> spIndex
 	sp        int
-	pc        int
+	pc        uint16
 	channelId int
 	paused    bool
 }
@@ -112,9 +112,9 @@ func (state *VMState) setupGamePart(newGamePart int) {
 }
 
 func (state *VMState) executeOp() {
-	opcode := state.bytecode[state.pc]
-	fmt.Printf("> step: opcode[%2d], pc[%5d], channel[%2d] >>> ", opcode, state.pc, state.channelId)
-	state.pc++
+	lastPc := state.pc
+	opcode := state.fetchByte()
+	fmt.Printf("> step: opcode[%2d], pc[%5d], channel[%2d] >>> ", opcode, lastPc, state.channelId)
 
 	if opcode > 0x7F {
 		state.opVidDrawPolyBackground(opcode)
