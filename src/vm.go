@@ -36,7 +36,7 @@ type VMState struct {
 	stackCalls [VM_MAX_STACK_SIZE]int
 	bytecode   []uint8
 
-	//TODO rename channel specific data
+	//TODO rename channel specific data, sp -> spIndex
 	sp        int
 	pc        int
 	channelId int

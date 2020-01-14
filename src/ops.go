@@ -124,11 +124,17 @@ func (state *VMState) opRemoveTask() {
 
 //Vec début, fin, type - Deletes, freezes or unfreezes a series of channels
 func (state *VMState) opChangeTaskState() {
-	j := state.fetchByte()
-	i := state.fetchByte()
-	a := state.fetchByte()
-	fmt.Println("#opChangeTaskState TODO", j, i, a)
-	//TODO _scriptPtr.pc = _res->_segCode + 0xFFFF;
+	channelIdStart := int(state.fetchByte())
+	channelIdEnd := int(state.fetchByte())
+	changeType := state.fetchByte()
+	fmt.Println("#opChangeTaskState", channelIdStart, channelIdEnd, changeType)
+	for i := channelIdStart; i <= channelIdEnd; i++ {
+		if changeType == 2 {
+			fmt.Println("#opChangeTaskState UNBLOCK? TODO", i)
+		} else {
+			fmt.Println("#opChangeTaskState TODO", i, changeType)
+		}
+	}
 }
 
 //Dbra Variable, Adress - Decrements the variable, if the result is different from zero the execution continues at the indicated address.
