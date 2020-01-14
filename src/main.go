@@ -31,7 +31,7 @@ func main() {
 	vmState.setupGamePart(GAME_PART_ID_1 + 2)
 
 	//start endless loop
-	for i := 0; i < 9128; i++ {
+	for i := 0; i < 999128; i++ {
 		//vmState.executeOp()
 		vmState.mainLoop()
 	}

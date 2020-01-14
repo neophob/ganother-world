@@ -130,11 +130,13 @@ func (state *VMState) opChangeTaskState() {
 	changeType := state.fetchByte()
 	fmt.Println("#opChangeTaskState", channelIdStart, channelIdEnd, changeType)
 	for i := channelIdStart; i <= channelIdEnd; i++ {
-		if changeType == 2 {
+		switch changeType {
+		case 0:
+			state.channelPC[i] = VM_INACTIVE_THREAD
+		case 1:
+			state.channelPaused[i] = true
+		case 2:
 			state.channelPaused[i] = false
-			//fmt.Println("#opChangeTaskState UNBLOCK? TODO", i)
-		} else {
-			fmt.Println("#opChangeTaskState TODO", i, changeType)
 		}
 	}
 }

@@ -30,21 +30,24 @@ const (
 )
 
 type VMState struct {
-	assets    Assets
-	variables [VM_NUM_VARIABLES]int16
-	channelPC [VM_NUM_THREADS]uint16
-	//TODO not sure if this is used!
+	assets        Assets
+	variables     [VM_NUM_VARIABLES]int16
+	channelPC     [VM_NUM_THREADS]uint16
 	channelPaused [VM_NUM_THREADS]bool
 	gamePart      int
 	stackCalls    [VM_MAX_STACK_SIZE]uint16
 	bytecode      []uint8
 
-	countNoOps int
-	//TODO rename channel specific data, sp -> spIndex
+	//context of the current channel
 	sp        int
 	pc        uint16
 	channelId int
 	paused    bool
+
+	//statistics
+	countNoOps     int
+	countOps       int
+	countSPNotZero int
 }
 
 func createNewState(assets Assets) VMState {
@@ -115,6 +118,8 @@ func (state *VMState) executeOp() {
 	lastPc := state.pc
 	opcode := state.fetchByte()
 	fmt.Printf("> step: opcode[%2d], pc[%5d], channel[%2d] >>> ", opcode, lastPc, state.channelId)
+
+	state.countOps++
 
 	if opcode > 0x7F {
 		state.opVidDrawPolyBackground(opcode)
@@ -211,7 +216,7 @@ func (state *VMState) mainLoop() {
 				state.executeOp()
 			}
 			if state.sp > 0 {
-				fmt.Println("WARNING, SP > 0", state.sp)
+				countSPNotZero++
 			}
 			state.channelPC[channelId] = state.pc
 		}
