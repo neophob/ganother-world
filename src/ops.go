@@ -3,6 +3,36 @@ package main
 import (
 	"fmt"
 )
+/*
+# ranges - should be a int16 type!
+> step: opcode[78], pc[20170], channel[16] >>> >VID: SETDATABUFFER 114708
+>VID: DRAWSHAPE color:255, x:17193, y:32, zoom:0
+> step: opcode[78], pc[20177], channel[16] >>> >VID: SETDATABUFFER 123440
+>VID: DRAWSHAPE color:255, x:95, y:28, zoom:64
+
+> step: opcode[ 4], pc[    0], channel[ 0] >>> #op_call(), jump to pc: 17119 62683
+> step: opcode[14], pc[17119], channel[ 0] >>> >VID: FILLPAGE 1 0
+> step: opcode[14], pc[17122], channel[ 0] >>> >VID: FILLPAGE 2 0
+> step: opcode[13], pc[17125], channel[ 0] >>> >VID: SETWORKPAGEPTR 1
+> step: opcode[16], pc[17127], channel[ 0] >>> >VID: UPDATEDISPLAY 1
+> step: opcode[16], pc[17129], channel[ 0] >>> >VID: UPDATEDISPLAY 255
+> step: opcode[16], pc[17131], channel[ 0] >>> >VID: UPDATEDISPLAY 2
+> step: opcode[ 5], pc[17133], channel[ 0] >>> #op_ret(), pc: 1
+> step: opcode[66], pc[    1], channel[ 0] >>> >VID: SETDATABUFFER 114192
+>VID: DRAWSHAPE color:255, x:15423, y:23552, zoom:255
+> step: opcode[ 0], pc[    9], channel[ 0] >>> #op_movConst 4 246
+> step: opcode[ 0], pc[   13], channel[ 0] >>> #op_movConst 1 50
+> step: opcode[ 0], pc[   17], channel[ 0] >>> #op_movConst 0 1560
+> step: opcode[ 0], pc[   21], channel[ 0] >>> #op_movConst 106 5120
+> step: opcode[ 2], pc[   25], channel[ 0] >>> #op_add() index=24, var1=0, var2=1560
+> step: opcode[106], pc[   28], channel[ 0] >>> >VID: SETDATABUFFER 10240
+>VID: DRAWSHAPE color:255, x:3, y:24, zoom:0
+> step: opcode[106], pc[   34], channel[ 0] >>> >VID: SETDATABUFFER 10240
+>VID: DRAWSHAPE color:255, x:1, y:24, zoom:0
+> step: opcode[106], pc[   40], channel[ 0] >>> >VID: SETDATABUFFER 10240
+>VID: DRAWSHAPE color:255, x:0, y:4, zoom:71
+> step: opcode[56], pc[   46], channel[ 0] >>> NO_OP 56
+*/
 
 //Continues the code execution at the indicated address.
 func (state *VMState) opJmp() {
@@ -14,7 +44,7 @@ func (state *VMState) opJmp() {
 //Set.i variable, value - Initialises the variable with an integer value from -32768 to 32767.
 func (state *VMState) opMovConst() {
 	index := state.fetchByte()
-	value := int(state.fetchWord())
+	value := int16(state.fetchWord())
 	fmt.Println("#op_movConst", index, value)
 	state.variables[index] = value
 }
@@ -34,7 +64,7 @@ func (state *VMState) opAddConst() {
 	//	warning("Script::op_addConst() workaround for infinite looping gun sound");
 	//snd_playSound(0x5B, 1, 64, 1);
 	index := state.fetchByte()
-	value := int(state.fetchWord())
+	value := int16(state.fetchWord())
 	fmt.Printf("#op_addConst() index=%d, value=%d, add=%d\n", index, state.variables[index], value)
 	state.variables[index] += value
 }
@@ -58,7 +88,7 @@ func (state *VMState) opSub() {
 //Variable = Variable AND value
 func (state *VMState) opAnd() {
 	index := state.fetchByte()
-	value := int(state.fetchWord())
+	value := int16(state.fetchWord())
 	fmt.Println("#op_and()", index, value)
 	state.variables[index] &= value
 }
@@ -66,7 +96,7 @@ func (state *VMState) opAnd() {
 //Variable = Variable OR value
 func (state *VMState) opOr() {
 	index := state.fetchByte()
-	value := int(state.fetchWord())
+	value := int16(state.fetchWord())
 	fmt.Println("#op_or()", index, value)
 	state.variables[index] |= value
 }
@@ -236,7 +266,8 @@ func (state *VMState) opVidUpdatePage() {
 }
 
 func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
-	offset := ((int(opcode) << 8) | int(state.fetchByte())) << 1
+	offset := ((uint16(opcode) << 8) | uint16(state.fetchByte())) << 1
+	//_res->_useSegVideo2 = false;
 	posX := int(state.fetchByte())
 	posY := int(state.fetchByte())
 	height := posY - 199
@@ -244,19 +275,20 @@ func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
 		posY = 199
 		posX += height
 	}
-	setDataBuffer(offset)
+	fmt.Println("opVidUpdatePage", offset)
+	setDataBuffer(int(offset))
 	drawShape(0xFF, 0x40, posX, posY)
 }
 
 //Spr "'object name" , x, y, z - In the work screen, draws the graphics tool at the coordinates x,y and the zoom factor z. A polygon, a group of polygons...
 func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 	offsetHi := state.fetchByte()
-	offset := ((int(offsetHi) << 8) | int(state.fetchByte())) << 1
-	posX := int(state.fetchByte())
-
+	offset := ((uint16(offsetHi) << 8) | uint16(state.fetchByte())) << 1
+	posX := int16(state.fetchByte())
+	//_res->_useSegVideo2 = false;
 	if opcode&0x20 == 0 {
 		if opcode&0x10 == 0 {
-			posX = (posX << 8) | int(state.fetchByte())
+			posX = (posX << 8) | int16(state.fetchByte())
 		} else {
 			posX = state.variables[posX]
 		}
@@ -265,16 +297,15 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 			posX += 0x100
 		}
 	}
-	posY := int(state.fetchByte())
+	posY := int16(state.fetchByte())
 	if opcode&8 == 0 {
 		if opcode&4 == 0 {
-			posY = (posY << 8) | int(state.fetchByte())
+			posY = (posY << 8) | int16(state.fetchByte())
 		} else {
 			posY = state.variables[posY]
 		}
 	}
-
-	zoom := int(state.fetchByte())
+	zoom := uint16(state.fetchByte())
 	if opcode&2 == 0 {
 		if opcode&1 == 0 {
 			//TODO hmm interesting...
@@ -282,7 +313,7 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 			fmt.Println("zoom decreased PC", state.pc)
 			zoom = 0x40
 		} else {
-			zoom = state.variables[zoom]
+			zoom = uint16(state.variables[zoom])
 		}
 	} else {
 		if opcode&1 > 0 {
@@ -292,8 +323,9 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 			zoom = 0x40
 		}
 	}
-	setDataBuffer(offset)
-	drawShape(0xFF, zoom, posX, posY)
+	fmt.Printf("opVidDrawPolySprite")
+	setDataBuffer(int(offset))
+	drawShape(0xFF, int(zoom), int(posX), int(posY))
 }
 
 //Initialises a song.

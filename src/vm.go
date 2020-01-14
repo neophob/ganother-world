@@ -30,12 +30,14 @@ const (
 
 type VMState struct {
 	assets        Assets
-	variables     [VM_NUM_VARIABLES]int
+	variables     [VM_NUM_VARIABLES]int16
 	channelPC     [VM_NUM_THREADS]int
 	channelPaused [VM_NUM_THREADS]bool
 	gamePart      int
 	stackCalls    [VM_MAX_STACK_SIZE]int
 	bytecode      []uint8
+
+	countNoOps    int
 
 	//TODO rename channel specific data, sp -> spIndex
 	sp        int
@@ -186,6 +188,7 @@ func (state *VMState) executeOp() {
 	case 0x1A:
 		state.opPlayMusic()
 	default:
+		state.countNoOps++
 		fmt.Println("NO_OP", opcode)
 	}
 }
