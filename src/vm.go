@@ -203,8 +203,10 @@ func (state *VMState) mainLoop() {
 			for state.paused == false {
 				state.executeOp()
 			}
+			if state.sp > 0 {
+				fmt.Println("WARNING, SP > 0", state.sp)
+			}
 			state.channelData[channelId] = state.pc
-			//state.channelData[channelId] = _scriptPtr.pc - res->segBytecode;
 		}
 	}
 }

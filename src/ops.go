@@ -80,7 +80,7 @@ func (state *VMState) opAddConst() {
 func (state *VMState) opCall() {
 	state.saveSP()
 	state.pc = int(state.fetchWord())
-	fmt.Println("#op_call(), jump to pc:", state.pc)
+	fmt.Println("#op_call(), jump to pc:", state.pc, len(state.bytecode))
 }
 
 func (state *VMState) opRet() {
@@ -103,7 +103,7 @@ func (state *VMState) opYieldTask() {
 
 func (state *VMState) opRemoveTask() {
 	fmt.Println("#opRemoveTask", state.channelId)
-	state.channelData[state.channelId] = VM_INACTIVE_THREAD
+	state.pc = VM_INACTIVE_THREAD
 	state.paused = true
 }
 
