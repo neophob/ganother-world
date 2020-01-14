@@ -4,9 +4,9 @@ import (
 	"testing"
 )
 
-func TestParts(t *testing.T) {
+func TestPartsAllDefined(t *testing.T) {
 	result := getGameParts()
-	if len(result) != 10 {
+	if len(result) != GAME_PARTS_COUNT {
 		t.Errorf("The world will end: %d", result)
 	}
 }
