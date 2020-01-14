@@ -4,12 +4,14 @@ import (
 	"fmt"
 )
 
+//Continues the code execution at the indicated address.
 func (state *VMState) opJmp() {
 	offset := state.fetchWord()
 	state.pc = int(offset)
 	fmt.Println("#op_jmp() jump to", state.pc)
 }
 
+//Set.i variable, value - Initialises the variable with an integer value from -32768 to 32767.
 func (state *VMState) opMovConst() {
 	index := state.fetchByte()
 	value := int(state.fetchWord())
@@ -17,6 +19,7 @@ func (state *VMState) opMovConst() {
 	state.variables[index] = value
 }
 
+//Initialises variable 1 with variable 2.
 func (state *VMState) opMov() {
 	dest := int(state.fetchByte())
 	source := int(state.fetchByte())
@@ -24,48 +27,7 @@ func (state *VMState) opMov() {
 	state.variables[dest] = state.variables[source]
 }
 
-func (state *VMState) opAdd() {
-	dest := state.fetchByte()
-	source := state.fetchByte()
-	fmt.Println("#op_add()", dest, state.variables[source])
-	state.variables[dest] += state.variables[source]
-}
-
-func (state *VMState) opSub() {
-	dest := state.fetchByte()
-	source := state.fetchByte()
-	fmt.Println("#op_sub()", dest, state.variables[source])
-	state.variables[dest] -= state.variables[source]
-}
-
-func (state *VMState) opAnd() {
-	index := state.fetchByte()
-	value := int(state.fetchWord())
-	fmt.Println("#op_and()", index, value)
-	state.variables[index] = state.variables[index] & value
-}
-
-func (state *VMState) opOr() {
-	index := state.fetchByte()
-	value := int(state.fetchWord())
-	fmt.Println("#op_or()", index, value)
-	state.variables[index] = state.variables[index] | value
-}
-
-func (state *VMState) opShl() {
-	index := state.fetchByte()
-	value := int(state.fetchWord())
-	fmt.Println("#op_shl()", index, value)
-	state.variables[index] = state.variables[index] << uint(value)
-}
-
-func (state *VMState) opShr() {
-	index := state.fetchByte()
-	value := int(state.fetchWord())
-	fmt.Println("#op_shr()", index, value)
-	state.variables[index] = state.variables[index] >> uint(value)
-}
-
+//Variable = Variable + Integer value
 func (state *VMState) opAddConst() {
 	//TODO add workaround for vm bug
 	//		if (_res->_currentPart == 16006 && _scriptPtr.pc == _res->_segCode + 0x6D48) {
@@ -77,36 +39,90 @@ func (state *VMState) opAddConst() {
 	state.variables[index] += value
 }
 
+//Add Variable1, Variable2. Variable1 = Variable 1 + Variable2
+func (state *VMState) opAdd() {
+	dest := state.fetchByte()
+	source := state.fetchByte()
+	fmt.Println("#op_add()", dest, state.variables[source])
+	state.variables[dest] += state.variables[source]
+}
+
+//Sub Variable1, Variable2, Variable1 = Variable1 - Variable2
+func (state *VMState) opSub() {
+	dest := state.fetchByte()
+	source := state.fetchByte()
+	fmt.Println("#op_sub()", dest, state.variables[source])
+	state.variables[dest] -= state.variables[source]
+}
+
+//Variable = Variable AND value
+func (state *VMState) opAnd() {
+	index := state.fetchByte()
+	value := int(state.fetchWord())
+	fmt.Println("#op_and()", index, value)
+	state.variables[index] &= value
+}
+
+//Variable = Variable OR value
+func (state *VMState) opOr() {
+	index := state.fetchByte()
+	value := int(state.fetchWord())
+	fmt.Println("#op_or()", index, value)
+	state.variables[index] |= value
+}
+
+//Makes a N bit rotation to the left on the variable. Zeros on the right.
+func (state *VMState) opShl() {
+	index := state.fetchByte()
+	value := int(state.fetchWord())
+	fmt.Println("#op_shl()", index, value)
+	state.variables[index] = state.variables[index] << uint(value)
+}
+
+//Makes a N bit rotation to the right on the variable.
+func (state *VMState) opShr() {
+	index := state.fetchByte()
+	value := int(state.fetchWord())
+	fmt.Println("#op_shr()", index, value)
+	state.variables[index] = state.variables[index] >> uint(value)
+}
+
+//Jsr Adress - Executes the subroutine located at the indicated address.
 func (state *VMState) opCall() {
 	state.saveSP()
 	state.pc = int(state.fetchWord())
 	fmt.Println("#op_call(), jump to pc:", state.pc, len(state.bytecode))
 }
 
+//End of a subroutine.
 func (state *VMState) opRet() {
 	state.restoreSP()
 	fmt.Println("#op_ret(), pc:", state.pc)
 }
 
+//Setvec "numéro de canal", address - Initialises a channel with a code address to execute
 func (state *VMState) opInstallTask() {
-	index := state.fetchByte()
-	value := int(state.fetchWord())
-	fmt.Println("#opInstallTask", index, value)
+	channelID := state.fetchByte()
+	address := int(state.fetchWord())
+	fmt.Println("#opInstallTask", channelID, address)
 	// TODO validate me: 	_scriptTasks[1][i] = n;
-	state.channelPC[index] = value
+	state.channelPC[channelID] = address
 }
 
+//Break - Temporarily stops the executing channel and goes to the next.
 func (state *VMState) opYieldTask() {
 	fmt.Println("#opYieldTask")
 	state.paused = true
 }
 
+//Bigend - Permanently stops the executing channel and goes to the next.
 func (state *VMState) opRemoveTask() {
 	fmt.Println("#opRemoveTask", state.channelId)
 	state.pc = VM_INACTIVE_THREAD
 	state.paused = true
 }
 
+//Vec début, fin, type - Deletes, freezes or unfreezes a series of channels
 func (state *VMState) opChangeTaskState() {
 	j := state.fetchByte()
 	i := state.fetchByte()
@@ -115,6 +131,7 @@ func (state *VMState) opChangeTaskState() {
 	//TODO _scriptPtr.pc = _res->_segCode + 0xFFFF;
 }
 
+//Dbra Variable, Adress - Decrements the variable, if the result is different from zero the execution continues at the indicated address.
 func (state *VMState) opJmpIfVar() {
 	index := state.fetchByte()
 	state.variables[index]--
@@ -125,6 +142,7 @@ func (state *VMState) opJmpIfVar() {
 	}
 }
 
+//Conditional branch, If (=Si) the comparison of the variables is right, the execution continues at the indicated address.
 func (state *VMState) opCondJmp() {
 	op := state.fetchByte()
 	variableId := uint16(state.fetchByte())
@@ -164,12 +182,14 @@ func (state *VMState) opCondJmp() {
 	}
 }
 
+// Fade "palette number" - Changes of colour palette
 func (state *VMState) opVidSetPalette() {
 	index := state.fetchWord()
 	fmt.Println("#opVidSetPalette", index)
 	//TODO	_vid->_nextPal = num >> 8
 }
 
+//Text "text number", x, y, color - Displays in the work screen the specified text for the coordinates x,y.
 func (state *VMState) opVidDrawString() {
 	stringId := int(state.fetchWord())
 	x := int(state.fetchByte())
@@ -178,17 +198,20 @@ func (state *VMState) opVidDrawString() {
 	drawString(col, x, y, stringId)
 }
 
+//SetWS "Screen number" - Sets the work screen, which is where the polygons will be drawn by default.
 func (state *VMState) opVidSelectPage() {
 	page := int(state.fetchByte())
 	setWorkPagePtr(page)
 }
 
+//Clr "Screen number", Color - Deletes a screen with one colour. Ingame, there are 4 screen buffers
 func (state *VMState) opVidFillPage() {
 	page := int(state.fetchByte())
 	color := int(state.fetchByte())
 	fillPage(page, color)
 }
 
+//Copy "Screen number A", "Screen number B" - Copies screen buffer A to screen buffer B.
 func (state *VMState) opVidCopyPage() {
 	source := state.fetchByte()
 	dest := state.fetchByte()
@@ -196,6 +219,7 @@ func (state *VMState) opVidCopyPage() {
 	//TODO _vid->copyPage(i, j, _scriptVars[VAR_SCROLL_Y]);
 }
 
+//Show "Screen number" - Displays the screen buffer specified in the next video frame.
 func (state *VMState) opVidUpdatePage() {
 	page := int(state.fetchByte())
 	//TODO inp_handleSpecialKeys();
@@ -263,6 +287,7 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 	drawShape(0xFF, zoom, posX, posY)
 }
 
+//Initialises a song.
 func (state *VMState) opPlayMusic() {
 	resNum := int(state.fetchWord())
 	delay := int(state.fetchWord())
@@ -271,6 +296,7 @@ func (state *VMState) opPlayMusic() {
 	//TODO snd_playMusic(resNum, delay, pos);
 }
 
+//Plays the sound file on one of the four game audio channels with specific height and volume.
 func (state *VMState) opPlaySound() {
 	resNum := int(state.fetchWord())
 	freq := int(state.fetchByte())
