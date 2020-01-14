@@ -9,10 +9,13 @@ import (
 	"sort"
 )
 
-// remderer is a global variable that needs to implement the Renderer interface
-var renderer Renderer = DummyRenderer{}
+// renderer is a global variable that needs to implement the Renderer interface
+//var renderer Renderer = DummyRenderer{}
+var renderer Renderer
 
 func main() {
+	renderer = buildSDLRenderer()
+
 	log.SetFlags(log.Lshortfile | log.Lmicroseconds)
 
 	log.Println("- load memlist.bin")
@@ -34,7 +37,7 @@ func main() {
 	vmState.setupGamePart(GAME_PART_ID_1 + 2)
 
 	//start endless loop
-	for i := 0; i < 999128; i++ {
+	for i := 0; i < 99128; i++ {
 		//vmState.executeOp()
 		vmState.mainLoop()
 	}
