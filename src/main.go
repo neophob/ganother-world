@@ -10,12 +10,18 @@ import (
 )
 
 // renderer is a global variable that needs to implement the Renderer interface
-//var renderer Renderer = DummyRenderer{}
-var renderer Renderer
+var renderer Renderer = initVideo()
+
+func initVideo() Renderer {
+	// start with env VIDEO="SDL" ./main to enable SDL
+	videoEnv := os.Getenv("VIDEO")
+	if videoEnv == "SDL" {
+		return buildSDLRenderer()
+	}
+	return DummyRenderer{}
+}
 
 func main() {
-	renderer = buildSDLRenderer()
-
 	log.SetFlags(log.Lshortfile | log.Lmicroseconds)
 
 	log.Println("- load memlist.bin")

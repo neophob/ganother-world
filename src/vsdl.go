@@ -59,6 +59,7 @@ func (render SDLRenderer) drawShape(color, zoom, posX, posY int) {
 
 func (render SDLRenderer) fillPage(page, color int) {
 	fmt.Println(">VID: FILLPAGE", page, color)
+	//_graphics->clearBuffer(getPagePtr(page), color);
 }
 
 func (render SDLRenderer) copyPage(src, dst, vscroll int) {
