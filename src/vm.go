@@ -100,6 +100,7 @@ func (state *VMState) setupGamePart(newGamePart int) {
 		state.variables[VM_VARIABLE_TITLESCREEN] = 0x81
 	}
 
+	//TODO move this to a more generic functino get Current bytecode/palette/videodata
 	gamePartAsset := state.assets.gameParts[newGamePart-GAME_PART_FIRST]
 	fmt.Println("- load bytecode, resource", gamePartAsset.bytecode)
 	state.bytecode = state.assets.loadEntryFromBank(gamePartAsset.bytecode)
