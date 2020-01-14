@@ -7,6 +7,16 @@ import (
 	"fmt"
 )
 
+type Renderer interface {
+	drawString(color, posX, posY, stringId int)
+	drawShape(color, zoom, posX, posY int)
+	fillPage(page, color int)
+	copyPage(src, dst, vscroll int)
+	updateDisplay(page int)
+	setDataBuffer(offset int)
+	setWorkPagePtr(page int)
+}
+
 //TODO where is the stringId defined?
 func drawString(color, posX, posY, stringId int) {
 	text := getText(stringId)
@@ -21,8 +31,8 @@ func fillPage(page, color int) {
 	fmt.Println(">VID: FILLPAGE", page, color)
 }
 
-func copyPage() {
-	fmt.Println(">VID: COPYPAGE")
+func copyPage(src, dst, vscroll int) {
+	fmt.Println(">VID: COPYPAGE", src, dst, vscroll)
 }
 
 // blit

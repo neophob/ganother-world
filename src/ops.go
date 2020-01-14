@@ -226,8 +226,7 @@ func (state *VMState) opVidFillPage() {
 func (state *VMState) opVidCopyPage() {
 	source := state.fetchByte()
 	dest := state.fetchByte()
-	fmt.Println("#opVidCopyPage", source, dest)
-	//TODO _vid->copyPage(i, j, _scriptVars[VAR_SCROLL_Y]);
+	copyPage(int(source), int(dest), int(state.variables[VM_VARIABLE_SCROLL_Y]))
 }
 
 //Show "Screen number" - Displays the screen buffer specified in the next video frame.
