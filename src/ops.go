@@ -321,21 +321,19 @@ func (state *VMState) opPlaySound() {
 }
 
 func (state *VMState) opUpdateResource() {
-	id := uint16(state.fetchWord())
+	id := int(uint16(state.fetchWord()))
 	fmt.Println("opUpdateResource", id)
 	if id >= GAME_PART_ID_1 {
 		fmt.Println("should load next part", id)
 		state.setupGamePart(id)
 		return
 	}
+	if id == 0 {
+		fmt.Println("opUpdateResource TODO! INVALIDATE DATA", id)
+		//_ply->stop();
+		//_mix->stopAll();
+		//_res->invalidateRes();
+		return
+	}
 	state.assets.loadResource(id)
-	/*
-		if (num == 0) {
-				_ply->stop();
-				_mix->stopAll();
-				_res->invalidateRes();
-			} else {
-				_res->update(num);
-			}*/
-	//TODO _res->update(num);
 }
