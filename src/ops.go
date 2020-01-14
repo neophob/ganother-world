@@ -206,27 +206,27 @@ func (state *VMState) opVidDrawString() {
 	x := int(state.fetchByte())
 	y := int(state.fetchByte())
 	col := int(state.fetchByte())
-	drawString(col, x, y, stringId)
+	renderer.drawString(col, x, y, stringId)
 }
 
 //SetWS "Screen number" - Sets the work screen, which is where the polygons will be drawn by default.
 func (state *VMState) opVidSelectPage() {
 	page := int(state.fetchByte())
-	setWorkPagePtr(page)
+	renderer.setWorkPagePtr(page)
 }
 
 //Clr "Screen number", Color - Deletes a screen with one colour. Ingame, there are 4 screen buffers
 func (state *VMState) opVidFillPage() {
 	page := int(state.fetchByte())
 	color := int(state.fetchByte())
-	fillPage(page, color)
+	renderer.fillPage(page, color)
 }
 
 //Copy "Screen number A", "Screen number B" - Copies screen buffer A to screen buffer B.
 func (state *VMState) opVidCopyPage() {
 	source := state.fetchByte()
 	dest := state.fetchByte()
-	copyPage(int(source), int(dest), int(state.variables[VM_VARIABLE_SCROLL_Y]))
+	renderer.copyPage(int(source), int(dest), int(state.variables[VM_VARIABLE_SCROLL_Y]))
 }
 
 //Show "Screen number" - Displays the screen buffer specified in the next video frame.
@@ -234,7 +234,7 @@ func (state *VMState) opVidUpdatePage() {
 	page := int(state.fetchByte())
 	//TODO inp_handleSpecialKeys();
 	//TODO bypass protection, handle pause
-	updateDisplay(page)
+	renderer.updateDisplay(page)
 }
 
 func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
@@ -248,8 +248,8 @@ func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
 		posX += height
 	}
 	fmt.Println("opVidUpdatePage", offset)
-	setDataBuffer(int(offset))
-	drawShape(0xFF, 0x40, posX, posY)
+	renderer.setDataBuffer(int(offset))
+	renderer.drawShape(0xFF, 0x40, posX, posY)
 }
 
 //Spr "'object name" , x, y, z - In the work screen, draws the graphics tool at the coordinates x,y and the zoom factor z. A polygon, a group of polygons...
@@ -296,8 +296,8 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 		}
 	}
 	fmt.Printf("opVidDrawPolySprite")
-	setDataBuffer(int(offset))
-	drawShape(0xFF, int(zoom), int(posX), int(posY))
+	renderer.setDataBuffer(int(offset))
+	renderer.drawShape(0xFF, int(zoom), int(posX), int(posY))
 }
 
 //Initialises a song.

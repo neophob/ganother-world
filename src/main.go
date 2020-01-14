@@ -9,6 +9,9 @@ import (
 	"sort"
 )
 
+// remderer is a global variable that needs to implement the Renderer interface
+var renderer Renderer = DummyRenderer{}
+
 func main() {
 	log.SetFlags(log.Lshortfile | log.Lmicroseconds)
 
