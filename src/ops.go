@@ -35,7 +35,7 @@ func (state *VMState) opAddConst() {
 	//snd_playSound(0x5B, 1, 64, 1);
 	index := state.fetchByte()
 	value := int(state.fetchWord())
-	fmt.Println("#op_addConst()", index, value)
+	fmt.Printf("#op_addConst() index=%d, value=%d, add=%d\n", index, state.variables[index], value)
 	state.variables[index] += value
 }
 
@@ -43,7 +43,7 @@ func (state *VMState) opAddConst() {
 func (state *VMState) opAdd() {
 	dest := state.fetchByte()
 	source := state.fetchByte()
-	fmt.Println("#op_add()", dest, state.variables[source])
+	fmt.Printf("#op_add() index=%d, var1=%d, var2=%d\n", dest, state.variables[dest], state.variables[source])
 	state.variables[dest] += state.variables[source]
 }
 
@@ -75,16 +75,16 @@ func (state *VMState) opOr() {
 func (state *VMState) opShl() {
 	index := state.fetchByte()
 	value := int(state.fetchWord())
-	fmt.Println("#op_shl()", index, value)
-	state.variables[index] = state.variables[index] << uint(value)
+	state.variables[index] <<= uint(value)
+	fmt.Println("#op_shl()", index, value, state.variables[index])
 }
 
 //Makes a N bit rotation to the right on the variable.
 func (state *VMState) opShr() {
 	index := state.fetchByte()
 	value := int(state.fetchWord())
-	fmt.Println("#op_shr()", index, value)
-	state.variables[index] = state.variables[index] >> uint(value)
+	state.variables[index] >>= uint(value)
+	fmt.Println("#op_shr()", index, value, state.variables[index])
 }
 
 //Jsr Adress - Executes the subroutine located at the indicated address.
@@ -135,6 +135,7 @@ func (state *VMState) opChangeTaskState() {
 func (state *VMState) opJmpIfVar() {
 	index := state.fetchByte()
 	state.variables[index]--
+	fmt.Println("#opJmpIfVar", state.variables[index])
 	if state.variables[index] != 0 {
 		state.opJmp()
 	} else {
