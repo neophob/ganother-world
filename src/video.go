@@ -8,7 +8,7 @@ type VideoAssets struct {
 	videoPC int
 }
 
-func (asset *VideoAssets) fetchVideoByte() uint8 {
+func (asset *VideoAssets) fetchByte() uint8 {
 	if len(asset.cinematic) == 0 {
 		return 0
 	}
@@ -17,7 +17,7 @@ func (asset *VideoAssets) fetchVideoByte() uint8 {
 	return result
 }
 
-func (asset *VideoAssets) fetchVideoWord() uint16 {
+func (asset *VideoAssets) fetchWord() uint16 {
 	if len(asset.cinematic) == 0 {
 		return 0
 	}

@@ -38,10 +38,6 @@ func buildSDLRenderer() *SDLRenderer {
 		panic(err)
 	}
 
-	/*	renderer, err := window.GetRenderer()
-		if err != nil {
-			panic(err)
-		}*/
 	renderer, err := sdl.CreateRenderer(window, -1, sdl.RENDERER_SOFTWARE)
 	if err != nil {
 		panic(err)
@@ -90,6 +86,24 @@ func (render SDLRenderer) drawString(color, posX, posY, stringId int) {
 func (render SDLRenderer) drawShape(color, zoom, posX, posY int) {
 	fmt.Printf(">VID: DRAWSHAPE color:%d, x:%d, y:%d, zoom:%d\n", color, posX, posY, zoom)
 	//render.softwareVideo_SetColor(color)
+
+	i := render.videoAssets.fetchByte()
+	if i >= 0xC0 {
+		if color&0x80 > 0 {
+			color = int(i & 0x3F)
+		}
+		render.softwareVideo_FillPolygon(color, zoom, posX, posY)
+	} else {
+		i &= 0x3F
+		if i == 1 {
+			fmt.Printf("Video::drawShape() ec=0x%X (i != 2)", 0xF80)
+		} else if i == 2 {
+			render.softwareVideo_DrawShapeParts(zoom, posX, posY)
+		} else {
+			fmt.Printf("Video::drawShape() ec=0x%X (i != 2)", 0xFBB)
+		}
+	}
+
 }
 
 func (render SDLRenderer) fillPage(page, color int) {
@@ -127,7 +141,7 @@ func (render SDLRenderer) setWorkPagePtr(page int) {
 func (render *SDLRenderer) setPalette(index int) {
 	//render.loadPalette = index >> 8
 	//TODO make this when updating screen and remove me
-	render.colors = render.videoAssets.getPalette(index>>8)
+	render.colors = render.videoAssets.getPalette(index >> 8)
 	fmt.Println(">VID: SETPALETTE", index>>8)
 }
 
@@ -196,4 +210,12 @@ func (render SDLRenderer) softwareVideo_DrawChar(posX, posY int32, char byte) {
 			}
 		}
 	}
+}
+
+func (render SDLRenderer) softwareVideo_FillPolygon(color, zoom, posX, posY int) {
+	fmt.Printf(">VID: FILLPOLYGON color:%d, x:%d, y:%d, zoom:%d\n", color, posX, posY, zoom)
+}
+
+func (render SDLRenderer) softwareVideo_DrawShapeParts(zoom, posX, posY int) {
+	fmt.Printf(">VID: DRAWSHAPEPARTS x:%d, y:%d, zoom:%d\n", posX, posY, zoom)
 }
