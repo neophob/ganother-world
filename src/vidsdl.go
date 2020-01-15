@@ -17,6 +17,7 @@ const (
 
 type SDLRenderer struct {
 	surface     *sdl.Surface
+	renderer    *sdl.Renderer
 	window      *sdl.Window
 	videoAssets VideoAssets
 	exitReq     bool
@@ -35,10 +36,10 @@ func buildSDLRenderer() *SDLRenderer {
 		panic(err)
 	}
 
-/*	renderer, err := window.GetRenderer()
-	if err != nil {
-		panic(err)
-	}*/
+	/*	renderer, err := window.GetRenderer()
+		if err != nil {
+			panic(err)
+		}*/
 	renderer, err := sdl.CreateRenderer(window, -1, sdl.RENDERER_SOFTWARE)
 	if err != nil {
 		panic(err)
@@ -51,26 +52,45 @@ func buildSDLRenderer() *SDLRenderer {
 		panic(err)
 	}
 
-	rect := sdl.Rect{0, 0, WIDTH, 100}
-	renderer.SetDrawColor(0,33,110,255)
-	renderer.FillRect(&rect)
+	//rect := sdl.Rect{0, 0, WIDTH, 100}
+	renderer.SetDrawColor(250, 33, 110, 255)
+	//renderer.FillRect(&rect)
 
-	renderer.Present()
+	//renderer.Present()
 
-//	surface.FillRect(&rect, 0xff003300)
-//	window.UpdateSurface()
+	//	surface.FillRect(&rect, 0xff003300)
+	//	window.UpdateSurface()
 
-	return &SDLRenderer{surface: surface, window: window}
+	return &SDLRenderer{
+		surface:  surface,
+		window:   window,
+		renderer: renderer,
+	}
 }
 
 func (render SDLRenderer) updateGamePart(videoAssets VideoAssets) {
 	render.videoAssets = videoAssets
 }
 
-//TODO where is the stringId defined?
 func (render SDLRenderer) drawString(color, posX, posY, stringId int) {
 	text := getText(stringId)
 	fmt.Printf(">VID: DRAWSTRING color:%d, x:%d, y:%d, text:%s\n", color, posX, posY, text)
+	//TODO whats the color? index to palette?
+
+	//setWorkPagePtr(buffer);?
+
+	charPosX := int32(posX)
+	charPosY := int32(posY)
+	for i := 0; i < len(text); i++ {
+		if text[i] == '\n' {
+			charPosY += int32(FONT_HEIGHT)
+			charPosX = int32(posX)
+		} else {
+			render.softwareVideo_DrawChar(color, charPosX, charPosY, text[i])
+			charPosX += 8
+		}
+	}
+	render.renderer.Present()
 }
 
 func (render SDLRenderer) drawShape(color, zoom, posX, posY int) {
@@ -142,6 +162,44 @@ func (render *SDLRenderer) updateWorkerPage(page int) {
 	default:
 		render.workerPage = 0
 		fmt.Println("Video::getPagePtr() p != [0,1,2,3,0xFF,0xFE] ==", page)
+	}
+
+}
+
+func (render SDLRenderer) softwareVideo_DrawChar(color int, posX, posY int32, char byte) {
+	/*
+		const uint8_t *ft = _font + (c - 0x20) * 8;
+		const int offset = (x + y * _w) * _byteDepth;
+		if (_byteDepth == 1) {
+			for (int j = 0; j < 8; ++j) {
+				const uint8_t ch = ft[j];
+				for (int i = 0; i < 8; ++i) {
+					if (ch & (1 << (7 - i))) {
+						_drawPagePtr[offset + j * _w + i] = color;
+					}
+				}
+			}
+		} else if (_byteDepth == 2) {
+			const uint16_t rgbColor = _pal[color].rgb555();
+			for (int j = 0; j < 8; ++j) {
+				const uint8_t ch = ft[j];
+				for (int i = 0; i < 8; ++i) {
+					if (ch & (1 << (7 - i))) {
+						((uint16_t *)(_drawPagePtr + offset))[j * _w + i] = rgbColor;
+					}
+				}
+			}
+		}
+	*/
+	ofs := 8 * (int32(char) - 0x20)
+	fmt.Printf("DRAWCHAR %c %d(%d) - x=%d y=%d\n", char, int32(char), (int32(char) - 0x20), posX, posY)
+	for j := int32(0); j < 8; j++ {
+		ch := FONT[ofs+j]
+		for i := int32(0); i < 8; i++ {
+			if ch&(1<<(7-i)) > 0 {
+				render.renderer.DrawPoint(posX + i, posY + j)
+			}
+		}
 	}
 
 }

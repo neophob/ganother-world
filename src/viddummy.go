@@ -8,7 +8,6 @@ import (
 type DummyRenderer struct {
 }
 
-//TODO where is the stringId defined?
 func (render DummyRenderer) drawString(color, posX, posY, stringId int) {
 	text := getText(stringId)
 	fmt.Printf(">VID: DRAWSTRING color:%d, x:%d, y:%d, text:%s\n", color, posX, posY, text)
