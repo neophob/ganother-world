@@ -95,7 +95,7 @@ func (render *SDLRenderer) drawShape(offset, zoom, posX, posY int) {
 		if color&0x80 > 0 {
 			color = int(i & 0x3F)
 		}
-		render.softwareVideo_FillPolygon(color, offset, zoom, posX, posY)
+		render.softwareVideo_FillPolygon(color, zoom, posX, posY)
 	} else {
 		i &= 0x3F
 		if i == 1 {
@@ -211,8 +211,8 @@ func (render SDLRenderer) softwareVideo_DrawChar(posX, posY int32, char byte) {
 	}
 }
 
-func (render *SDLRenderer) softwareVideo_FillPolygon(color, offset, zoom, posX, posY int) {
-	fmt.Printf(">VID: FILLPOLYGON color:%d, offset:%d, x:%d, y:%d, zoom:%d\n", color, offset, posX, posY, zoom)
+func (render *SDLRenderer) softwareVideo_FillPolygon(color, zoom, posX, posY int) {
+	fmt.Printf(">VID: FILLPOLYGON color:%d, x:%d, y:%d, zoom:%d\n", color, posX, posY, zoom)
 
 	bbw := int(render.videoAssets.fetchByte()) * zoom / 64
 	bbh := int(render.videoAssets.fetchByte()) * zoom / 64
