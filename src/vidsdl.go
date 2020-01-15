@@ -24,7 +24,7 @@ type SDLRenderer struct {
 	videoAssets VideoAssets
 	loadPalette int
 	colors      [16]Color
-	exitReq     bool
+	exitAppReq  bool
 
 	workerPage int
 }
@@ -94,7 +94,7 @@ func (render *SDLRenderer) drawShape(offset, zoom, posX, posY int) {
 	i := render.videoAssets.fetchByte()
 	if i >= 0xC0 {
 		//if color&0x80 > 0 {
-			color = int(i & 0x3F)
+		color = int(i & 0x3F)
 		//}
 		render.softwareVideo_FillPolygon(color, zoom, posX, posY)
 	} else {
@@ -149,11 +149,12 @@ func (render *SDLRenderer) mainLoop() {
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 		switch t := event.(type) {
 		case *sdl.QuitEvent:
-			render.exitReq = true
-			fmt.Println(">render.exitReq", render.exitReq)
+			render.exitAppReq = true
+			fmt.Println(">render.exitAppReq", render.exitAppReq)
 		case *sdl.KeyboardEvent:
-			if t.Type == 769 {
-				render.exitReq = true
+			fmt.Println(">render.exitAppReq2", t.Keysym.Sym)
+			if t.Keysym.Sym == sdl.K_ESCAPE && t.State == 1 {
+				render.exitAppReq = true
 			}
 
 		default:
@@ -168,7 +169,7 @@ func (render *SDLRenderer) shutdown() {
 }
 
 func (render SDLRenderer) exitRequested(frameCount int) bool {
-	return render.exitReq
+	return render.exitAppReq
 }
 
 // ----
