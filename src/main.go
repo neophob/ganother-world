@@ -42,9 +42,12 @@ func main() {
 	vmState := createNewState(assets)
 	vmState.setupGamePart(GAME_PART_ID_1 + 2)
 
+	videoAssets := vmState.buildVideoAssets()
+	renderer.updateGamePart(videoAssets)
+
 	//start main loop
 	exit := false
-	for i:= 0; exit == false; i++ {
+	for i := 0; exit == false; i++ {
 		vmState.mainLoop()
 		renderer.mainLoop()
 		exit = renderer.exitRequested(i)

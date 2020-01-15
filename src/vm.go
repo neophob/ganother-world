@@ -73,6 +73,14 @@ func (state *VMState) loadGameParts(gamePart int) {
 	state.video2 = state.assets.loadEntryFromBank(gamePartAsset.video2)
 }
 
+func (state VMState) buildVideoAssets() VideoAssets {
+	return VideoAssets{
+		palette:   state.palette,
+		cinematic: state.cinematic,
+		video2:    state.video2,
+	}
+}
+
 func (state *VMState) saveSP() {
 	if state.sp >= VM_MAX_STACK_SIZE {
 		panic("SaveSP, stack overflow")

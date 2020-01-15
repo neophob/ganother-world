@@ -13,23 +13,22 @@ const (
 )
 
 type SDLRenderer struct {
-	surface *sdl.Surface
-	window  *sdl.Window
-	exitReq bool
+	surface     *sdl.Surface
+	window      *sdl.Window
+	videoAssets VideoAssets
+	exitReq     bool
 }
 
 func buildSDLRenderer() *SDLRenderer {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		panic(err)
 	}
-	//	defer sdl.Quit()
 
 	window, err := sdl.CreateWindow("ganother world", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
 		WIDTH, HEIGHT, sdl.WINDOW_ALLOW_HIGHDPI)
 	if err != nil {
 		panic(err)
 	}
-	//	defer window.Destroy()
 
 	surface, err := window.GetSurface()
 	if err != nil {
@@ -41,6 +40,10 @@ func buildSDLRenderer() *SDLRenderer {
 	window.UpdateSurface()
 
 	return &SDLRenderer{surface: surface, window: window}
+}
+
+func (render SDLRenderer) updateGamePart(videoAssets VideoAssets) {
+	render.videoAssets = videoAssets
 }
 
 //TODO where is the stringId defined?
@@ -68,7 +71,7 @@ func (render SDLRenderer) updateDisplay(page int) {
 }
 
 //TODO gimme a better name
-func (render SDLRenderer) setDataBuffer(offset int) {
+func (render SDLRenderer) setDataBuffer(useSecondVideo bool, offset int) {
 	fmt.Println(">VID: SETDATABUFFER", offset)
 }
 
@@ -94,7 +97,7 @@ func (render *SDLRenderer) mainLoop() {
 	}
 }
 
-func (render SDLRenderer) shutdown() {
+func (render *SDLRenderer) shutdown() {
 	render.window.Destroy()
 	sdl.Quit()
 }

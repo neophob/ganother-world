@@ -32,8 +32,8 @@ func (render DummyRenderer) updateDisplay(page int) {
 }
 
 //TODO gimme a better name
-func (render DummyRenderer) setDataBuffer(offset int) {
-	fmt.Println(">VID: SETDATABUFFER", offset)
+func (render DummyRenderer) setDataBuffer(useSecondVideo bool, offset int) {
+	fmt.Println(">VID: SETDATABUFFER", useSecondVideo, offset)
 }
 
 func (render DummyRenderer) setWorkPagePtr(page int) {
@@ -50,6 +50,10 @@ func (render DummyRenderer) mainLoop() {
 }
 
 func (render DummyRenderer) shutdown() {
+	//nothin to see here, move on!
+}
+
+func (render DummyRenderer) updateGamePart(videoAssets VideoAssets) {
 	//nothin to see here, move on!
 }
 
