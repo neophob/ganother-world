@@ -20,6 +20,7 @@ type SDLRenderer struct {
 	renderer    *sdl.Renderer
 	window      *sdl.Window
 	videoAssets VideoAssets
+	loadPalette int
 	colors      [16]Color
 	exitReq     bool
 
@@ -102,8 +103,15 @@ func (render SDLRenderer) copyPage(src, dst, vscroll int) {
 }
 
 // blit
-func (render SDLRenderer) updateDisplay(page int) {
+func (render *SDLRenderer) updateDisplay(page int) {
 	fmt.Println(">VID: UPDATEDISPLAY", page)
+
+	if render.loadPalette != 0xFF {
+		fmt.Println(">VID: UPDATEPAL", render.loadPalette)
+		//render.colors = render.videoAssets.getPalette(render.loadPalette)
+		render.loadPalette = 0xFF
+	}
+
 }
 
 //TODO gimme a better name
@@ -117,8 +125,10 @@ func (render SDLRenderer) setWorkPagePtr(page int) {
 }
 
 func (render *SDLRenderer) setPalette(index int) {
-	render.colors = render.videoAssets.getPalette(index >> 8)
-	fmt.Println(">VID: SETPALETTE", index>>8, render.colors)
+	//render.loadPalette = index >> 8
+	//TODO make this when updating screen and remove me
+	render.colors = render.videoAssets.getPalette(index>>8)
+	fmt.Println(">VID: SETPALETTE", index>>8)
 }
 
 func (render *SDLRenderer) mainLoop() {

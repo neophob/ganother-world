@@ -40,7 +40,7 @@ func (asset VideoAssets) getPalette(index int) [16]Color {
 		return palette
 	}
 
-	ofs := index*32
+	ofs := index * 32
 	for i := 0; i < 16; i++ {
 		color := toUint16BE(asset.palette[ofs], asset.palette[ofs+1])
 		ofs += 2
