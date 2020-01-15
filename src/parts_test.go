@@ -12,8 +12,7 @@ func TestPartsAllDefined(t *testing.T) {
 	}
 }
 
-// TODO get game parts and then test validate palette entries ARE type RT_PALETTE and code is RT_BYTECODE
-func TestPartsIntegrationValidateGamePartsPalettes(t *testing.T) {
+func TestPartsIntegrationValidateGamePartTypes(t *testing.T) {
 	gamePartsIndex := getGameParts()
 	gameData := readFile("../assets/memlist.bin")
 	resourceMap, _ := unmarshallingMemlistBin(gameData)
@@ -22,16 +21,37 @@ func TestPartsIntegrationValidateGamePartsPalettes(t *testing.T) {
 		t.Errorf("Unexpected empty resourceMap: %d", resourceMap)
 	}
 
-	// TODO loop all parts
-	partNumber := 1
-	gamePart1 := gamePartsIndex[partNumber-1]
-	part1Palette := resourceMap[gamePart1.palette]
-	part1PaletteType := getResourceTypeName(int(part1Palette.resourceType))
+	for partNumber := 1; partNumber < GAME_PARTS_COUNT; partNumber++ {
+		gamePart := gamePartsIndex[partNumber-1]
+		var partType string
 
-	fmt.Printf("Test:%#02x, %-17s palette %d\n", gamePart1.palette,
-		getResourceTypeName(int(part1Palette.resourceType)), part1Palette)
+		part1Palette := resourceMap[gamePart.palette]
+		partType = getResourceTypeName(int(part1Palette.resourceType))
+		if partType != "RT_PALETTE" {
+			t.Errorf("Expected GamePartContent:%d palette (%#02x) to have type RT_PALETTE got: %s",
+				partNumber, gamePart.palette, partType)
+		}
 
-	if part1PaletteType != "RT_PALETTE" {
-		t.Errorf("Expected GamePartContent %d palette (%#02x) to have type RT_PALETTE got: %s", partNumber, gamePart1.palette, part1PaletteType)
+		partByteCode := resourceMap[gamePart.bytecode]
+		partType = getResourceTypeName(int(partByteCode.resourceType))
+		if partType != "RT_BYTECODE" {
+			t.Errorf("Expected GamePartContent %d bytecode (%#02x) to have type RT_BYTECODE got: %s",
+				partNumber, gamePart.bytecode, partType)
+		}
+
+		partCinematic := resourceMap[gamePart.cinematic]
+		partType = getResourceTypeName(int(partCinematic.resourceType))
+		if partType != "RT_POLY_CINEMATIC" {
+			t.Errorf("Expected GamePartContent %d cinematic (%#02x) to have type RT_POLY_CINEMATIC got: %s",
+				partNumber, gamePart.cinematic, partType)
+		}
+
+		partVideo2 := resourceMap[gamePart.video2]
+		partType = getResourceTypeName(int(partVideo2.resourceType))
+		fmt.Printf("Test:%#02x, %-17s video2 %d\n", gamePart.video2, partType, partVideo2) // TODO remove test print
+		if partType != "RT_COMMON_SHAPES" {
+			t.Errorf("Expected GamePartContent %d video2 (%#02x) to have type RT_COMMON_SHAPES got: %s",
+				partNumber, gamePart.video2, partType)
+		}
 	}
 }
