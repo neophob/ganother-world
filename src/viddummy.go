@@ -13,8 +13,8 @@ func (render DummyRenderer) drawString(color, posX, posY, stringId int) {
 	fmt.Printf(">VID: DRAWSTRING color:%d, x:%d, y:%d, text:%s\n", color, posX, posY, text)
 }
 
-func (render DummyRenderer) drawShape(color, zoom, posX, posY int) {
-	fmt.Printf(">VID: DRAWSHAPE color:%d, x:%d, y:%d, zoom:%d\n", color, posX, posY, zoom)
+func (render DummyRenderer) drawShape(offset, zoom, posX, posY int) {
+	fmt.Printf(">VID: DRAWSHAPE offset:%d, x:%d, y:%d, zoom:%d\n", offset, posX, posY, zoom)
 }
 
 func (render DummyRenderer) fillPage(page, color int) {
@@ -28,11 +28,6 @@ func (render DummyRenderer) copyPage(src, dst, vscroll int) {
 // blit
 func (render DummyRenderer) updateDisplay(page int) {
 	fmt.Println(">VID: UPDATEDISPLAY", page)
-}
-
-//TODO gimme a better name
-func (render DummyRenderer) setDataBuffer(useSecondVideo bool, offset int) {
-	fmt.Println(">VID: SETDATABUFFER", useSecondVideo, offset)
 }
 
 func (render DummyRenderer) setWorkPagePtr(page int) {

@@ -81,19 +81,21 @@ func (render SDLRenderer) drawString(color, posX, posY, stringId int) {
 			charPosX += 8
 		}
 	}
+	//TODO why is this needed?
 	render.renderer.Present()
 }
 
-func (render SDLRenderer) drawShape(color, zoom, posX, posY int) {
-	fmt.Printf(">VID: DRAWSHAPE color:%d, x:%d, y:%d, zoom:%d\n", color, posX, posY, zoom)
-	//render.softwareVideo_SetColor(color)
+func (render *SDLRenderer) drawShape(offset, zoom, posX, posY int) {
+	fmt.Printf(">VID: DRAWSHAPE offset:%d, x:%d, y:%d, zoom:%d\n", offset, posX, posY, zoom)
+	render.videoAssets.videoPC = offset
 
+	color := 0xFF
 	i := render.videoAssets.fetchByte()
 	if i >= 0xC0 {
 		if color&0x80 > 0 {
 			color = int(i & 0x3F)
 		}
-		render.softwareVideo_FillPolygon(color, zoom, posX, posY)
+		render.softwareVideo_FillPolygon(color, offset, zoom, posX, posY)
 	} else {
 		i &= 0x3F
 		if i == 1 {
@@ -104,7 +106,8 @@ func (render SDLRenderer) drawShape(color, zoom, posX, posY int) {
 			fmt.Printf("Video::drawShape() ec=0x%X (i != 2)", 0xFBB)
 		}
 	}
-
+	//TODO why is this needed?
+	render.renderer.Present()
 }
 
 func (render SDLRenderer) fillPage(page, color int) {
@@ -129,12 +132,6 @@ func (render *SDLRenderer) updateDisplay(page int) {
 
 }
 
-//TODO gimme a better name
-func (render *SDLRenderer) setDataBuffer(useSecondVideo bool, offset int) {
-	fmt.Println(">VID: SETDATABUFFER", offset, render.videoAssets.videoPC)
-	render.videoAssets.videoPC = offset
-}
-
 func (render SDLRenderer) setWorkPagePtr(page int) {
 	fmt.Println(">VID: SETWORKPAGEPTR", page)
 	render.updateWorkerPage(page)
@@ -142,7 +139,7 @@ func (render SDLRenderer) setWorkPagePtr(page int) {
 
 func (render *SDLRenderer) setPalette(index int) {
 	//render.loadPalette = index >> 8
-	//TODO make this when updating screen and remove me
+	//TODO move this to updateDisplay and remove me
 	render.colors = render.videoAssets.getPalette(index >> 8)
 	fmt.Println(">VID: SETPALETTE", index>>8)
 }
@@ -214,8 +211,8 @@ func (render SDLRenderer) softwareVideo_DrawChar(posX, posY int32, char byte) {
 	}
 }
 
-func (render SDLRenderer) softwareVideo_FillPolygon(color, zoom, posX, posY int) {
-	fmt.Printf(">VID: FILLPOLYGON color:%d, x:%d, y:%d, zoom:%d\n", color, posX, posY, zoom)
+func (render *SDLRenderer) softwareVideo_FillPolygon(color, offset, zoom, posX, posY int) {
+	fmt.Printf(">VID: FILLPOLYGON color:%d, offset:%d, x:%d, y:%d, zoom:%d\n", color, offset, posX, posY, zoom)
 
 	bbw := int(render.videoAssets.fetchByte()) * zoom / 64
 	bbh := int(render.videoAssets.fetchByte()) * zoom / 64

@@ -54,11 +54,10 @@ func (asset VideoAssets) getPalette(index int) [16]Color {
 
 type Renderer interface {
 	drawString(color, posX, posY, stringId int)
-	drawShape(color, zoom, posX, posY int)
+	drawShape(offset, zoom, posX, posY int)
 	fillPage(page, color int)
 	copyPage(src, dst, vscroll int)
 	updateDisplay(page int)
-	setDataBuffer(useSecondVideo bool, offset int)
 	setWorkPagePtr(page int)
 	setPalette(index int)
 	mainLoop()
