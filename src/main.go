@@ -40,6 +40,8 @@ func main() {
 
 	log.Println("- create state")
 	vmState := createNewState(assets)
+
+	log.Println("- setup game")
 	vmState.setupGamePart(GAME_PART_ID_1 + 0)
 
 	videoAssets := vmState.buildVideoAssets()

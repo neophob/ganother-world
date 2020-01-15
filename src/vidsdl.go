@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	WINDOW_WIDTH  int32 = 640
-	WINDOW_HEIGHT int32 = 480
+	WINDOW_WIDTH  int32 = 320 * 3
+	WINDOW_HEIGHT int32 = 200 * 3
 
 	WIDTH  int32 = 320
 	HEIGHT int32 = 200
@@ -20,6 +20,7 @@ type SDLRenderer struct {
 	renderer    *sdl.Renderer
 	window      *sdl.Window
 	videoAssets VideoAssets
+	colors      [16]Color
 	exitReq     bool
 
 	workerPage int
@@ -46,20 +47,12 @@ func buildSDLRenderer() *SDLRenderer {
 	}
 	renderer.SetLogicalSize(WIDTH, HEIGHT)
 	renderer.Clear()
+	renderer.Present()
 
 	surface, err := window.GetSurface()
 	if err != nil {
 		panic(err)
 	}
-
-	//rect := sdl.Rect{0, 0, WIDTH, 100}
-	renderer.SetDrawColor(250, 33, 110, 255)
-	//renderer.FillRect(&rect)
-
-	//renderer.Present()
-
-	//	surface.FillRect(&rect, 0xff003300)
-	//	window.UpdateSurface()
 
 	return &SDLRenderer{
 		surface:  surface,
@@ -68,17 +61,17 @@ func buildSDLRenderer() *SDLRenderer {
 	}
 }
 
-func (render SDLRenderer) updateGamePart(videoAssets VideoAssets) {
+func (render *SDLRenderer) updateGamePart(videoAssets VideoAssets) {
 	render.videoAssets = videoAssets
+	render.colors = videoAssets.getPalette(0)
 }
 
 func (render SDLRenderer) drawString(color, posX, posY, stringId int) {
 	text := getText(stringId)
 	fmt.Printf(">VID: DRAWSTRING color:%d, x:%d, y:%d, text:%s\n", color, posX, posY, text)
-	//TODO whats the color? index to palette?
-
 	//setWorkPagePtr(buffer);?
 
+	render.softwareVideo_SetColor(color)
 	charPosX := int32(posX)
 	charPosY := int32(posY)
 	for i := 0; i < len(text); i++ {
@@ -86,7 +79,7 @@ func (render SDLRenderer) drawString(color, posX, posY, stringId int) {
 			charPosY += int32(FONT_HEIGHT)
 			charPosX = int32(posX)
 		} else {
-			render.softwareVideo_DrawChar(color, charPosX, charPosY, text[i])
+			render.softwareVideo_DrawChar(charPosX, charPosY, text[i])
 			charPosX += 8
 		}
 	}
@@ -121,9 +114,9 @@ func (render SDLRenderer) setWorkPagePtr(page int) {
 	render.updateWorkerPage(page)
 }
 
-func (render SDLRenderer) setPalette(index int) {
-	fmt.Println(">VID: SETPALETTE", index>>8)
-	//TODO	_vid->_nextPal = num >> 8
+func (render *SDLRenderer) setPalette(index int) {
+	render.colors = render.videoAssets.getPalette(index >> 8)
+	fmt.Println(">VID: SETPALETTE", index>>8, render.colors)
 }
 
 func (render *SDLRenderer) mainLoop() {
@@ -152,7 +145,7 @@ func (render SDLRenderer) exitRequested(frameCount int) bool {
 	return render.exitReq
 }
 
-//
+// ----
 
 func (render *SDLRenderer) updateWorkerPage(page int) {
 	if page >= 0 && page <= 3 {
@@ -170,13 +163,19 @@ func (render *SDLRenderer) updateWorkerPage(page int) {
 	}
 }
 
-func (render SDLRenderer) softwareVideo_DrawChar(color int, posX, posY int32, char byte) {
+func (render SDLRenderer) softwareVideo_SetColor(color int) {
+	col := render.colors[color]
+	fmt.Println(">VID: SETCOLOR", color, col)
+	render.renderer.SetDrawColor(col.r, col.g, col.g, 255)
+}
+
+func (render SDLRenderer) softwareVideo_DrawChar(posX, posY int32, char byte) {
 	ofs := 8 * (int32(char) - 0x20)
 	for j := int32(0); j < 8; j++ {
 		ch := FONT[ofs+j]
 		for i := int32(0); i < 8; i++ {
 			if ch&(1<<(7-i)) > 0 {
-				render.renderer.DrawPoint(posX + i, posY + j)
+				render.renderer.DrawPoint(posX+i, posY+j)
 			}
 		}
 	}
