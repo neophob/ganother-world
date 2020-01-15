@@ -128,10 +128,15 @@ func (render SDLRenderer) setPalette(index int) {
 
 func (render *SDLRenderer) mainLoop() {
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-		switch event.(type) {
+		switch t := event.(type) {
 		case *sdl.QuitEvent:
 			render.exitReq = true
 			fmt.Println(">render.exitReq", render.exitReq)
+		case *sdl.KeyboardEvent:
+			if t.Type == 769 {
+				render.exitReq = true
+			}
+
 		default:
 			//fmt.Println("SDL EVENT", event)
 		}
@@ -163,36 +168,10 @@ func (render *SDLRenderer) updateWorkerPage(page int) {
 		render.workerPage = 0
 		fmt.Println("Video::getPagePtr() p != [0,1,2,3,0xFF,0xFE] ==", page)
 	}
-
 }
 
 func (render SDLRenderer) softwareVideo_DrawChar(color int, posX, posY int32, char byte) {
-	/*
-		const uint8_t *ft = _font + (c - 0x20) * 8;
-		const int offset = (x + y * _w) * _byteDepth;
-		if (_byteDepth == 1) {
-			for (int j = 0; j < 8; ++j) {
-				const uint8_t ch = ft[j];
-				for (int i = 0; i < 8; ++i) {
-					if (ch & (1 << (7 - i))) {
-						_drawPagePtr[offset + j * _w + i] = color;
-					}
-				}
-			}
-		} else if (_byteDepth == 2) {
-			const uint16_t rgbColor = _pal[color].rgb555();
-			for (int j = 0; j < 8; ++j) {
-				const uint8_t ch = ft[j];
-				for (int i = 0; i < 8; ++i) {
-					if (ch & (1 << (7 - i))) {
-						((uint16_t *)(_drawPagePtr + offset))[j * _w + i] = rgbColor;
-					}
-				}
-			}
-		}
-	*/
 	ofs := 8 * (int32(char) - 0x20)
-	fmt.Printf("DRAWCHAR %c %d(%d) - x=%d y=%d\n", char, int32(char), (int32(char) - 0x20), posX, posY)
 	for j := int32(0); j < 8; j++ {
 		ch := FONT[ofs+j]
 		for i := int32(0); i < 8; i++ {
@@ -201,5 +180,4 @@ func (render SDLRenderer) softwareVideo_DrawChar(color int, posX, posY int32, ch
 			}
 		}
 	}
-
 }
