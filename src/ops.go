@@ -92,7 +92,7 @@ func (state *VMState) opCall() {
 	newPC := state.fetchWord()
 	state.saveSP()
 	state.pc = newPC
-	fmt.Println("#op_call(), jump to pc:", state.pc, len(state.bytecode))
+	fmt.Println("#op_call(), jump to pc:", state.pc)
 }
 
 //End of a subroutine.

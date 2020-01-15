@@ -34,9 +34,13 @@ type VMState struct {
 	variables     [VM_NUM_VARIABLES]int16
 	channelPC     [VM_NUM_THREADS]uint16
 	channelPaused [VM_NUM_THREADS]bool
-	gamePart      int
 	stackCalls    [VM_MAX_STACK_SIZE]uint16
-	bytecode      []uint8
+	gamePart      int
+
+	palette   []uint8
+	bytecode  []uint8
+	cinematic []uint8
+	video2    []uint8
 
 	//context of the current channel
 	sp        int
@@ -56,6 +60,17 @@ func createNewState(assets Assets) VMState {
 	//WTF? whats this? -> create const
 	state.variables[0xE4] = 0x14
 	return state
+}
+
+// gamePart is the int between 0 and 10
+func (state *VMState) loadGameParts(gamePart int) {
+	state.gamePart = gamePart
+
+	gamePartAsset := state.assets.gameParts[gamePart]
+	state.bytecode = state.assets.loadEntryFromBank(gamePartAsset.bytecode)
+	state.palette = state.assets.loadEntryFromBank(gamePartAsset.palette)
+	state.cinematic = state.assets.loadEntryFromBank(gamePartAsset.cinematic)
+	state.video2 = state.assets.loadEntryFromBank(gamePartAsset.video2)
 }
 
 func (state *VMState) saveSP() {
@@ -100,11 +115,7 @@ func (state *VMState) setupGamePart(newGamePart int) {
 		state.variables[VM_VARIABLE_TITLESCREEN] = 0x81
 	}
 
-	//TODO move this to a more generic functino get Current bytecode/palette/videodata
-	gamePartAsset := state.assets.gameParts[newGamePart-GAME_PART_FIRST]
-	fmt.Println("- load bytecode, resource", gamePartAsset.bytecode)
-	state.bytecode = state.assets.loadEntryFromBank(gamePartAsset.bytecode)
-	state.gamePart = newGamePart
+	state.loadGameParts(newGamePart - GAME_PART_FIRST)
 
 	//Set all thread to inactive (pc at 0xFFFF or 0xFFFE )
 	for i := range state.channelPC {
