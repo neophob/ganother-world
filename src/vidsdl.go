@@ -7,6 +7,11 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 )
 
+const (
+	WIDTH  int32 = 800
+	HEIGHT int32 = 600
+)
+
 type SDLRenderer struct {
 	surface *sdl.Surface
 }
@@ -18,7 +23,7 @@ func buildSDLRenderer() SDLRenderer {
 	defer sdl.Quit()
 
 	window, err := sdl.CreateWindow("ganother world", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
-		800, 600, sdl.WINDOW_SHOWN)
+		WIDTH, HEIGHT, sdl.WINDOW_ALLOW_HIGHDPI)
 	if err != nil {
 		panic(err)
 	}
@@ -29,8 +34,8 @@ func buildSDLRenderer() SDLRenderer {
 		panic(err)
 	}
 
-	rect := sdl.Rect{0, 0, 200, 200}
-	surface.FillRect(&rect, 0xffff0000)
+	rect := sdl.Rect{0, 0, WIDTH, HEIGHT}
+	surface.FillRect(&rect, 0xff000000)
 	window.UpdateSurface()
 
 	running := true
