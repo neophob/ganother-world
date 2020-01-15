@@ -130,8 +130,9 @@ func (render *SDLRenderer) updateDisplay(page int) {
 }
 
 //TODO gimme a better name
-func (render SDLRenderer) setDataBuffer(useSecondVideo bool, offset int) {
-	fmt.Println(">VID: SETDATABUFFER", offset)
+func (render *SDLRenderer) setDataBuffer(useSecondVideo bool, offset int) {
+	fmt.Println(">VID: SETDATABUFFER", offset, render.videoAssets.videoPC)
+	render.videoAssets.videoPC = offset
 }
 
 func (render SDLRenderer) setWorkPagePtr(page int) {
