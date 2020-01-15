@@ -41,7 +41,7 @@ func (asset VideoAssets) getPalette(index int) [16]Color {
 	}
 
 	//TODO probably wrong!
-	ofs := 32 + index*32
+	ofs := 32*3 + index*32
 	for i := 0; i < 16; i++ {
 		color := toUint16BE(asset.palette[ofs], asset.palette[ofs+1])
 		ofs += 2

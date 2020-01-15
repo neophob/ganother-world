@@ -88,11 +88,13 @@ func (render SDLRenderer) drawString(color, posX, posY, stringId int) {
 
 func (render SDLRenderer) drawShape(color, zoom, posX, posY int) {
 	fmt.Printf(">VID: DRAWSHAPE color:%d, x:%d, y:%d, zoom:%d\n", color, posX, posY, zoom)
+	//render.softwareVideo_SetColor(color)
 }
 
 func (render SDLRenderer) fillPage(page, color int) {
 	fmt.Println(">VID: FILLPAGE", page, color)
-	//_graphics->clearBuffer(getPagePtr(page), color);
+	render.softwareVideo_SetColor(color)
+	render.softwareVideo_FillBuffer()
 }
 
 func (render SDLRenderer) copyPage(src, dst, vscroll int) {
@@ -167,6 +169,11 @@ func (render SDLRenderer) softwareVideo_SetColor(color int) {
 	col := render.colors[color]
 	fmt.Println(">VID: SETCOLOR", color, col)
 	render.renderer.SetDrawColor(col.r, col.g, col.g, 255)
+}
+
+func (render SDLRenderer) softwareVideo_FillBuffer() {
+	rect := sdl.Rect{0, 0, WIDTH, HEIGHT}
+	render.renderer.FillRect(&rect)
 }
 
 func (render SDLRenderer) softwareVideo_DrawChar(posX, posY int32, char byte) {
