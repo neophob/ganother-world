@@ -21,40 +21,47 @@ func TestPartsIntegrationValidateGamePartTypes(t *testing.T) {
 		t.Errorf("Unexpected empty resourceMap: %d", resourceMap)
 	}
 
-	for partNumber := 1; partNumber < GAME_PARTS_COUNT; partNumber++ {
-		gamePart := gamePartsIndex[partNumber-1]
+	for partIndex := 0; partIndex < GAME_PARTS_COUNT; partIndex++ {
 		var partType string
+		var resource MemlistEntry
 
-		part1Palette := resourceMap[gamePart.palette]
-		partType = getResourceTypeName(int(part1Palette.resourceType))
+		gamePart := gamePartsIndex[partIndex]
+
+		resource = resourceMap[gamePart.palette]
+		partType = getResourceTypeName(int(resource.resourceType))
 		if partType != "RT_PALETTE" {
 			t.Errorf("Expected GamePartContent:%d palette (%#02x) to have type RT_PALETTE got: %s",
-				partNumber, gamePart.palette, partType)
+				partIndex, gamePart.palette, partType)
 		}
 
-		partByteCode := resourceMap[gamePart.bytecode]
-		partType = getResourceTypeName(int(partByteCode.resourceType))
+		resource = resourceMap[gamePart.bytecode]
+		partType = getResourceTypeName(int(resource.resourceType))
 		if partType != "RT_BYTECODE" {
 			t.Errorf("Expected GamePartContent %d bytecode (%#02x) to have type RT_BYTECODE got: %s",
-				partNumber, gamePart.bytecode, partType)
+				partIndex, gamePart.bytecode, partType)
 		}
 
-		partCinematic := resourceMap[gamePart.cinematic]
-		partType = getResourceTypeName(int(partCinematic.resourceType))
+		resource = resourceMap[gamePart.cinematic]
+		partType = getResourceTypeName(int(resource.resourceType))
 		if partType != "RT_POLY_CINEMATIC" {
-			t.Errorf("Expected GamePartContent %d cinematic (%#02x) to have type RT_POLY_CINEMATIC got: %s",
-				partNumber, gamePart.cinematic, partType)
+			if resource.unpackedSize == 0 {
+				fmt.Printf("Warning empty GamePartContent[%d].cinematic:%#02x, %-17s\n",
+					partIndex, gamePart.cinematic, partType)
+			} else {
+				t.Errorf("Expected GamePartContent %d cinematic (%#02x) to have type RT_COMMON_SHAPES got: %s",
+					partIndex, gamePart.cinematic, partType)
+			}
 		}
 
-		partVideo2 := resourceMap[gamePart.video2]
-		partType = getResourceTypeName(int(partVideo2.resourceType))
+		resource = resourceMap[gamePart.video2]
+		partType = getResourceTypeName(int(resource.resourceType))
 		if partType != "RT_COMMON_SHAPES" {
-			if partVideo2.unpackedSize == 0 {
-				fmt.Printf("Warning empty GamePartContent[%d].video2:%#02x, %-17s video2 %d\n",
-					partNumber, gamePart.video2, partType, partVideo2)
+			if resource.unpackedSize == 0 {
+				fmt.Printf("Warning empty GamePartContent[%d].video2:%#02x, %-17s\n",
+					partIndex, gamePart.video2, partType)
 			} else {
 				t.Errorf("Expected GamePartContent %d video2 (%#02x) to have type RT_COMMON_SHAPES got: %s",
-					partNumber, gamePart.video2, partType)
+					partIndex, gamePart.video2, partType)
 			}
 		}
 	}
