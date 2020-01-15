@@ -44,3 +44,15 @@ func (render DummyRenderer) setPalette(index int) {
 	fmt.Println(">VID: SETPALETTE", index>>8)
 	//TODO	_vid->_nextPal = num >> 8
 }
+
+func (render DummyRenderer) mainLoop() {
+	//nothin to see here, move on!
+}
+
+func (render DummyRenderer) shutdown() {
+	//nothin to see here, move on!
+}
+
+func (render DummyRenderer) exitRequested(frameCount int) bool {
+	return frameCount > 128
+}

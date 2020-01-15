@@ -14,20 +14,22 @@ const (
 
 type SDLRenderer struct {
 	surface *sdl.Surface
+	window  *sdl.Window
+	exitReq bool
 }
 
-func buildSDLRenderer() SDLRenderer {
+func buildSDLRenderer() *SDLRenderer {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		panic(err)
 	}
-	defer sdl.Quit()
+	//	defer sdl.Quit()
 
 	window, err := sdl.CreateWindow("ganother world", sdl.WINDOWPOS_UNDEFINED, sdl.WINDOWPOS_UNDEFINED,
 		WIDTH, HEIGHT, sdl.WINDOW_ALLOW_HIGHDPI)
 	if err != nil {
 		panic(err)
 	}
-	defer window.Destroy()
+	//	defer window.Destroy()
 
 	surface, err := window.GetSurface()
 	if err != nil {
@@ -38,18 +40,7 @@ func buildSDLRenderer() SDLRenderer {
 	surface.FillRect(&rect, 0xff000000)
 	window.UpdateSurface()
 
-	running := true
-	for running {
-		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-			switch event.(type) {
-			case *sdl.QuitEvent:
-				println("Quit")
-				running = false
-				break
-			}
-		}
-	}
-	return SDLRenderer{surface}
+	return &SDLRenderer{surface: surface, window: window}
 }
 
 //TODO where is the stringId defined?
@@ -88,4 +79,26 @@ func (render SDLRenderer) setWorkPagePtr(page int) {
 func (render SDLRenderer) setPalette(index int) {
 	fmt.Println(">VID: SETPALETTE", index>>8)
 	//TODO	_vid->_nextPal = num >> 8
+}
+
+func (render *SDLRenderer) mainLoop() {
+	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
+		switch event.(type) {
+		case *sdl.QuitEvent:
+			render.exitReq = true
+			fmt.Println(">render.exitReq", render.exitReq)
+		default:
+			//fmt.Println("SDL EVENT", event)
+
+		}
+	}
+}
+
+func (render SDLRenderer) shutdown() {
+	render.window.Destroy()
+	sdl.Quit()
+}
+
+func (render SDLRenderer) exitRequested(frameCount int) bool {
+	return render.exitReq
 }

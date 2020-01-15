@@ -42,12 +42,15 @@ func main() {
 	vmState := createNewState(assets)
 	vmState.setupGamePart(GAME_PART_ID_1 + 2)
 
-	//start endless loop
-	for i := 0; i < 99128; i++ {
-		//vmState.executeOp()
+	//start main loop
+	exit := false
+	for i:= 0; exit == false; i++ {
 		vmState.mainLoop()
+		renderer.mainLoop()
+		exit = renderer.exitRequested(i)
 	}
 
+	renderer.shutdown()
 }
 
 func readFile(filename string) []byte {

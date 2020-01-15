@@ -9,4 +9,7 @@ type Renderer interface {
 	setDataBuffer(offset int)
 	setWorkPagePtr(page int)
 	setPalette(index int)
+	mainLoop()
+	shutdown()
+	exitRequested(frameCount int) bool
 }
