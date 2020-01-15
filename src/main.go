@@ -42,7 +42,7 @@ func main() {
 	vmState := createNewState(assets)
 
 	log.Println("- setup game")
-	vmState.setupGamePart(GAME_PART_ID_1 + 0)
+	vmState.setupGamePart(GAME_PART_ID_1 + 3)
 
 	videoAssets := vmState.buildVideoAssets()
 	renderer.updateGamePart(videoAssets)

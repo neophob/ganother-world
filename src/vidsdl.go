@@ -1,4 +1,5 @@
-//dummy video implementation, text output
+//SDL video implementation
+//TODO: implement multiple pages
 package main
 
 import (
@@ -92,9 +93,9 @@ func (render *SDLRenderer) drawShape(offset, zoom, posX, posY int) {
 	color := 0xFF
 	i := render.videoAssets.fetchByte()
 	if i >= 0xC0 {
-		if color&0x80 > 0 {
+		//if color&0x80 > 0 {
 			color = int(i & 0x3F)
-		}
+		//}
 		render.softwareVideo_FillPolygon(color, zoom, posX, posY)
 	} else {
 		i &= 0x3F

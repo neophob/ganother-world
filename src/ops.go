@@ -1,5 +1,7 @@
 package main
 
+//TODO implement workaround
+
 import (
 	"fmt"
 )
@@ -238,7 +240,6 @@ func (state *VMState) opVidUpdatePage() {
 
 func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
 	offset := ((uint16(opcode) << 8) | uint16(state.fetchByte())) << 1
-	//_res->_useSegVideo2 = false;
 	posX := int(state.fetchByte())
 	posY := int(state.fetchByte())
 	height := posY - 199
@@ -278,7 +279,6 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 	zoom := uint16(state.fetchByte())
 	if opcode&2 == 0 {
 		if opcode&1 == 0 {
-			//TODO hmm interesting...
 			state.pc--
 			fmt.Println("zoom decreased PC", state.pc)
 			zoom = 0x40
