@@ -59,6 +59,14 @@ func createNewState(assets Assets) VMState {
 	state.variables[VM_VARIABLE_RANDOM_SEED] = 42
 	//WTF? whats this? -> create const
 	state.variables[0xE4] = 0x14
+
+	//BYPASS START
+	state.variables[0xBC] = 0x10
+	state.variables[0xC6] = 0x80
+	state.variables[0xDC] = 33
+	//state.variables[0xF2] = 6000
+	//BYPASS END
+
 	return state
 }
 

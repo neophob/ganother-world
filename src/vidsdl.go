@@ -82,8 +82,6 @@ func (render SDLRenderer) drawString(color, posX, posY, stringId int) {
 			charPosX += 8
 		}
 	}
-	//TODO why is this needed?
-	render.renderer.Present()
 }
 
 func (render *SDLRenderer) drawShape(offset, zoom, posX, posY int) {
@@ -107,8 +105,6 @@ func (render *SDLRenderer) drawShape(offset, zoom, posX, posY int) {
 			fmt.Printf("Video::drawShape() ec=0x%X (i != 2)", 0xFBB)
 		}
 	}
-	//TODO why is this needed?
-	render.renderer.Present()
 }
 
 func (render SDLRenderer) fillPage(page, color int) {
@@ -131,6 +127,8 @@ func (render *SDLRenderer) updateDisplay(page int) {
 		render.loadPalette = 0xFF
 	}
 
+	//TODO why is this needed?
+	render.renderer.Present()
 }
 
 func (render SDLRenderer) setWorkPagePtr(page int) {
@@ -186,7 +184,7 @@ func (render *SDLRenderer) updateWorkerPage(page int) {
 		render.workerPage = 1
 	default:
 		render.workerPage = 0
-		fmt.Println("Video::getPagePtr() p != [0,1,2,3,0xFF,0xFE] ==", page)
+		fmt.Println("updateWorkerPage != [0,1,2,3,0xFF,0xFE] ==", page)
 	}
 }
 

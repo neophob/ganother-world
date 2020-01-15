@@ -173,7 +173,7 @@ func (state *VMState) opCondJmp() {
 	switch op & 7 {
 	case 0:
 		expr = (variableId == newVariable)
-		//TODO implement bypass protection
+		//TODO implement BYPASS protection
 	case 1:
 		expr = (variableId != newVariable)
 	case 2:
@@ -234,7 +234,11 @@ func (state *VMState) opVidCopyPage() {
 func (state *VMState) opVidUpdatePage() {
 	page := int(state.fetchByte())
 	//TODO inp_handleSpecialKeys();
-	//TODO bypass protection, handle pause
+	if state.gamePart == 0 && state.variables[0x67] == 1 {
+		fmt.Println("opVidUpdatePage: BYPASS PROTECTION", page)
+		state.variables[0xDC] = 33
+	}
+
 	renderer.updateDisplay(page)
 }
 
@@ -247,7 +251,7 @@ func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
 		posY = 199
 		posX += height
 	}
-	fmt.Println("opVidUpdatePage", offset)
+	fmt.Println("opVidDrawPolyBackground", offset)
 	renderer.drawShape(int(offset), 0x40, posX, posY)
 }
 
