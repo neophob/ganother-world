@@ -7,8 +7,6 @@ PROJECTNAME := $(shell basename "$(PWD)")
 
 # Go related variables.
 GOBASE := $(shell pwd)
-GOPATH := $(GOBASE)/vendor:$(GOBASE)
-GOBIN := $(GOBASE)/bin
 GOFILES := $(wildcard *.go)
 
 # -X add string value definition of the form importpath.name=value
@@ -19,11 +17,11 @@ SRCDIR := ./src
 ## build: build go binary in dev mode
 build:
 	@echo "  >  BUILD"
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go build $(SRC)
+	@go build $(SRC)
 
 ## format: format code using go fmt
 format:
-	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go fmt $(SRC)
+	@go fmt $(SRC)
 
 ## build-cross: cross compile project in release mode (without debug symbols)
 build-cross:
