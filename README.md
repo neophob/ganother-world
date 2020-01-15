@@ -49,6 +49,7 @@ Reference:
 
 - Install make (autotools on linux, xcode on OSX)
 - Install go 1.13 https://golang.org/dl/
+- install SDL2 (sdl2, sdl2_gfx, sdl2_image, sdl2_mixer, sdl_net)
 - Check out repo
 - Run `make` to build, if it's green you're good
 - Use `make help` for more

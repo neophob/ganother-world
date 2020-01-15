@@ -4,6 +4,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/veandco/go-sdl2/gfx"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -214,6 +215,31 @@ func (render SDLRenderer) softwareVideo_DrawChar(posX, posY int32, char byte) {
 
 func (render SDLRenderer) softwareVideo_FillPolygon(color, zoom, posX, posY int) {
 	fmt.Printf(">VID: FILLPOLYGON color:%d, x:%d, y:%d, zoom:%d\n", color, posX, posY, zoom)
+
+	bbw := int(render.videoAssets.fetchByte()) * zoom / 64
+	bbh := int(render.videoAssets.fetchByte()) * zoom / 64
+	col := render.colors[color]
+
+	x1 := posX - bbw/2
+	x2 := posX + bbw/2
+	y1 := posY - bbh/2
+	y2 := posY + bbh/2
+
+	if x1 > 319 || x2 < 0 || y1 > 199 || y2 < 0 {
+		fmt.Println(">VID: FILLPOLYGON INVALID")
+		return
+	}
+
+	numVertices := int(render.videoAssets.fetchByte())
+
+	var vx, vy = make([]int16, numVertices), make([]int16, numVertices)
+	for i := 0; i < numVertices; i++ {
+		vx[i] = int16(x1 + int(render.videoAssets.fetchByte())*zoom/64)
+		vy[i] = int16(y1 + int(render.videoAssets.fetchByte())*zoom/64)
+	}
+
+	fmt.Println(">VID: FILLPOLYGON", numVertices, vx, vy)
+	gfx.FilledPolygonColor(render.renderer, vx, vy, sdl.Color{col.r, col.g, col.g, 255})
 }
 
 func (render SDLRenderer) softwareVideo_DrawShapeParts(zoom, posX, posY int) {
