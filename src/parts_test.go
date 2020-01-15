@@ -48,10 +48,14 @@ func TestPartsIntegrationValidateGamePartTypes(t *testing.T) {
 
 		partVideo2 := resourceMap[gamePart.video2]
 		partType = getResourceTypeName(int(partVideo2.resourceType))
-		fmt.Printf("Test:%#02x, %-17s video2 %d\n", gamePart.video2, partType, partVideo2) // TODO remove test print
 		if partType != "RT_COMMON_SHAPES" {
-			t.Errorf("Expected GamePartContent %d video2 (%#02x) to have type RT_COMMON_SHAPES got: %s",
-				partNumber, gamePart.video2, partType)
+			if partVideo2.unpackedSize == 0 {
+				fmt.Printf("Warning empty GamePartContent[%d].video2:%#02x, %-17s video2 %d\n",
+					partNumber, gamePart.video2, partType, partVideo2)
+			} else {
+				t.Errorf("Expected GamePartContent %d video2 (%#02x) to have type RT_COMMON_SHAPES got: %s",
+					partNumber, gamePart.video2, partType)
+			}
 		}
 	}
 }
