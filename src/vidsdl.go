@@ -257,7 +257,7 @@ func (render SDLRenderer) softwareVideo_DrawShapeParts(zoom, posX, posY int) {
 
 		var color uint16 = 0xFF
 		if off&0x8000 > 0 {
-			readOfs := render.videoAssets.videoPC&0x7F
+			readOfs := render.videoAssets.videoPC & 0x7F
 			b1 := render.videoAssets.cinematic[readOfs]
 			color = uint16(b1)
 			//TODO display head.. WTF is this?

@@ -1,11 +1,28 @@
 package main
 
+type Renderer interface {
+	drawString(color, posX, posY, stringId int)
+	drawShape(color, offset, zoom, posX, posY int)
+	fillPage(page, color int)
+	copyPage(src, dst, vscroll int)
+	updateDisplay(page int)
+	setWorkPagePtr(page int)
+	setPalette(index int)
+	mainLoop()
+	shutdown()
+	exitRequested(frameCount int) bool
+	updateGamePart(videoAssets VideoAssets)
+}
+
 type VideoAssets struct {
 	palette   []uint8
 	cinematic []uint8
 	video2    []uint8
+	videoPC   int
+}
 
-	videoPC int
+type Color struct {
+	r, g, b uint8
 }
 
 func (asset *VideoAssets) fetchByte() uint8 {
@@ -25,10 +42,6 @@ func (asset *VideoAssets) fetchWord() uint16 {
 	b2 := asset.cinematic[asset.videoPC+1]
 	asset.videoPC += 2
 	return toUint16BE(b1, b2)
-}
-
-type Color struct {
-	r, g, b uint8
 }
 
 // each asset is 2048 bytes long, a palette stores 16 colors
@@ -51,18 +64,3 @@ func (asset VideoAssets) getPalette(index int) [16]Color {
 	}
 	return palette
 }
-
-type Renderer interface {
-	drawString(color, posX, posY, stringId int)
-	drawShape(color, offset, zoom, posX, posY int)
-	fillPage(page, color int)
-	copyPage(src, dst, vscroll int)
-	updateDisplay(page int)
-	setWorkPagePtr(page int)
-	setPalette(index int)
-	mainLoop()
-	shutdown()
-	exitRequested(frameCount int) bool
-	updateGamePart(videoAssets VideoAssets)
-}
-
