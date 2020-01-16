@@ -269,7 +269,7 @@ func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
 		posY = 199
 		posX += height
 	}
-	fmt.Println("opVidDrawPolyBackground", offset)
+	fmt.Println("opVidDrawPolyBackground", opcode, offset)
 	renderer.drawShape(0xFF, int(offset), 0x40, posX, posY)
 }
 

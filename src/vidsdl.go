@@ -227,6 +227,11 @@ func (render *SDLRenderer) softwareVideo_FillPolygon(color, zoom, posX, posY int
 	col := render.colors[color%16]
 	numVertices := int(render.videoAssets.fetchByte())
 
+	if numVertices > 70 {
+		fmt.Println(">VID: TOOMANY", numVertices)
+		panic("UNEXPECTED_AMOUNT_OF_VERTICES")
+	}
+
 	var vx, vy = make([]int16, numVertices), make([]int16, numVertices)
 	for i := 0; i < numVertices; i++ {
 		vx[i] = int16(x1 + int(render.videoAssets.fetchByte())*zoom/64)

@@ -66,7 +66,7 @@ func createNewState(assets Assets) VMState {
 	state.variables[0xBC] = 0x10
 	state.variables[0xC6] = 0x80
 	state.variables[0xDC] = 33
-	//state.variables[0xF2] = 6000
+	state.variables[0xF2] = 4000
 	//BYPASS END
 
 	return state
@@ -120,7 +120,6 @@ func (state *VMState) fetchWord() uint16 {
 	return toUint16BE(b1, b2)
 }
 
-//TODO using a pointer - its own state can be modified. using the value, state does not change!
 func (state *VMState) setupGamePart(newGamePart int) {
 	if state.gamePart == newGamePart {
 		return

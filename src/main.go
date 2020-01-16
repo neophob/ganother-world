@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math"
+	//"math/rand"
 	"os"
 	"sort"
 )
@@ -43,13 +44,18 @@ func main() {
 
 	log.Println("- setup game")
 	vmState.setupGamePart(GAME_PART_ID_1 + 1)
-
 	videoAssets := vmState.buildVideoAssets()
 	renderer.updateGamePart(videoAssets)
 
 	//start main loop
 	exit := false
 	for i := 0; exit == false; i++ {
+/*		if i % 50 == rand.Intn(50) {
+			vmState.setupGamePart(GAME_PART_ID_1 + rand.Intn(9))
+			videoAssets := vmState.buildVideoAssets()
+			renderer.updateGamePart(videoAssets)
+		}*/
+
 		vmState.mainLoop()
 		renderer.mainLoop()
 		exit = renderer.exitRequested(i)
