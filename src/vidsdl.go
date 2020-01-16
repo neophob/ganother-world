@@ -84,25 +84,25 @@ func (render SDLRenderer) drawString(color, posX, posY, stringId int) {
 	}
 }
 
-func (render *SDLRenderer) drawShape(offset, zoom, posX, posY int) {
-	fmt.Printf(">VID: DRAWSHAPE offset:%d, x:%d, y:%d, zoom:%d\n", offset, posX, posY, zoom)
+func (render *SDLRenderer) drawShape(color, offset, zoom, posX, posY int) {
 	render.videoAssets.videoPC = offset
-
-	color := 0xFF
 	i := render.videoAssets.fetchByte()
+
+	fmt.Printf(">VID: DRAWSHAPE i:%d, color:%d, offset:%d, x:%d, y:%d, zoom:%d\n", i, color, offset, posX, posY, zoom)
+
 	if i >= 0xC0 {
-		//if color&0x80 > 0 {
-		color = int(i & 0x3F)
-		//}
+		if color&0x80 > 0 {
+			color = int(i & 0x3F)
+		}
 		render.softwareVideo_FillPolygon(color, zoom, posX, posY)
 	} else {
 		i &= 0x3F
 		if i == 1 {
-			fmt.Printf("Video::drawShape() ec=0x%X (i != 2)", 0xF80)
+			fmt.Printf("drawShape INVALID! (1 != 2)\n")
 		} else if i == 2 {
 			render.softwareVideo_DrawShapeParts(zoom, posX, posY)
 		} else {
-			fmt.Printf("Video::drawShape() ec=0x%X (i != 2)", 0xFBB)
+			fmt.Printf("drawShape INVALID! (%d != 2)\n", i)
 		}
 	}
 }
@@ -154,9 +154,6 @@ func (render *SDLRenderer) mainLoop() {
 			if t.Keysym.Sym == sdl.K_ESCAPE && t.State == 1 {
 				render.exitAppReq = true
 			}
-
-		default:
-			//fmt.Println("SDL EVENT", event)
 		}
 	}
 }
@@ -216,7 +213,6 @@ func (render *SDLRenderer) softwareVideo_FillPolygon(color, zoom, posX, posY int
 
 	bbw := int(render.videoAssets.fetchByte()) * zoom / 64
 	bbh := int(render.videoAssets.fetchByte()) * zoom / 64
-	col := render.colors[color]
 
 	x1 := posX - bbw/2
 	x2 := posX + bbw/2
@@ -228,6 +224,7 @@ func (render *SDLRenderer) softwareVideo_FillPolygon(color, zoom, posX, posY int
 		return
 	}
 
+	col := render.colors[color%16]
 	numVertices := int(render.videoAssets.fetchByte())
 
 	var vx, vy = make([]int16, numVertices), make([]int16, numVertices)
@@ -241,5 +238,30 @@ func (render *SDLRenderer) softwareVideo_FillPolygon(color, zoom, posX, posY int
 }
 
 func (render SDLRenderer) softwareVideo_DrawShapeParts(zoom, posX, posY int) {
-	fmt.Printf(">VID: DRAWSHAPEPARTS x:%d, y:%d, zoom:%d\n", posX, posY, zoom)
+	x := posX - int(render.videoAssets.fetchByte())*zoom/64
+	y := posY - int(render.videoAssets.fetchByte())*zoom/64
+	n := int16(render.videoAssets.fetchByte())
+	fmt.Printf(">VID: DRAWSHAPEPARTS x:%d, y:%d, n:%d\n", x, y, n)
+
+	for ; n >= 0; n-- {
+		off := render.videoAssets.fetchWord()
+		_x := x + int(render.videoAssets.fetchByte())*zoom/64
+		_y := y + int(render.videoAssets.fetchByte())*zoom/64
+
+		fmt.Printf(">VID: DRAWSHAPEPARTS off:%d at %d/%d\n", off, _x, _y)
+
+		var color uint16 = 0xFF
+		if off&0x8000 > 0 {
+			readOfs := render.videoAssets.videoPC&0x7F
+			b1 := render.videoAssets.cinematic[readOfs]
+			color = uint16(b1)
+			//TODO display head.. WTF is this?
+			render.videoAssets.fetchWord()
+		}
+		off &= 0x7FFF
+
+		oldVideoPc := render.videoAssets.videoPC
+		render.drawShape(int(color), int(off*2), zoom, _x, _y)
+		render.videoAssets.videoPC = oldVideoPc
+	}
 }

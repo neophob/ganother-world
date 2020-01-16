@@ -23,18 +23,23 @@ func (state *VMState) opMovConst() {
 
 //Initialises variable 1 with variable 2.
 func (state *VMState) opMov() {
-	dest := int(state.fetchByte())
-	source := int(state.fetchByte())
+	dest := state.fetchByte()
+	source := state.fetchByte()
 	fmt.Println("#op_mov", source, dest, state.variables[source])
 	state.variables[dest] = state.variables[source]
 }
 
 //Variable = Variable + Integer value
 func (state *VMState) opAddConst() {
-	//TODO add workaround for vm bug
-	//		if (_res->_currentPart == 16006 && _scriptPtr.pc == _res->_segCode + 0x6D48) {
-	//	warning("Script::op_addConst() workaround for infinite looping gun sound");
-	//snd_playSound(0x5B, 1, 64, 1);
+	if state.gamePart == 5 && state.pc == 0x6D48 {
+		fmt.Println("TODO Script::op_addConst() workaround for infinite looping gun sound")
+		// The script 0x27 slot 0x17 doesn't stop the gun sound from looping.
+		// This is a bug in the original game code, confirmed by Eric Chahi and
+		// addressed with the anniversary editions.
+		// For older releases (DOS, Amiga), we play the 'stop' sound like it is
+		// done in other part of the game code.
+		//snd_playSound(0x5B, 1, 64, 1);
+	}
 	index := state.fetchByte()
 	value := int16(state.fetchWord())
 	fmt.Printf("#op_addConst() index=%d, value=%d, add=%d\n", index, state.variables[index], value)
@@ -60,17 +65,17 @@ func (state *VMState) opSub() {
 //Variable = Variable AND value
 func (state *VMState) opAnd() {
 	index := state.fetchByte()
-	value := int16(state.fetchWord())
+	value := state.fetchWord()
 	fmt.Println("#op_and()", index, value)
-	state.variables[index] &= value
+	state.variables[index] &= int16(value)
 }
 
 //Variable = Variable OR value
 func (state *VMState) opOr() {
 	index := state.fetchByte()
-	value := int16(state.fetchWord())
+	value := state.fetchWord()
 	fmt.Println("#op_or()", index, value)
-	state.variables[index] |= value
+	state.variables[index] |= int16(value)
 }
 
 //Makes a N bit rotation to the left on the variable. Zeros on the right.
@@ -127,8 +132,8 @@ func (state *VMState) opRemoveTask() {
 
 //Vec début, fin, type - Deletes, freezes or unfreezes a series of channels
 func (state *VMState) opChangeTaskState() {
-	channelIdStart := int(state.fetchByte())
-	channelIdEnd := int(state.fetchByte())
+	channelIdStart := state.fetchByte()
+	channelIdEnd := state.fetchByte()
 	changeType := state.fetchByte()
 	fmt.Println("#opChangeTaskState", channelIdStart, channelIdEnd, changeType)
 	for i := channelIdStart; i <= channelIdEnd; i++ {
@@ -173,7 +178,19 @@ func (state *VMState) opCondJmp() {
 	switch op & 7 {
 	case 0:
 		expr = (currentVariable == newVariable)
-		//TODO implement BYPASS protection
+		if variableId == 0x29 && op&0x80 != 0 {
+			fmt.Println("TODO BYPASS PROTECTION!")
+			/*				// 4 symbols
+							_scriptVars[0x29] = _scriptVars[0x1E];
+							_scriptVars[0x2A] = _scriptVars[0x1F];
+							_scriptVars[0x2B] = _scriptVars[0x20];
+							_scriptVars[0x2C] = _scriptVars[0x21];
+							// counters
+							_scriptVars[0x32] = 6;
+							_scriptVars[0x64] = 20;
+							warning("Script::op_condJmp() bypassing protection");
+							expr = true;*/
+		}
 	case 1:
 		expr = (currentVariable != newVariable)
 	case 2:
@@ -188,7 +205,7 @@ func (state *VMState) opCondJmp() {
 		fmt.Println("#op_condJmp: Invalid condition!")
 	}
 	if expr {
-		fmt.Printf("> step: TRUE!ILLJUMP\n");
+		fmt.Printf("> step: TRUE!ILLJUMP\n")
 		state.opJmp()
 		//fixUpPalette_changeScreen(_res->_currentPart, _scriptVars[VAR_SCREEN_NUM]);
 	} else {
@@ -198,8 +215,8 @@ func (state *VMState) opCondJmp() {
 
 // Fade "palette number" - Changes of colour palette
 func (state *VMState) opVidSetPalette() {
-	index := int(state.fetchWord())
-	renderer.setPalette(index)
+	index := state.fetchWord()
+	renderer.setPalette(int(index))
 }
 
 //Text "text number", x, y, color - Displays in the work screen the specified text for the coordinates x,y.
@@ -253,7 +270,7 @@ func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
 		posX += height
 	}
 	fmt.Println("opVidDrawPolyBackground", offset)
-	renderer.drawShape(int(offset), 0x40, posX, posY)
+	renderer.drawShape(0xFF, int(offset), 0x40, posX, posY)
 }
 
 //Spr "'object name" , x, y, z - In the work screen, draws the graphics tool at the coordinates x,y and the zoom factor z. A polygon, a group of polygons...
@@ -301,7 +318,7 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 	fmt.Printf("opVidDrawPolySprite %d", offset)
 	//renderer.setDataBuffer(useSecondVideoResource, int(offset))
 	//TODO implement useSecondVideoResource
-	renderer.drawShape(int(offset), int(zoom), int(posX), int(posY))
+	renderer.drawShape(0xFF, int(offset), int(zoom), int(posX), int(posY))
 }
 
 //Initialises a song.
@@ -324,7 +341,7 @@ func (state *VMState) opPlaySound() {
 }
 
 func (state *VMState) opUpdateResource() {
-	id := int(uint16(state.fetchWord()))
+	id := int(state.fetchWord())
 	fmt.Println("opUpdateResource", id)
 	if id >= GAME_PART_ID_1 {
 		fmt.Println("should load next part", id)

@@ -13,7 +13,7 @@ func (render DummyRenderer) drawString(color, posX, posY, stringId int) {
 	fmt.Printf(">VID: DRAWSTRING color:%d, x:%d, y:%d, text:%s\n", color, posX, posY, text)
 }
 
-func (render DummyRenderer) drawShape(offset, zoom, posX, posY int) {
+func (render DummyRenderer) drawShape(color, offset, zoom, posX, posY int) {
 	fmt.Printf(">VID: DRAWSHAPE offset:%d, x:%d, y:%d, zoom:%d\n", offset, posX, posY, zoom)
 }
 
