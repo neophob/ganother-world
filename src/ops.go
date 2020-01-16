@@ -160,34 +160,35 @@ func (state *VMState) opCondJmp() {
 	op := state.fetchByte()
 	variableId := uint16(state.fetchByte())
 	currentVariable := state.variables[variableId]
-	var newVariable uint16
+	var newVariable int16
 	if op&0x80 > 0 {
-		newVariable = uint16(state.variables[state.fetchByte()])
+		newVariable = int16(state.variables[state.fetchByte()])
 	} else if op&0x40 > 0 {
-		newVariable = state.fetchWord()
+		newVariable = int16(state.fetchWord())
 	} else {
-		newVariable = uint16(state.fetchByte())
+		newVariable = int16(state.fetchByte())
 	}
-	fmt.Printf("#op_condJmp op=%d, variableId=%d, currentVariable=%d, newVariable=%d\n", op, variableId, currentVariable, newVariable)
+	fmt.Printf("> step #op_condJmp (%d, 0x%02X, 0x%02X) var=0x%02X\n", op, currentVariable, newVariable, variableId)
 	expr := false
 	switch op & 7 {
 	case 0:
-		expr = (variableId == newVariable)
+		expr = (currentVariable == newVariable)
 		//TODO implement BYPASS protection
 	case 1:
-		expr = (variableId != newVariable)
+		expr = (currentVariable != newVariable)
 	case 2:
-		expr = (variableId > newVariable)
+		expr = (currentVariable > newVariable)
 	case 3:
-		expr = (variableId >= newVariable)
+		expr = (currentVariable >= newVariable)
 	case 4:
-		expr = (variableId < newVariable)
+		expr = (currentVariable < newVariable)
 	case 5:
-		expr = (variableId <= newVariable)
+		expr = (currentVariable <= newVariable)
 	default:
 		fmt.Println("#op_condJmp: Invalid condition!")
 	}
 	if expr {
+		fmt.Printf("> step: TRUE!ILLJUMP\n");
 		state.opJmp()
 		//fixUpPalette_changeScreen(_res->_currentPart, _scriptVars[VAR_SCREEN_NUM]);
 	} else {
