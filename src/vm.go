@@ -13,6 +13,7 @@ const (
 
 	VM_NO_SETVEC_REQUESTED uint16 = 0xFFFF
 	VM_INACTIVE_THREAD     uint16 = 0xFFFF
+	VM_NO_TASK_OP          uint16 = 0xFFFE
 
 	VM_VARIABLE_RANDOM_SEED          int = 0x3C
 	VM_VARIABLE_SCREEN_NUM           int = 0x67
@@ -30,12 +31,13 @@ const (
 )
 
 type VMState struct {
-	assets        Assets
-	variables     [VM_NUM_VARIABLES]int16
-	channelPC     [VM_NUM_THREADS]uint16
-	channelPaused [VM_NUM_THREADS]bool
-	stackCalls    [VM_MAX_STACK_SIZE]uint16
-	gamePart      int
+	assets            Assets
+	variables         [VM_NUM_VARIABLES]int16
+	channelPC         [VM_NUM_THREADS]uint16
+	nextLoopChannelPC [VM_NUM_THREADS]uint16
+	channelPaused     [VM_NUM_THREADS]bool
+	stackCalls        [VM_MAX_STACK_SIZE]uint16
+	gamePart          int
 
 	palette   []uint8
 	bytecode  []uint8
@@ -136,6 +138,7 @@ func (state *VMState) setupGamePart(newGamePart int) {
 	//Set all thread to inactive (pc at 0xFFFF or 0xFFFE )
 	for i := range state.channelPC {
 		state.channelPC[i] = VM_INACTIVE_THREAD
+		state.nextLoopChannelPC[i] = VM_NO_TASK_OP
 	}
 
 	//activate first channel, set initial PC to 0
@@ -144,6 +147,8 @@ func (state *VMState) setupGamePart(newGamePart int) {
 
 // Run the Virtual Machine for every active threads
 func (state *VMState) mainLoop() {
+	//TODO check if next part needs to be loaded!
+	state.setupChannels()
 	for channelId := 0; channelId < VM_NUM_THREADS; channelId++ {
 		channelPC := state.channelPC[channelId]
 		channelPaused := state.channelPaused[channelId]
@@ -153,9 +158,11 @@ func (state *VMState) mainLoop() {
 			state.paused = false
 			state.pc = channelPC
 			state.sp = 0
+			//loop channel until finished
 			for state.paused == false {
 				state.executeOp()
 			}
+			fmt.Printf("> step: PAUSED, pc[%5d], channel[%2d] >>> \n", state.pc-1, channelId)
 			if state.sp > 0 {
 				state.countSPNotZero++
 			}
@@ -164,10 +171,18 @@ func (state *VMState) mainLoop() {
 	}
 }
 
+func (state *VMState) setupChannels() {
+	for channelId := 0; channelId < VM_NUM_THREADS; channelId++ {
+		if state.nextLoopChannelPC[channelId] != VM_NO_TASK_OP {
+			state.channelPC[channelId] = state.nextLoopChannelPC[channelId]
+			state.nextLoopChannelPC[channelId] = VM_NO_TASK_OP
+		}
+	}
+}
+
 func (state *VMState) executeOp() {
-	lastPc := state.pc
 	opcode := state.fetchByte()
-	fmt.Printf("> step: opcode[%2d], pc[%5d], channel[%2d] >>> ", opcode, lastPc, state.channelId)
+	fmt.Printf("> step: opcode[%2d], pc[%5d], channel[%2d] >>> ", opcode, state.pc-1, state.channelId)
 
 	state.countOps++
 

@@ -104,12 +104,12 @@ func (state *VMState) opRet() {
 }
 
 //Setvec "numéro de canal", address - Initialises a channel with a code address to execute
+//NOTE: if a channel is installed, e.g. Channel 0 installs Channel 1 - this new channel is only respected in the NEXT iteration!
 func (state *VMState) opInstallTask() {
 	channelID := state.fetchByte()
 	address := state.fetchWord()
 	fmt.Println("#opInstallTask", channelID, address)
-	// TODO validate me: 	_scriptTasks[1][i] = n;
-	state.channelPC[channelID] = address
+	state.nextLoopChannelPC[channelID] = address
 }
 
 //Break - Temporarily stops the executing channel and goes to the next.
@@ -134,7 +134,7 @@ func (state *VMState) opChangeTaskState() {
 	for i := channelIdStart; i <= channelIdEnd; i++ {
 		switch changeType {
 		case 0:
-			state.channelPC[i] = VM_INACTIVE_THREAD
+			state.nextLoopChannelPC[i] = VM_INACTIVE_THREAD
 		case 1:
 			state.channelPaused[i] = true
 		case 2:
