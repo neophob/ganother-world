@@ -8,49 +8,35 @@ import (
 type DummyRenderer struct {
 }
 
-func (render DummyRenderer) drawString(color, posX, posY, stringId int) {
-	text := getText(stringId)
-	fmt.Printf(">VID: DRAWSTRING color:%d, x:%d, y:%d, text:%s\n", color, posX, posY, text)
+func (render DummyRenderer) setColor(col Color) {
+	fmt.Println(">VID: SETCOLOR", col)
 }
 
-func (render DummyRenderer) drawShape(color, offset, zoom, posX, posY int) {
-	fmt.Printf(">VID: DRAWSHAPE offset:%d, x:%d, y:%d, zoom:%d\n", offset, posX, posY, zoom)
+func (render DummyRenderer) fillPage(page int) {
+	fmt.Println(">VID: FILLPAGE", page)
 }
 
-func (render DummyRenderer) fillPage(page, color int) {
-	fmt.Println(">VID: FILLPAGE", page, color)
+func (render DummyRenderer) blitPage(page int) {
+	fmt.Println(">VID: BLITPAGE", page)
 }
 
-func (render DummyRenderer) copyPage(src, dst, vscroll int) {
-	fmt.Println(">VID: COPYPAGE", src, dst, vscroll)
+func (render DummyRenderer) copyPage(src, dst int) {
+	fmt.Println(">VID: COPYPAGE", src, dst)
 }
 
-// blit
-func (render DummyRenderer) updateDisplay(page int) {
-	fmt.Println(">VID: UPDATEDISPLAY", page)
+func (render DummyRenderer) drawChar(posX, posY int32, char byte) {
+	fmt.Printf(">VID: DRAWCHAR char:%s, x:%d, y:%d\n", char, posX, posY)
 }
 
-func (render DummyRenderer) setWorkPagePtr(page int) {
-	fmt.Println(">VID: SETWORKPAGEPTR", page)
+func (render DummyRenderer) drawFilledPolygons(vx, vy []int16, col Color) {
+	fmt.Println(">VID: DRAWFILLEDPOLYGONS", col, vx, vy)
 }
 
-func (render DummyRenderer) setPalette(index int) {
-	fmt.Println(">VID: SETPALETTE", index>>8)
-	//TODO	_vid->_nextPal = num >> 8
-}
-
-func (render DummyRenderer) mainLoop() {
-	//nothin to see here, move on!
+func (render DummyRenderer) eventLoop(frameCount int) bool {
+	fmt.Println(">VID: EVENTLOOP", frameCount)
+	return frameCount > 128
 }
 
 func (render DummyRenderer) shutdown() {
 	//nothin to see here, move on!
-}
-
-func (render DummyRenderer) updateGamePart(videoAssets VideoAssets) {
-	//nothin to see here, move on!
-}
-
-func (render DummyRenderer) exitRequested(frameCount int) bool {
-	return frameCount > 128
 }

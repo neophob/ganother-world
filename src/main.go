@@ -5,21 +5,22 @@ import (
 	"io/ioutil"
 	"log"
 	"math"
+
 	//"math/rand"
 	"os"
 	"sort"
 )
 
-// renderer is a global variable that needs to implement the Renderer interface
-var renderer Renderer = initVideo()
+// video is a global variable that needs to implement the Renderer interface
+var video Video = initVideo()
 
-func initVideo() Renderer {
+func initVideo() Video {
 	// start with env VIDEO="SDL" ./main to enable SDL
 	videoEnv := os.Getenv("VIDEO")
 	if videoEnv == "SDL" {
-		return buildSDLRenderer()
+		return Video{renderer: buildSDLRenderer()}
 	}
-	return DummyRenderer{}
+	return Video{renderer: DummyRenderer{}}
 }
 
 func main() {
@@ -45,7 +46,7 @@ func main() {
 	log.Println("- setup game")
 	vmState.setupGamePart(GAME_PART_ID_1 + 1)
 	videoAssets := vmState.buildVideoAssets()
-	renderer.updateGamePart(videoAssets)
+	video.updateGamePart(videoAssets)
 
 	//start main loop
 	exit := false
@@ -57,11 +58,10 @@ func main() {
 			}*/
 
 		vmState.mainLoop()
-		renderer.mainLoop()
-		exit = renderer.exitRequested(i)
+		exit = video.eventLoop(i)
 	}
 
-	renderer.shutdown()
+	video.renderer.shutdown()
 }
 
 func readFile(filename string) []byte {
