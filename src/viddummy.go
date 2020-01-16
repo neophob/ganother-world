@@ -24,8 +24,8 @@ func (render DummyRenderer) copyPage(src, dst int) {
 	fmt.Println(">VID: COPYPAGE", src, dst)
 }
 
-func (render DummyRenderer) drawChar(posX, posY int32, char byte) {
-	fmt.Printf(">VID: DRAWCHAR char:%s, x:%d, y:%d\n", char, posX, posY)
+func (render DummyRenderer) drawPixel(posX, posY int32) {
+	fmt.Printf(">VID: DRAWPIXEL x:%d, y:%d\n", posX, posY)
 }
 
 func (render DummyRenderer) drawFilledPolygons(vx, vy []int16, col Color) {

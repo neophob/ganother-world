@@ -59,19 +59,6 @@ func (render SDLRenderer) setColor(col Color) {
 	render.renderer.SetDrawColor(col.r, col.g, col.g, 255)
 }
 
-//TODO move me to video?
-func (render SDLRenderer) drawChar(posX, posY int32, char byte) {
-	ofs := 8 * (int32(char) - 0x20)
-	for j := int32(0); j < 8; j++ {
-		ch := FONT[ofs+j]
-		for i := int32(0); i < 8; i++ {
-			if ch&(1<<(7-i)) > 0 {
-				render.renderer.DrawPoint(posX+i, posY+j)
-			}
-		}
-	}
-}
-
 func (render SDLRenderer) fillPage(page int) {
 	fmt.Println("XXXLLKKKK", page)
 	render.renderer.FillRect(nil)
@@ -111,4 +98,8 @@ func (render SDLRenderer) shutdown() {
 
 func (render SDLRenderer) drawFilledPolygons(vx, vy []int16, col Color) {
 	gfx.FilledPolygonColor(render.renderer, vx, vy, sdl.Color{col.r, col.g, col.g, 255})
+}
+
+func (render SDLRenderer) drawPixel(posX, posY int32) {
+	render.renderer.DrawPoint(posX, posY)
 }
