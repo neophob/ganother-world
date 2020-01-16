@@ -9,8 +9,7 @@ PROJECTNAME := $(shell basename "$(PWD)")
 GOBASE := $(shell pwd)
 GOFILES := $(wildcard *.go)
 
-# -X add string value definition of the form importpath.name=value
-RELEASE := -ldflags "-s -w -X gaw.hello=world"
+RELEASE := -ldflags "-s -w"
 SRC := src/main.go src/resource.go src/vm.go src/parts.go src/decrunch.go src/ops.go src/assets.go src/video.go src/viddummy.go src/vidsdl.go src/text.go src/font.go src/debug.go
 SRCDIR := ./src
 
@@ -18,6 +17,10 @@ SRCDIR := ./src
 build:
 	@echo "  >  BUILD"
 	@go build $(SRC)
+
+## clean: removes build files
+clean:
+	@rm ./main
 
 ## format: format code using go fmt
 format:
