@@ -22,6 +22,7 @@ const (
 	VM_VARIABLE_HERO_POS_UP_DOWN     int = 0xE5
 	VM_VARIABLE_MUS_MARK             int = 0xF4
 	VM_VARIABLE_SCROLL_Y             int = 0xF9
+	VM_VARIABLE_PROTECTION_CHECK     int = 0xF2
 	VM_VARIABLE_HERO_ACTION          int = 0xFA
 	VM_VARIABLE_HERO_POS_JUMP_DOWN   int = 0xFB
 	VM_VARIABLE_HERO_POS_LEFT_RIGHT  int = 0xFC
@@ -62,11 +63,12 @@ func createNewState(assets Assets) VMState {
 	//WTF? whats this? -> create const
 	state.variables[0xE4] = 0x14
 
-	//BYPASS START
+	//BYPASS PROTECTION START
 	state.variables[0xBC] = 0x10
 	state.variables[0xC6] = 0x80
-	state.variables[0xDC] = 33
-	state.variables[0xF2] = 4000
+	state.variables[0xDC] = 0x21
+	// this variable explicit checked when level 2 starts - if content != 0xFA0 then a cond jump will be made to nowhere
+	state.variables[VM_VARIABLE_PROTECTION_CHECK] = 0xFA0
 	//BYPASS END
 
 	return state

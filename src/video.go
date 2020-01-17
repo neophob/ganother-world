@@ -38,8 +38,10 @@ func (video *Video) fillPage(page, colorIndex int) {
 }
 
 func (video *Video) copyPage(src, dst, vscroll int) {
+	workerPageSrc := getWorkerPage(src)
+	workerPageDst := getWorkerPage(dst)
 	fmt.Println(">VID: COPYPAGE", vscroll)
-	video.renderer.copyPage(src, dst)
+	video.renderer.copyPage(workerPageSrc, workerPageDst)
 }
 
 func (video *Video) setWorkPagePtr(page int) {

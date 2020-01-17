@@ -1,10 +1,10 @@
 package main
 
-//TODO implement workaround
-
 import (
 	"fmt"
 )
+
+//Implementation of all VM ops
 
 //Continues the code execution at the indicated address.
 func (state *VMState) opJmp() {
