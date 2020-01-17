@@ -207,6 +207,6 @@ func (video *Video) eventLoop(frameCount int) bool {
 	return video.renderer.eventLoop(frameCount)
 }
 
-func (video *Video) shutdown()  {
+func (video *Video) shutdown() {
 	video.renderer.shutdown()
 }

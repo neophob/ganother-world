@@ -14,7 +14,7 @@ type Assets struct {
 // this is a function for the Assets struct
 func (assets Assets) loadEntryFromBank(index int) []uint8 {
 	memlistEntry := assets.memList[index]
-	bank := assets.bank[int(memlistEntry.bankId)]
+	bank := assets.bank[int(memlistEntry.bankID)]
 	ofs := int(memlistEntry.bankOffset)
 	result := bank[ofs : ofs+int(memlistEntry.packedSize)]
 	if memlistEntry.packedSize == memlistEntry.unpackedSize {

@@ -14,7 +14,7 @@ const (
 type MemlistEntry struct {
 	resourceType uint8  //ofs: 1
 	rankNum      uint8  //ofs: 6
-	bankId       uint8  //ofs: 7
+	bankID       uint8  //ofs: 7
 	bankOffset   uint32 //ofs: 8
 	packedSize   uint32 //ofs: 12
 	unpackedSize uint32 //ofs: 16
@@ -36,7 +36,7 @@ func unmarshallingMemlistBin(data []uint8) (map[int]MemlistEntry, MemlistStatist
 		entry := MemlistEntry{
 			resourceType: data[i+1],
 			rankNum:      data[i+6],
-			bankId:       data[i+7],
+			bankID:       data[i+7],
 			bankOffset:   toUint32BE(data[i+8], data[i+9], data[i+10], data[i+11]),
 			packedSize:   toUint32BE(data[i+12], data[i+13], data[i+14], data[i+15]),
 			unpackedSize: toUint32BE(data[i+16], data[i+17], data[i+18], data[i+19]),
@@ -46,7 +46,7 @@ func unmarshallingMemlistBin(data []uint8) (map[int]MemlistEntry, MemlistStatist
 			break
 		}
 		fmt.Printf("R:%#02x, %-17s size=%5d (%5d)  bank=%2d  offset=%6d\n", memlistStatistic.entryCount,
-			getResourceTypeName(int(entry.resourceType)), entry.unpackedSize, entry.packedSize, entry.bankId, entry.bankOffset)
+			getResourceTypeName(int(entry.resourceType)), entry.unpackedSize, entry.packedSize, entry.bankID, entry.bankOffset)
 		resourceMap[memlistStatistic.entryCount] = entry
 		memlistStatistic.entryCount++
 		memlistStatistic.sizeCompressed += int(entry.packedSize)
