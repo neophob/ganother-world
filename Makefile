@@ -10,7 +10,9 @@ GOBASE := $(shell pwd)
 GOFILES := $(wildcard *.go)
 
 RELEASE := -ldflags "-s -w"
-SRC := src/main.go src/resource.go src/vm.go src/parts.go src/decrunch.go src/ops.go src/assets.go src/video.go src/viddummy.go src/vidsdl.go src/text.go src/font.go src/debug.go
+SRC := src/main.go src/resource.go src/vm.go src/parts.go src/decrunch.go \
+	src/vm-ops.go src/assets.go src/video.go src/video-dummy.go src/video-sdl.go src/text.go \
+	src/font.go src/debug.go src/videoassets.go
 SRCDIR := ./src
 
 ## build: build go binary in dev mode

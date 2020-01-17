@@ -1,10 +1,10 @@
 package main
 
-//TODO implement workaround
-
 import (
 	"fmt"
 )
+
+//Implementation of all VM ops
 
 //Continues the code execution at the indicated address.
 func (state *VMState) opJmp() {
@@ -216,7 +216,7 @@ func (state *VMState) opCondJmp() {
 // Fade "palette number" - Changes of colour palette
 func (state *VMState) opVidSetPalette() {
 	index := state.fetchWord()
-	renderer.setPalette(int(index))
+	video.setPalette(int(index))
 }
 
 //Text "text number", x, y, color - Displays in the work screen the specified text for the coordinates x,y.
@@ -225,27 +225,27 @@ func (state *VMState) opVidDrawString() {
 	x := int(state.fetchByte())
 	y := int(state.fetchByte())
 	col := int(state.fetchByte())
-	renderer.drawString(col, x, y, stringId)
+	video.drawString(col, x, y, stringId)
 }
 
 //SetWS "Screen number" - Sets the work screen, which is where the polygons will be drawn by default.
 func (state *VMState) opVidSelectPage() {
 	page := int(state.fetchByte())
-	renderer.setWorkPagePtr(page)
+	video.setWorkPagePtr(page)
 }
 
 //Clr "Screen number", Color - Deletes a screen with one colour. Ingame, there are 4 screen buffers
 func (state *VMState) opVidFillPage() {
 	page := int(state.fetchByte())
 	color := int(state.fetchByte())
-	renderer.fillPage(page, color)
+	video.fillPage(page, color)
 }
 
 //Copy "Screen number A", "Screen number B" - Copies screen buffer A to screen buffer B.
 func (state *VMState) opVidCopyPage() {
 	source := state.fetchByte()
 	dest := state.fetchByte()
-	renderer.copyPage(int(source), int(dest), int(state.variables[VM_VARIABLE_SCROLL_Y]))
+	video.copyPage(int(source), int(dest), int(state.variables[VM_VARIABLE_SCROLL_Y]))
 }
 
 //Show "Screen number" - Displays the screen buffer specified in the next video frame.
@@ -257,7 +257,7 @@ func (state *VMState) opVidUpdatePage() {
 		state.variables[0xDC] = 33
 	}
 
-	renderer.updateDisplay(page)
+	video.updateDisplay(page)
 }
 
 func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
@@ -270,7 +270,7 @@ func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
 		posX += height
 	}
 	fmt.Println("opVidDrawPolyBackground", opcode, offset)
-	renderer.drawShape(0xFF, int(offset), 0x40, posX, posY)
+	video.drawShape(0xFF, int(offset), 0x40, posX, posY)
 }
 
 //Spr "'object name" , x, y, z - In the work screen, draws the graphics tool at the coordinates x,y and the zoom factor z. A polygon, a group of polygons...
@@ -316,9 +316,9 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 		}
 	}
 	fmt.Printf("opVidDrawPolySprite %d", offset)
-	//renderer.setDataBuffer(useSecondVideoResource, int(offset))
+	//video.renderer.setDataBuffer(useSecondVideoResource, int(offset))
 	//TODO implement useSecondVideoResource
-	renderer.drawShape(0xFF, int(offset), int(zoom), int(posX), int(posY))
+	video.drawShape(0xFF, int(offset), int(zoom), int(posX), int(posY))
 }
 
 //Initialises a song.
