@@ -97,6 +97,7 @@ func (video *Video) drawString(color, posX, posY, stringId int) {
 	}
 }
 
+//target is always buffer 0
 func (video *Video) drawChar(posX, posY int32, char byte) {
 	ofs := 8 * (int32(char) - 0x20)
 	for j := int32(0); j < 8; j++ {
@@ -161,6 +162,7 @@ func (video *Video) drawShapeParts(zoom, posX, posY int) {
 	}
 }
 
+//target is always buffer 0
 func (video *Video) drawFilledPolygon(color, zoom, posX, posY int) {
 	fmt.Printf(">VID: FILLPOLYGON color:%d, x:%d, y:%d, zoom:%d\n", color, posX, posY, zoom)
 

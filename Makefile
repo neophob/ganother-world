@@ -28,7 +28,7 @@ format:
 ## build-release: build release build, could be compressed with UPX
 build-release:
 	#@env GOOS=js GOARCH=wasm go build -o gaw.js $(RELEASE) $(SRC)
-	@env go build -o gaw.lnx $(RELEASE) $(SRC)
+	@env go build -o main.release $(RELEASE) $(SRC)
 
 ## test: run unit tests
 test:
