@@ -75,7 +75,8 @@ func buildSDLRenderer() *SDLRenderer {
 }
 
 func buildBuffer(surface *sdl.Surface) *sdl.Surface {
-	buffer, _ := sdl.CreateRGBSurface(0, WINDOW_WIDTH, WINDOW_HEIGHT, 32, surface.Format.Rmask, surface.Format.Gmask, surface.Format.Bmask, surface.Format.Amask)
+	buffer, _ := sdl.CreateRGBSurface(0, 320, 200, 32, surface.Format.Rmask, surface.Format.Gmask, surface.Format.Bmask, surface.Format.Amask)
+	//	buffer, _ := sdl.CreateRGBSurface(0, WINDOW_WIDTH, WINDOW_HEIGHT, 32, surface.Format.Rmask, surface.Format.Gmask, surface.Format.Bmask, surface.Format.Amask)
 	return buffer
 }
 
@@ -112,16 +113,31 @@ func (render *SDLRenderer) copyPage(src, dst int) {
 	if err != nil {
 		panic(err)
 	}
+	renderer := render.screenRenderer[dst]
+	renderer.Present()
 }
 
 // blit
 func (render *SDLRenderer) blitPage(page int) {
-	fmt.Println(">VID: UPDATEDISPLAY", page)
-	surface := render.screenBuffers[page]
-	err := surface.Blit(nil, render.surface, nil)
-	if err != nil {
-		panic(err)
-	}
+	/*	fmt.Println(">VID: UPDATEDISPLAY", page)
+		surface := render.screenBuffers[page]
+		err := surface.Blit(nil, render.surface, nil)
+		if err != nil {
+			panic(err)
+		}*/
+
+	//rect := sdl.Rect{0, 0, 320, 200}
+	render.screenBuffers[0].Blit(nil, render.surface, nil)
+
+	r1 := &sdl.Rect{320, 0, 320, 200}
+	render.screenBuffers[1].Blit(nil, render.surface, r1)
+
+	r2 := &sdl.Rect{0, 200, 320, 200}
+	render.screenBuffers[2].Blit(nil, render.surface, r2)
+
+	r3 := &sdl.Rect{320, 200, 320, 200}
+	render.screenBuffers[3].Blit(nil, render.surface, r3)
+
 	render.renderer.Present()
 }
 

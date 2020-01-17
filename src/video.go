@@ -99,6 +99,8 @@ func (video *Video) drawString(color, posX, posY, stringID int) {
 
 //target is always buffer 0
 func (video *Video) drawChar(posX, posY int32, char byte) {
+	fmt.Printf(">VID: DRAWCHAR char:%s, x:%d, y:%\n", char, posX, posY)
+
 	ofs := 8 * (int32(char) - 0x20)
 	for j := int32(0); j < 8; j++ {
 		ch := FONT[ofs+j]
@@ -193,7 +195,7 @@ func (video *Video) drawFilledPolygon(color, zoom, posX, posY int) {
 		vy[i] = int16(y1 + int(video.videoAssets.fetchByte())*zoom/64)
 	}
 
-	fmt.Println(">VID: FILLPOLYGON", numVertices, vx, vy)
+	fmt.Println(">VID: FILLPOLYGON", numVertices, col, vx, vy)
 	video.renderer.drawFilledPolygons(vx, vy, col)
 }
 

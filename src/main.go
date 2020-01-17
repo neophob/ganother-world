@@ -9,6 +9,7 @@ import (
 	//"math/rand"
 	"os"
 	"sort"
+	"time"
 )
 
 // video is a global variable that needs to implement the Renderer interface
@@ -55,6 +56,8 @@ func main() {
 				videoAssets := vmState.buildVideoAssets()
 				renderer.updateGamePart(videoAssets)
 			}*/
+
+		time.Sleep(20 * time.Millisecond)
 
 		vmState.mainLoop()
 		exit = video.eventLoop(i)
