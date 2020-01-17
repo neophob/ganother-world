@@ -38,6 +38,11 @@ test:
 doc:
 	@go doc -all $(SRCDIR)
 
+## clean: removes build files
+clean:
+	@rm -f ./main
+	@rm -f ./main.release
+
 .PHONY: help
 all: help
 help: Makefile
