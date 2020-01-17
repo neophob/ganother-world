@@ -7,8 +7,8 @@ type Renderer interface {
 	fillPage(page int)
 	blitPage(page int)
 	copyPage(src, dst int)
-	drawPixel(posX, posY int32)
-	drawFilledPolygons(vx, vy []int16, col Color)
+	drawPixel(page int, posX, posY int32)
+	drawFilledPolygons(page int, vx, vy []int16, col Color)
 	eventLoop(frameCount int) bool
 	shutdown()
 }
@@ -97,16 +97,15 @@ func (video *Video) drawString(color, posX, posY, stringID int) {
 	}
 }
 
-//target is always buffer 0
 func (video *Video) drawChar(posX, posY int32, char byte) {
-	fmt.Printf(">VID: DRAWCHAR char:%s, x:%d, y:%\n", char, posX, posY)
+	fmt.Printf(">VID: DRAWCHAR char:%s, x:%d, y:%d\n", char, posX, posY)
 
 	ofs := 8 * (int32(char) - 0x20)
 	for j := int32(0); j < 8; j++ {
 		ch := FONT[ofs+j]
 		for i := int32(0); i < 8; i++ {
 			if ch&(1<<(7-i)) > 0 {
-				video.renderer.drawPixel(posX+i, posY+j)
+				video.renderer.drawPixel(video.workerPage, posX+i, posY+j)
 			}
 		}
 	}
@@ -164,7 +163,6 @@ func (video *Video) drawShapeParts(zoom, posX, posY int) {
 	}
 }
 
-//target is always buffer 0
 func (video *Video) drawFilledPolygon(color, zoom, posX, posY int) {
 	fmt.Printf(">VID: FILLPOLYGON color:%d, x:%d, y:%d, zoom:%d\n", color, posX, posY, zoom)
 
@@ -195,8 +193,8 @@ func (video *Video) drawFilledPolygon(color, zoom, posX, posY int) {
 		vy[i] = int16(y1 + int(video.videoAssets.fetchByte())*zoom/64)
 	}
 
-	fmt.Println(">VID: FILLPOLYGON", numVertices, col, vx, vy)
-	video.renderer.drawFilledPolygons(vx, vy, col)
+	fmt.Println(">VID: FILLPOLYGON", video.workerPage, numVertices, col, vx, vy)
+	video.renderer.drawFilledPolygons(video.workerPage, vx, vy, col)
 }
 
 func (video *Video) setPalette(index int) {

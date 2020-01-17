@@ -163,12 +163,12 @@ func (render *SDLRenderer) shutdown() {
 	sdl.Quit()
 }
 
-func (render *SDLRenderer) drawFilledPolygons(vx, vy []int16, col Color) {
-	renderer := render.screenRenderer[0]
+func (render *SDLRenderer) drawFilledPolygons(page int, vx, vy []int16, col Color) {
+	renderer := render.screenRenderer[page]
 	gfx.FilledPolygonColor(renderer, vx, vy, sdl.Color{col.r, col.g, col.g, 255})
 }
 
-func (render *SDLRenderer) drawPixel(posX, posY int32) {
-	renderer := render.screenRenderer[0]
+func (render *SDLRenderer) drawPixel(page int, posX, posY int32) {
+	renderer := render.screenRenderer[page]
 	renderer.DrawPoint(posX, posY)
 }
