@@ -1,5 +1,6 @@
 //SDL video implementation
 //TODO: implement multiple pages
+//TODO: split me away from the core lib here
 package main
 
 import (
@@ -60,7 +61,7 @@ func (render SDLRenderer) setColor(col Color) {
 }
 
 func (render SDLRenderer) fillPage(page int) {
-	fmt.Println("XXXLLKKKK", page)
+	fmt.Println(">VID: FILLPAGE", page)
 	render.renderer.FillRect(nil)
 }
 

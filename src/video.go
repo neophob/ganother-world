@@ -37,6 +37,7 @@ func (video *Video) fillPage(page, colorIndex int) {
 	video.renderer.fillPage(workerPage)
 }
 
+//TODO no clue why vscroll is used
 func (video *Video) copyPage(src, dst, vscroll int) {
 	workerPageSrc := getWorkerPage(src)
 	workerPageDst := getWorkerPage(dst)
@@ -202,4 +203,8 @@ func (video *Video) setPalette(index int) {
 
 func (video *Video) eventLoop(frameCount int) bool {
 	return video.renderer.eventLoop(frameCount)
+}
+
+func (video *Video) shutdown()  {
+	video.renderer.shutdown()
 }

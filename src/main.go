@@ -60,7 +60,7 @@ func main() {
 		exit = video.eventLoop(i)
 	}
 
-	video.renderer.shutdown()
+	video.shutdown()
 }
 
 func readFile(filename string) []byte {

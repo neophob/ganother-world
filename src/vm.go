@@ -76,6 +76,7 @@ func createNewState(assets Assets) VMState {
 
 // gamePart is the int between 0 and 10
 func (state *VMState) loadGameParts(gamePart int) {
+	fmt.Println("LOAD GAME PART", gamePart)
 	state.gamePart = gamePart
 
 	gamePartAsset := state.assets.gameParts[gamePart]
