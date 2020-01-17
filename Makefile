@@ -12,7 +12,7 @@ GOFILES := $(wildcard *.go)
 # -X add string value definition of the form importpath.name=value
 RELEASE := -ldflags "-s -w -X gaw.hello=world"
 SRC := src/main.go src/resource.go src/vm.go src/parts.go src/decrunch.go \
-	src/ops.go src/assets.go src/video.go src/viddummy.go src/vidsdl.go src/text.go \
+	src/vm-ops.go src/assets.go src/video.go src/video-dummy.go src/video-sdl.go src/text.go \
 	src/font.go src/debug.go src/videoassets.go
 SRCDIR := ./src
 

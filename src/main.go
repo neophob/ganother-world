@@ -16,8 +16,7 @@ var video Video = initVideo()
 
 func initVideo() Video {
 	// start with env VIDEO="SDL" ./main to enable SDL
-	videoEnv := os.Getenv("VIDEO")
-	if videoEnv == "SDL" {
+	if os.Getenv("VIDEO") == "SDL" {
 		return Video{renderer: buildSDLRenderer()}
 	}
 	return Video{renderer: DummyRenderer{}}
