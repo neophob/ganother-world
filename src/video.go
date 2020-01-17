@@ -78,8 +78,8 @@ func getWorkerPage(page int) int {
 	}
 }
 
-func (video *Video) drawString(color, posX, posY, stringId int) {
-	text := getText(stringId)
+func (video *Video) drawString(color, posX, posY, stringID int) {
+	text := getText(stringID)
 	fmt.Printf(">VID: DRAWSTRING color:%d, x:%d, y:%d, text:%s\n", color, posX, posY, text)
 	//setWorkPagePtr(buffer);?
 

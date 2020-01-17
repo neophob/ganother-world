@@ -48,7 +48,7 @@ type VMState struct {
 	//context of the current channel
 	sp        int
 	pc        uint16
-	channelId int
+	channelID int
 	paused    bool
 
 	//statistics
@@ -151,12 +151,12 @@ func (state *VMState) setupGamePart(newGamePart int) {
 func (state *VMState) mainLoop() {
 	//TODO check if next part needs to be loaded!
 	state.setupChannels()
-	for channelId := 0; channelId < VM_NUM_THREADS; channelId++ {
-		channelPC := state.channelPC[channelId]
-		channelPaused := state.channelPaused[channelId]
+	for channelID := 0; channelID < VM_NUM_THREADS; channelID++ {
+		channelPC := state.channelPC[channelID]
+		channelPaused := state.channelPaused[channelID]
 		// Inactive threads are marked with a thread instruction pointer set to 0xFFFF (VM_INACTIVE_THREAD).
 		if channelPC != VM_INACTIVE_THREAD && !channelPaused {
-			state.channelId = channelId
+			state.channelID = channelID
 			state.paused = false
 			state.pc = channelPC
 			state.sp = 0
@@ -164,27 +164,27 @@ func (state *VMState) mainLoop() {
 			for state.paused == false {
 				state.executeOp()
 			}
-			fmt.Printf("> step: PAUSED, pc[%5d], channel[%2d] >>> \n", state.pc-1, channelId)
+			fmt.Printf("> step: PAUSED, pc[%5d], channel[%2d] >>> \n", state.pc-1, channelID)
 			if state.sp > 0 {
 				state.countSPNotZero++
 			}
-			state.channelPC[channelId] = state.pc
+			state.channelPC[channelID] = state.pc
 		}
 	}
 }
 
 func (state *VMState) setupChannels() {
-	for channelId := 0; channelId < VM_NUM_THREADS; channelId++ {
-		if state.nextLoopChannelPC[channelId] != VM_NO_TASK_OP {
-			state.channelPC[channelId] = state.nextLoopChannelPC[channelId]
-			state.nextLoopChannelPC[channelId] = VM_NO_TASK_OP
+	for channelID := 0; channelID < VM_NUM_THREADS; channelID++ {
+		if state.nextLoopChannelPC[channelID] != VM_NO_TASK_OP {
+			state.channelPC[channelID] = state.nextLoopChannelPC[channelID]
+			state.nextLoopChannelPC[channelID] = VM_NO_TASK_OP
 		}
 	}
 }
 
 func (state *VMState) executeOp() {
 	opcode := state.fetchByte()
-	fmt.Printf("> step: opcode[%2d], pc[%5d], channel[%2d] >>> ", opcode, state.pc-1, state.channelId)
+	fmt.Printf("> step: opcode[%2d], pc[%5d], channel[%2d] >>> ", opcode, state.pc-1, state.channelID)
 
 	state.countOps++
 

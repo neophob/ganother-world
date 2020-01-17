@@ -125,18 +125,18 @@ func (state *VMState) opYieldTask() {
 
 //Bigend - Permanently stops the executing channel and goes to the next.
 func (state *VMState) opRemoveTask() {
-	fmt.Println("#opRemoveTask", state.channelId)
+	fmt.Println("#opRemoveTask", state.channelID)
 	state.pc = VM_INACTIVE_THREAD
 	state.paused = true
 }
 
 //Vec début, fin, type - Deletes, freezes or unfreezes a series of channels
 func (state *VMState) opChangeTaskState() {
-	channelIdStart := state.fetchByte()
-	channelIdEnd := state.fetchByte()
+	channelIDStart := state.fetchByte()
+	channelIDEnd := state.fetchByte()
 	changeType := state.fetchByte()
-	fmt.Println("#opChangeTaskState", channelIdStart, channelIdEnd, changeType)
-	for i := channelIdStart; i <= channelIdEnd; i++ {
+	fmt.Println("#opChangeTaskState", channelIDStart, channelIDEnd, changeType)
+	for i := channelIDStart; i <= channelIDEnd; i++ {
 		switch changeType {
 		case 0:
 			state.nextLoopChannelPC[i] = VM_INACTIVE_THREAD
@@ -163,8 +163,8 @@ func (state *VMState) opJmpIfVar() {
 //Conditional branch, If (=Si) the comparison of the variables is right, the execution continues at the indicated address.
 func (state *VMState) opCondJmp() {
 	op := state.fetchByte()
-	variableId := uint16(state.fetchByte())
-	currentVariable := state.variables[variableId]
+	variableID := uint16(state.fetchByte())
+	currentVariable := state.variables[variableID]
 	var newVariable int16
 	if op&0x80 > 0 {
 		newVariable = int16(state.variables[state.fetchByte()])
@@ -173,12 +173,12 @@ func (state *VMState) opCondJmp() {
 	} else {
 		newVariable = int16(state.fetchByte())
 	}
-	fmt.Printf("> step #op_condJmp (%d, 0x%02X, 0x%02X) var=0x%02X\n", op, currentVariable, newVariable, variableId)
+	fmt.Printf("> step #op_condJmp (%d, 0x%02X, 0x%02X) var=0x%02X\n", op, currentVariable, newVariable, variableID)
 	expr := false
 	switch op & 7 {
 	case 0:
 		expr = (currentVariable == newVariable)
-		if variableId == 0x29 && op&0x80 != 0 {
+		if variableID == 0x29 && op&0x80 != 0 {
 			fmt.Println("TODO BYPASS PROTECTION!")
 			/*				// 4 symbols
 							_scriptVars[0x29] = _scriptVars[0x1E];
@@ -221,11 +221,11 @@ func (state *VMState) opVidSetPalette() {
 
 //Text "text number", x, y, color - Displays in the work screen the specified text for the coordinates x,y.
 func (state *VMState) opVidDrawString() {
-	stringId := int(state.fetchWord())
+	stringID := int(state.fetchWord())
 	x := int(state.fetchByte())
 	y := int(state.fetchByte())
 	col := int(state.fetchByte())
-	video.drawString(col, x, y, stringId)
+	video.drawString(col, x, y, stringID)
 }
 
 //SetWS "Screen number" - Sets the work screen, which is where the polygons will be drawn by default.
