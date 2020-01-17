@@ -173,6 +173,7 @@ func (state *VMState) mainLoop() {
 	}
 }
 
+//no pending tasks when starting a loop
 func (state *VMState) setupChannels() {
 	for channelID := 0; channelID < VM_NUM_THREADS; channelID++ {
 		if state.nextLoopChannelPC[channelID] != VM_NO_TASK_OP {

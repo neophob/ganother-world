@@ -41,7 +41,6 @@ func (video *Video) fillPage(page, colorIndex int) {
 func (video *Video) copyPage(src, dst, vscroll int) {
 	workerPageSrc := getWorkerPage(src)
 	workerPageDst := getWorkerPage(dst)
-	fmt.Println(">VID: COPYPAGE", vscroll)
 	video.renderer.copyPage(workerPageSrc, workerPageDst)
 }
 
@@ -55,6 +54,7 @@ func (video *Video) updateDisplay(page int) {
 	workerPage := getWorkerPage(page)
 	fmt.Println(">VID: UPDATEDISPLAY", workerPage)
 
+	//TODO LOAD PALETTE WHEN REQUESTED
 	if video.loadPalette != 0xFF {
 		fmt.Println(">VID: UPDATEPAL", video.loadPalette)
 		//render.colors = render.videoAssets.getPalette(render.loadPalette)
