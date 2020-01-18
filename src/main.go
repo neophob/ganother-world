@@ -44,6 +44,15 @@ func main() {
 	vmState := createNewState(assets)
 
 	log.Println("- setup game")
+	/*
+		1: intro okish, rendering issues, wrong colors, black screen at the end
+		2: looks ok, wrong colors
+		3: weird flickering / rendering issues
+		4: just crap
+		5: weird color, rendering issues
+		6: clipping issues
+		7: crash!
+	*/
 	vmState.setupGamePart(GAME_PART_ID_1 + 1)
 	videoAssets := vmState.buildVideoAssets()
 	video.updateGamePart(videoAssets)

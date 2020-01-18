@@ -21,13 +21,22 @@ type Video struct {
 	colors      [16]Color
 }
 
+func (video *Video) getColor(index int) Color {
+	if index < 16 {
+		return video.colors[index]
+	}
+	//TODO in theory there should be only value 0x10 which adds 8 pixel to the current index
+	fmt.Println(">VID: TRANSLUCENT PIXEL", index)
+	return Color{255, 255, 0}
+}
+
 func (video *Video) updateGamePart(videoAssets VideoAssets) {
 	video.videoAssets = videoAssets
 	video.colors = videoAssets.getPalette(0)
 }
 
 func (video *Video) setColor(colorIndex int) {
-	col := video.colors[colorIndex]
+	col := video.getColor(colorIndex)
 	video.renderer.setColor(col)
 }
 
@@ -163,8 +172,8 @@ func (video *Video) drawShapeParts(zoom, posX, posY int) {
 	}
 }
 
-func (video *Video) drawFilledPolygon(color, zoom, posX, posY int) {
-	fmt.Printf(">VID: FILLPOLYGON color:%d, x:%d, y:%d, zoom:%d\n", color, posX, posY, zoom)
+func (video *Video) drawFilledPolygon(colorIndex, zoom, posX, posY int) {
+	fmt.Printf(">VID: FILLPOLYGON color:%d, x:%d, y:%d, zoom:%d\n", colorIndex, posX, posY, zoom)
 
 	bbw := int(video.videoAssets.fetchByte()) * zoom / 64
 	bbh := int(video.videoAssets.fetchByte()) * zoom / 64
@@ -179,7 +188,7 @@ func (video *Video) drawFilledPolygon(color, zoom, posX, posY int) {
 		return
 	}
 
-	col := video.colors[color%16]
+	col := video.getColor(colorIndex)
 	numVertices := int(video.videoAssets.fetchByte())
 
 	if numVertices > 70 {

@@ -138,6 +138,9 @@ func (render *SDLRenderer) blitPage(page int) {
 	r3 := &sdl.Rect{320, 200, 320, 200}
 	render.screenBuffers[3].Blit(nil, render.surface, r3)
 
+	r4 := &sdl.Rect{640, 100, 320, 200}
+	render.screenBuffers[page].Blit(nil, render.surface, r4)
+
 	render.renderer.Present()
 }
 
