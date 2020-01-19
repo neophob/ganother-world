@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math"
+	"time"
 
 	//"math/rand"
 	"os"
@@ -65,7 +66,7 @@ func main() {
 			}*/
 
 		//game run at approx 25 fps
-		//time.Sleep(40 * time.Millisecond)
+		time.Sleep(40 * time.Millisecond)
 		vmState.mainLoop()
 
 		if vmState.loadNextPart > 0 {
