@@ -50,3 +50,7 @@ func (asset VideoAssets) getPalette(index int) [16]Color {
 	}
 	return palette
 }
+
+func (color Color) toUint32() uint32 {
+	return uint32(0xFF000000) + uint32(color.r)<<16 + uint32(color.g)<<8 + uint32(color.b)
+}

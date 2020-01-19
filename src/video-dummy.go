@@ -24,12 +24,12 @@ func (render DummyRenderer) copyPage(src, dst int) {
 	fmt.Println(">VID: COPYPAGE", src, dst)
 }
 
-func (render DummyRenderer) drawPixel(posX, posY int32) {
-	fmt.Printf(">VID: DRAWPIXEL x:%d, y:%d\n", posX, posY)
+func (render DummyRenderer) drawPixel(page int, posX, posY int32) {
+	fmt.Printf(">VID: DRAWPIXEL x:%d, y:%d\n", page, posX, posY)
 }
 
-func (render DummyRenderer) drawFilledPolygons(vx, vy []int16, col Color) {
-	fmt.Println(">VID: DRAWFILLEDPOLYGONS", col, vx, vy)
+func (render DummyRenderer) drawFilledPolygons(page int, vx, vy []int16, col Color) {
+	fmt.Println(">VID: DRAWFILLEDPOLYGONS", page, col, vx, vy)
 }
 
 func (render DummyRenderer) eventLoop(frameCount int) bool {

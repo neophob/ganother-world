@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math"
+	"time"
 
 	//"math/rand"
 	"os"
@@ -43,9 +44,17 @@ func main() {
 	vmState := createNewState(assets)
 
 	log.Println("- setup game")
-	vmState.setupGamePart(GAME_PART_ID_1 + 1)
-	videoAssets := vmState.buildVideoAssets()
-	video.updateGamePart(videoAssets)
+	/*
+		1: intro okish, rendering issues, wrong colors, black screen at the end
+		2: looks ok, wrong colors
+		3: weird flickering / rendering issues
+		4: just crap
+		5: weird color, rendering issues
+		6: clipping issues
+		7: crash!
+	*/
+
+	loadGamePart(&vmState, GAME_PART_ID_1+1)
 
 	//start main loop
 	exit := false
@@ -56,11 +65,25 @@ func main() {
 				renderer.updateGamePart(videoAssets)
 			}*/
 
+		//game run at approx 25 fps
+		time.Sleep(40 * time.Millisecond)
 		vmState.mainLoop()
+
+		if vmState.loadNextPart > 0 {
+			log.Println("- load next part", vmState.loadNextPart)
+			loadGamePart(&vmState, vmState.loadNextPart)
+		}
+
 		exit = video.eventLoop(i)
 	}
 
 	video.shutdown()
+}
+
+func loadGamePart(vmState *VMState, partID int) {
+	vmState.setupGamePart(partID)
+	videoAssets := vmState.buildVideoAssets()
+	video.updateGamePart(videoAssets)
 }
 
 func readFile(filename string) []byte {

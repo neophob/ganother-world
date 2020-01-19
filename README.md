@@ -9,6 +9,7 @@ Reference:
 - https://fabiensanglard.net/anotherWorld_code_review/
 - https://fabiensanglard.net/another_world_polygons/index.html
 - http://www.anotherworld.fr/anotherworld_uk/another_world.htm
+- https://www.gdcvault.com/play/1014630/Classic-Game-Postmortem-OUT-OF
 
 # ARCHITECTURE
 
