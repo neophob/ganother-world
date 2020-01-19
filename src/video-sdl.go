@@ -11,7 +11,7 @@ import (
 
 const (
 	WINDOW_WIDTH  int32 = 320 * 3
-	WINDOW_HEIGHT int32 = 200 * 3
+	WINDOW_HEIGHT int32 = 200 * 2
 
 	WIDTH  int32 = 320
 	HEIGHT int32 = 200
@@ -168,7 +168,7 @@ func (render *SDLRenderer) shutdown() {
 func calcStep(x1, y1, x2, y2 int) (int, int) {
 	dy := y2 - y1
 	delta := dy
-	if dy == 0 {
+	if delta == 0 {
 		delta = 1
 	}
 	return ((x2 - x1) << 16) / delta, dy
@@ -177,7 +177,6 @@ func calcStep(x1, y1, x2, y2 int) (int, int) {
 func (render *SDLRenderer) drawFilledPolygons(page int, vx, vy []int16, col Color) {
 	//renderer := render.screenRenderer[page]
 	//gfx.FilledPolygonColor(renderer, vx, vy, sdl.Color{col.r, col.g, col.g, 255})
-
 	//scale?
 	render.setColor(col)
 
@@ -223,10 +222,9 @@ func (render *SDLRenderer) drawFilledPolygons(page int, vx, vy []int16, col Colo
 						if x2 >= int(WIDTH) {
 							x2 = int(WIDTH) - 1
 						}
-						for x := x1; x < x2; x++ {
+						for x := x1; x <= x2; x++ {
 							render.drawPixel(page, int32(x), int32(hliney))
 						}
-
 					}
 				}
 				cpt1 += step1
