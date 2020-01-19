@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+//TODO rename to staticGameAssets
 type Assets struct {
 	memList         map[int]MemlistEntry
 	gameParts       map[int]GamePartContent

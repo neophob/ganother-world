@@ -39,6 +39,7 @@ type VMState struct {
 	channelPaused     [VM_NUM_THREADS]bool
 	stackCalls        [VM_MAX_STACK_SIZE]uint16
 	gamePart          int
+	loadNextPart      int
 
 	palette   []uint8
 	bytecode  []uint8
@@ -74,18 +75,7 @@ func createNewState(assets Assets) VMState {
 	return state
 }
 
-// gamePart is the int between 0 and 10
-func (state *VMState) loadGameParts(gamePart int) {
-	fmt.Println("LOAD GAME PART", gamePart)
-	state.gamePart = gamePart
-
-	gamePartAsset := state.assets.gameParts[gamePart]
-	state.bytecode = state.assets.loadEntryFromBank(gamePartAsset.bytecode)
-	state.palette = state.assets.loadEntryFromBank(gamePartAsset.palette)
-	state.cinematic = state.assets.loadEntryFromBank(gamePartAsset.cinematic)
-	state.video2 = state.assets.loadEntryFromBank(gamePartAsset.video2)
-}
-
+//TODO integrate with setupGamePart
 func (state VMState) buildVideoAssets() VideoAssets {
 	return VideoAssets{
 		palette:   state.palette,
@@ -124,14 +114,12 @@ func (state *VMState) fetchWord() uint16 {
 }
 
 func (state *VMState) setupGamePart(newGamePart int) {
-	if state.gamePart == newGamePart {
-		return
-	}
 	if newGamePart < GAME_PART_FIRST || newGamePart > GAME_PART_LAST {
 		panic("INVALID_GAME_PART")
 	}
 	if newGamePart == GAME_PART_FIRST {
 		// VAR(0x54) indicates if the "Out of this World" title screen should be presented
+		// language setting?
 		state.variables[VM_VARIABLE_TITLESCREEN] = 0x81
 	}
 
@@ -141,10 +129,26 @@ func (state *VMState) setupGamePart(newGamePart int) {
 	for i := range state.channelPC {
 		state.channelPC[i] = VM_INACTIVE_THREAD
 		state.nextLoopChannelPC[i] = VM_NO_TASK_OP
+		state.channelPaused[i] = false
 	}
 
 	//activate first channel, set initial PC to 0
-	state.channelPC[0] = 0
+	state.pc = 0
+	state.channelPC[0] = state.pc
+
+	state.loadNextPart = 0
+}
+
+// gamePart is the int between 0 and 10
+func (state *VMState) loadGameParts(gamePart int) {
+	fmt.Println("LOAD GAME PART", gamePart)
+	state.gamePart = gamePart
+
+	gamePartAsset := state.assets.gameParts[gamePart]
+	state.bytecode = state.assets.loadEntryFromBank(gamePartAsset.bytecode)
+	state.palette = state.assets.loadEntryFromBank(gamePartAsset.palette)
+	state.cinematic = state.assets.loadEntryFromBank(gamePartAsset.cinematic)
+	state.video2 = state.assets.loadEntryFromBank(gamePartAsset.video2)
 }
 
 // Run the Virtual Machine for every active threads
@@ -171,6 +175,7 @@ func (state *VMState) mainLoop() {
 			state.channelPC[channelID] = state.pc
 		}
 	}
+	fmt.Println("> --- MAINLOOP DONE")
 }
 
 //no pending tasks when starting a loop

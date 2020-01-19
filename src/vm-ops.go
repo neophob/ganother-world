@@ -345,7 +345,7 @@ func (state *VMState) opUpdateResource() {
 	fmt.Println("opUpdateResource", id)
 	if id >= GAME_PART_ID_1 {
 		fmt.Println("should load next part", id)
-		state.setupGamePart(id)
+		state.loadNextPart = id
 		return
 	}
 	if id == 0 {

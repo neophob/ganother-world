@@ -158,9 +158,7 @@ func (video *Video) drawShapeParts(zoom, posX, posY int) {
 
 		var color uint16 = 0xFF
 		if off&0x8000 > 0 {
-			readOfs := video.videoAssets.videoPC & 0x7F
-			b1 := video.videoAssets.cinematic[readOfs]
-			color = uint16(b1)
+			color = uint16(video.videoAssets.cinematic[video.videoAssets.videoPC] & 0x7F)
 			//TODO display head.. WTF is this?
 			video.videoAssets.fetchWord()
 		}

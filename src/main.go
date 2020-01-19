@@ -9,7 +9,6 @@ import (
 	//"math/rand"
 	"os"
 	"sort"
-	"time"
 )
 
 // video is a global variable that needs to implement the Renderer interface
@@ -53,9 +52,8 @@ func main() {
 		6: clipping issues
 		7: crash!
 	*/
-	vmState.setupGamePart(GAME_PART_ID_1 + 1)
-	videoAssets := vmState.buildVideoAssets()
-	video.updateGamePart(videoAssets)
+
+	loadGamePart(&vmState, GAME_PART_ID_1+1)
 
 	//start main loop
 	exit := false
@@ -66,13 +64,25 @@ func main() {
 				renderer.updateGamePart(videoAssets)
 			}*/
 
-		time.Sleep(20 * time.Millisecond)
-
+		//game run at approx 25 fps
+		//time.Sleep(40 * time.Millisecond)
 		vmState.mainLoop()
+
+		if vmState.loadNextPart > 0 {
+			log.Println("- load next part", vmState.loadNextPart)
+			loadGamePart(&vmState, vmState.loadNextPart)
+		}
+
 		exit = video.eventLoop(i)
 	}
 
 	video.shutdown()
+}
+
+func loadGamePart(vmState *VMState, partID int) {
+	vmState.setupGamePart(partID)
+	videoAssets := vmState.buildVideoAssets()
+	video.updateGamePart(videoAssets)
 }
 
 func readFile(filename string) []byte {
