@@ -21,6 +21,11 @@ build:
 	@echo "  >  BUILD"
 	@go build $(SRC)
 
+## build-wasm: builds the wasm app
+build-wasm:
+	@echo "  >  BUILD-WASM"
+	@env GOARCH=wasm GOOS=js go build -o dist/wasm.lib src/wasm/main.go
+
 ## format: format code using go fmt
 format:
 	@go fmt $(SRC)
