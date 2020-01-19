@@ -62,13 +62,6 @@ func (video *Video) setWorkPagePtr(page int) {
 func (video *Video) updateDisplay(page int) {
 	workerPage := getWorkerPage(page)
 	fmt.Println(">VID: UPDATEDISPLAY", workerPage)
-
-	//TODO LOAD PALETTE WHEN REQUESTED
-	if video.loadPalette != 0xFF {
-		fmt.Println(">VID: UPDATEPAL", video.loadPalette)
-		//render.colors = render.videoAssets.getPalette(render.loadPalette)
-		video.loadPalette = 0xFF
-	}
 	video.renderer.blitPage(workerPage)
 }
 
@@ -205,7 +198,6 @@ func (video *Video) drawFilledPolygon(colorIndex, zoom, posX, posY int) {
 }
 
 func (video *Video) setPalette(index int) {
-	//render.loadPalette = index >> 8
 	video.colors = video.videoAssets.getPalette(index >> 8)
 	fmt.Println(">VID: SETPALETTE", index>>8)
 }

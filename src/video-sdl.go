@@ -175,9 +175,10 @@ func calcStep(x1, y1, x2, y2 int) (int, int) {
 }
 
 func (render *SDLRenderer) drawFilledPolygons(page int, vx, vy []int16, col Color) {
-	//renderer := render.screenRenderer[page]
-	//gfx.FilledPolygonColor(renderer, vx, vy, sdl.Color{col.r, col.g, col.g, 255})
-	//scale?
+	/*renderer := render.screenRenderer[page]
+	gfx.FilledPolygonColor(renderer, vx, vy, sdl.Color{col.r, col.g, col.g, 255})
+	return/**/
+
 	render.setColor(col)
 
 	i := 0
@@ -197,7 +198,7 @@ func (render *SDLRenderer) drawFilledPolygons(page int, vx, vy []int16, col Colo
 	cpt2 := x2 << 16
 
 	for numVertices := len(vx); numVertices > 0; numVertices -= 2 {
-		step1, h := calcStep(int(vx[j+1]), int(vy[j+1]), int(vx[j]), int(vy[j]))
+		step1, _ := calcStep(int(vx[j+1]), int(vy[j+1]), int(vx[j]), int(vy[j]))
 		step2, h := calcStep(int(vx[i-1]), int(vy[i-1]), int(vx[i]), int(vy[i]))
 
 		i++
