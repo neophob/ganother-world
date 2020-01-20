@@ -3,31 +3,25 @@ package main
 import "fmt"
 
 type Renderer interface {
-	setColor(col Color)
-	fillPage(page int)
-	blitPage(page int)
-	copyPage(src, dst int)
-	drawPixel(page int, posX, posY int32)
-	drawFilledPolygons(page int, vx, vy []int16, col Color)
+	blitPage(buffer [64000]Color)
 	eventLoop(frameCount int) bool
 	shutdown()
 }
+
+const (
+	WIDTH         int32 = 320
+	HEIGHT        int32 = 200
+	COLOR_ALPHA   int   = 16
+	COLOR_BUFFER0 int   = 17
+)
 
 type Video struct {
 	renderer    Renderer
 	videoAssets VideoAssets
 	workerPage  int
-	loadPalette int
 	colors      [16]Color
-}
-
-func (video *Video) getColor(index int) Color {
-	if index < 16 {
-		return video.colors[index]
-	}
-	//TODO in theory there should be only value 0x10 which adds 8 pixel to the current index
-	fmt.Println(">VID: TRANSLUCENT PIXEL", index)
-	return Color{255, 255, 0}
+	rawBuffer   [4][WIDTH * HEIGHT]uint8
+	drawColor   uint8
 }
 
 func (video *Video) updateGamePart(videoAssets VideoAssets) {
@@ -35,22 +29,42 @@ func (video *Video) updateGamePart(videoAssets VideoAssets) {
 	video.colors = videoAssets.getPalette(0)
 }
 
+func (video *Video) getColor(colorIndex, page, ofs int) uint8 {
+	if colorIndex < COLOR_ALPHA {
+		return uint8(colorIndex)
+	}
+	if colorIndex == COLOR_ALPHA {
+		//Alpha color, take current value and add 8 to the index, then map it
+		i := video.rawBuffer[page][ofs]
+		return (i | 0x08) & 0x0F
+	}
+	if colorIndex == COLOR_BUFFER0 {
+		//Color from buffer 0 (aka transparent?)
+		i := video.rawBuffer[0][ofs]
+		return i & 0x0F
+	}
+	fmt.Println(">VID: UNKNOWN PIXEL", colorIndex)
+	return uint8(colorIndex)
+}
+
 func (video *Video) setColor(colorIndex int) {
-	col := video.getColor(colorIndex)
-	video.renderer.setColor(col)
+	video.drawColor = uint8(colorIndex)
 }
 
 func (video *Video) fillPage(page, colorIndex int) {
-	video.setColor(colorIndex)
 	workerPage := getWorkerPage(page)
-	video.renderer.fillPage(workerPage)
+	for i := range video.rawBuffer[workerPage] {
+		video.rawBuffer[workerPage][i] = uint8(colorIndex)
+	}
 }
 
 //TODO no clue why vscroll is used
 func (video *Video) copyPage(src, dst, vscroll int) {
 	workerPageSrc := getWorkerPage(src)
 	workerPageDst := getWorkerPage(dst)
-	video.renderer.copyPage(workerPageSrc, workerPageDst)
+	for i := range video.rawBuffer[workerPageSrc] {
+		video.rawBuffer[workerPageDst][i] = video.rawBuffer[workerPageSrc][i]
+	}
 }
 
 func (video *Video) setWorkPagePtr(page int) {
@@ -59,10 +73,17 @@ func (video *Video) setWorkPagePtr(page int) {
 }
 
 // blit
+// step 1 is to convert the indexed color (0..15 for "normal" colors, 16 for translucent and 17 for buffer0 value) to an rgb value
+// step 2 is updating the sdl buffers
 func (video *Video) updateDisplay(page int) {
 	workerPage := getWorkerPage(page)
 	fmt.Println(">VID: UPDATEDISPLAY", workerPage)
-	video.renderer.blitPage(workerPage)
+
+	var outputBuffer [WIDTH * HEIGHT]Color
+	for i := range video.rawBuffer[workerPage] {
+		outputBuffer[i] = video.colors[video.rawBuffer[workerPage][i]]
+	}
+	video.renderer.blitPage(outputBuffer)
 }
 
 func getWorkerPage(page int) int {
@@ -102,12 +123,13 @@ func (video *Video) drawString(color, posX, posY, stringID int) {
 func (video *Video) drawChar(posX, posY int32, char byte) {
 	fmt.Printf(">VID: DRAWCHAR char:%s, x:%d, y:%d\n", char, posX, posY)
 
-	ofs := 8 * (int32(char) - 0x20)
+	fontOffset := 8 * (int32(char) - 0x20)
 	for j := int32(0); j < 8; j++ {
-		ch := FONT[ofs+j]
+		ch := FONT[fontOffset+j]
+		outputOffset := posX + (posY+j)*WIDTH
 		for i := int32(0); i < 8; i++ {
 			if ch&(1<<(7-i)) > 0 {
-				video.renderer.drawPixel(video.workerPage, posX+i, posY+j)
+				video.rawBuffer[video.workerPage][outputOffset+i] = video.drawColor
 			}
 		}
 	}
@@ -163,8 +185,8 @@ func (video *Video) drawShapeParts(zoom, posX, posY int) {
 	}
 }
 
-func (video *Video) drawFilledPolygon(colorIndex, zoom, posX, posY int) {
-	fmt.Printf(">VID: FILLPOLYGON color:%d, x:%d, y:%d, zoom:%d\n", colorIndex, posX, posY, zoom)
+func (video *Video) drawFilledPolygon(col, zoom, posX, posY int) {
+	fmt.Printf(">VID: FILLPOLYGON color:%d, x:%d, y:%d, zoom:%d\n", col, posX, posY, zoom)
 
 	bbw := int(video.videoAssets.fetchByte()) * zoom / 64
 	bbh := int(video.videoAssets.fetchByte()) * zoom / 64
@@ -179,7 +201,6 @@ func (video *Video) drawFilledPolygon(colorIndex, zoom, posX, posY int) {
 		return
 	}
 
-	col := video.getColor(colorIndex)
 	numVertices := int(video.videoAssets.fetchByte())
 
 	if numVertices > 70 {
@@ -194,7 +215,7 @@ func (video *Video) drawFilledPolygon(colorIndex, zoom, posX, posY int) {
 	}
 
 	fmt.Println(">VID: FILLPOLYGON", video.workerPage, numVertices, col, vx, vy)
-	video.renderer.drawFilledPolygons(video.workerPage, vx, vy, col)
+	video.drawFilledPolygons(video.workerPage, vx, vy, col)
 }
 
 func (video *Video) setPalette(index int) {
