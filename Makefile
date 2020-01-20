@@ -8,6 +8,7 @@ PROJECTNAME := $(shell basename "$(PWD)")
 # Go related variables.
 GOBASE := $(shell pwd)
 GOFILES := $(wildcard *.go)
+GOROOT := $(shell go env GOROOT)
 
 # -X add string value definition of the form importpath.name=value
 RELEASE := -ldflags "-s -w -X project.name=anotherworld"
@@ -15,6 +16,7 @@ SRC := src/main.go src/resource.go src/vm.go src/parts.go src/decrunch.go \
 	src/vm-ops.go src/assets.go src/video.go src/video-dummy.go src/video-sdl.go src/text.go \
 	src/font.go src/debug.go src/videoassets.go
 SRCDIR := ./src
+DISTDIR := ./dist
 
 ## build: build go binary in dev mode
 build:
@@ -24,7 +26,11 @@ build:
 ## build-wasm: builds the wasm app
 build-wasm:
 	@echo "  >  BUILD-WASM"
-	@env GOARCH=wasm GOOS=js go build -o dist/wasm.lib src/wasm/main.go
+	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" src/wasm/main.go
+	@go build -o "$(DISTDIR)/devserver" src/wasm/devserver/main.go
+	@cp src/wasm/index.html $(DISTDIR)
+	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
+
 
 ## format: format code using go fmt
 format:
