@@ -2,6 +2,7 @@ package main
 
 import "fmt"
 
+// implements actual rendering
 type Renderer interface {
 	blitPage(buffer [64000]Color)
 	eventLoop(frameCount int) bool
@@ -15,6 +16,7 @@ const (
 	COLOR_BUFFER0 int   = 17
 )
 
+// implements buffer handling (4 buffers) and game specific alpha/buffer0 handling
 type Video struct {
 	renderer    Renderer
 	videoAssets VideoAssets
