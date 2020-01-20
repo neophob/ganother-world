@@ -69,6 +69,7 @@ func (render *SDLRenderer) blitPage(buffer [64000]Color) {
 	render.renderer.Present()
 }
 
+// check if app should exit, needs more functionality soon (key values..)
 func (render *SDLRenderer) eventLoop(frameCount int) bool {
 	exitRequested := false
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
@@ -86,6 +87,7 @@ func (render *SDLRenderer) eventLoop(frameCount int) bool {
 	return exitRequested
 }
 
+// cleanup
 func (render *SDLRenderer) shutdown() {
 	render.window.Destroy()
 	sdl.Quit()
