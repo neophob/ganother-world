@@ -121,7 +121,7 @@ func (video *Video) drawString(color, posX, posY, stringID int) {
 }
 
 func (video *Video) drawChar(posX, posY int32, char byte) {
-	fmt.Printf(">VID: DRAWCHAR char:%s, x:%d, y:%d\n", char, posX, posY)
+	fmt.Printf(">VID: DRAWCHAR char:%c, x:%d, y:%d\n", char, posX, posY)
 
 	fontOffset := 8 * (int32(char) - 0x20)
 	for j := int32(0); j < 8; j++ {
