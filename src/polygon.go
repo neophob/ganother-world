@@ -9,29 +9,23 @@ func calcStep(x1, y1, x2, y2 int) (int, int) {
 	return ((x2 - x1) << 16) / delta, dy
 }
 
-//software version to draw a polygon
+//software version to draw a polygon, draw polygon line by line
 func (video *Video) drawFilledPolygons(page int, vx, vy []int16, col int) {
-	/*renderer := render.screenRenderer[page]
-	gfx.FilledPolygonColor(renderer, vx, vy, sdl.Color{col.r, col.g, col.g, 255})
-	return/**/
-
-	//	render.setColor(col)
-
 	i := 0
 	j := len(vx) - 1
 
-	x2 := int(vx[i])
-	x1 := int(vx[j])
-	hliney := int(vy[i])
+	xPositionEnd := int(vx[i])
+	xPositionStart := int(vx[j])
+	yPosition := int(vy[i])
 	if vy[j] < vy[i] {
-		hliney = int(vy[j])
+		yPosition = int(vy[j])
 	}
 
 	i++
 	j--
 
-	cpt1 := x1 << 16
-	cpt2 := x2 << 16
+	cpt1 := xPositionStart << 16
+	cpt2 := xPositionEnd << 16
 
 	for numVertices := len(vx); numVertices > 0; numVertices -= 2 {
 		step1, _ := calcStep(int(vx[j+1]), int(vy[j+1]), int(vx[j]), int(vy[j]))
@@ -49,19 +43,19 @@ func (video *Video) drawFilledPolygons(page int, vx, vy []int16, col int) {
 		} else {
 			for ; h > 0; h-- {
 
-				if hliney >= 0 {
-					x1 = cpt1 >> 16
-					x2 = cpt2 >> 16
-					if x1 < int(WIDTH) && x2 >= 0 {
-						if x1 < 0 {
-							x1 = 0
+				if yPosition >= 0 {
+					xPositionStart = cpt1 >> 16
+					xPositionEnd = cpt2 >> 16
+					if xPositionStart < int(WIDTH) && xPositionEnd >= 0 {
+						if xPositionStart < 0 {
+							xPositionStart = 0
 						}
-						if x2 >= int(WIDTH) {
-							x2 = int(WIDTH) - 1
+						if xPositionEnd >= int(WIDTH) {
+							xPositionEnd = int(WIDTH) - 1
 						}
 
-						outputOffset := hliney * int(WIDTH)
-						for x := x1; x <= x2; x++ {
+						outputOffset := yPosition * int(WIDTH)
+						for x := xPositionStart; x <= xPositionEnd; x++ {
 							color := video.getColor(col, video.workerPage, outputOffset+x)
 							video.rawBuffer[video.workerPage][outputOffset+x] = color
 						}
@@ -69,8 +63,8 @@ func (video *Video) drawFilledPolygons(page int, vx, vy []int16, col int) {
 				}
 				cpt1 += step1
 				cpt2 += step2
-				hliney++
-				if hliney >= int(HEIGHT) {
+				yPosition++
+				if yPosition >= int(HEIGHT) {
 					return
 				}
 			}

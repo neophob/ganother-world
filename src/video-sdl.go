@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	WINDOW_WIDTH  int32 = 320 * 3
-	WINDOW_HEIGHT int32 = 200 * 2
+	WINDOW_WIDTH  int32 = 320 * 4
+	WINDOW_HEIGHT int32 = 200 * 3
 )
 
 type SDLRenderer struct {

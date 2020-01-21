@@ -45,13 +45,14 @@ func main() {
 
 	log.Println("- setup game")
 	/*
-		1: intro okish, rendering issues, wrong colors, black screen at the end
-		2: looks ok, wrong colors
+		all: polygon clipping issues
+		1: intro okish, missing colors in elevator scene
+		2: looks ok
 		3: weird flickering / rendering issues
 		4: just crap
 		5: weird color, rendering issues
 		6: clipping issues
-		7: crash!
+		7: crash after some seconds
 	*/
 
 	loadGamePart(&vmState, GAME_PART_ID_1+1)
