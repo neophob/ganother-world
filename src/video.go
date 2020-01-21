@@ -116,8 +116,8 @@ func (video *Video) drawString(color, posX, posY, stringID int) {
 			charPosY += int32(FONT_HEIGHT)
 			charPosX = int32(posX)
 		} else {
-			video.drawChar(charPosX, charPosY, text[i])
-			charPosX += 8
+			video.drawChar(charPosX*8, charPosY, text[i])
+			charPosX += 1
 		}
 	}
 }
@@ -150,9 +150,7 @@ func (video *Video) drawShape(color, offset, zoom, posX, posY int) {
 		video.drawFilledPolygon(color, zoom, posX, posY)
 	} else {
 		i &= 0x3F
-		if i == 1 {
-			fmt.Printf("drawShape INVALID! (1 != 2)\n")
-		} else if i == 2 {
+		if i == 2 {
 			video.drawShapeParts(zoom, posX, posY)
 		} else {
 			fmt.Printf("drawShape INVALID! (%d != 2)\n", i)
