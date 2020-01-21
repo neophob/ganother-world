@@ -52,7 +52,7 @@ func main() {
 		4: just crap
 		5: weird color, rendering issues
 		6: clipping issues
-		7: crash after some seconds
+		7: works
 	*/
 
 	loadGamePart(&vmState, GAME_PART_ID_1+1)
