@@ -275,7 +275,7 @@ func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
 
 //Spr "'object name" , x, y, z - In the work screen, draws the graphics tool at the coordinates x,y and the zoom factor z. A polygon, a group of polygons...
 func (state *VMState) opVidDrawPolySprite(opcode uint8) {
-	//useSecondVideoResource := false
+	useSecondVideoResource := false
 	offsetHi := state.fetchByte()
 	offset := ((uint16(offsetHi) << 8) | uint16(state.fetchByte())) << 1
 	posX := int16(state.fetchByte())
@@ -309,7 +309,7 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 		}
 	} else {
 		if opcode&1 > 0 {
-			//useSecondVideoResource = true
+			useSecondVideoResource = true
 			state.pc--
 			fmt.Println("useSecondVideoResource! zoom decreased PC", state.pc)
 			zoom = 0x40
@@ -318,7 +318,9 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 	fmt.Printf("opVidDrawPolySprite %d", offset)
 	//video.renderer.setDataBuffer(useSecondVideoResource, int(offset))
 	//TODO implement useSecondVideoResource
-	video.drawShape(0xFF, int(offset), int(zoom), int(posX), int(posY))
+	if useSecondVideoResource == false {
+		video.drawShape(0xFF, int(offset), int(zoom), int(posX), int(posY))
+	}
 }
 
 //Initialises a song.
