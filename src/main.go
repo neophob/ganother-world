@@ -46,9 +46,9 @@ func main() {
 	log.Println("- setup game")
 	/*
 		all: polygon clipping issues
-		1: intro okish, missing colors in elevator scene
+		1: intro okish, elevator scene is weird (channel id issue?)
 		2: looks ok
-		3: weird flickering / rendering issues
+		3: weird flickering / rendering issues (alien body is missing)
 		4: just crap
 		5: weird color, rendering issues
 		6: clipping issues
@@ -60,11 +60,9 @@ func main() {
 	//start main loop
 	exit := false
 	for i := 0; exit == false; i++ {
-		/*		if i % 50 == rand.Intn(50) {
-				vmState.setupGamePart(GAME_PART_ID_1 + rand.Intn(9))
-				videoAssets := vmState.buildVideoAssets()
-				renderer.updateGamePart(videoAssets)
-			}*/
+		/*if i%30 == rand.Intn(30) {
+			loadGamePart(&vmState, GAME_PART_ID_1+rand.Intn(9))
+		}*/
 
 		//game run at approx 25 fps
 		time.Sleep(40 * time.Millisecond)

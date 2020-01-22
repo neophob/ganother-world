@@ -44,8 +44,8 @@ func (video *Video) drawFilledPolygons(page int, vx, vy []int16, col int) {
 			for ; h > 0; h-- {
 
 				if yPosition >= 0 {
-					xPositionStart = cpt1 >> 16
-					xPositionEnd = cpt2 >> 16
+					xPositionStart = int(int16(cpt1 >> 16))
+					xPositionEnd = int(int16(cpt2 >> 16))
 					if xPositionStart < int(WIDTH) && xPositionEnd >= 0 {
 						if xPositionStart < 0 {
 							xPositionStart = 0
