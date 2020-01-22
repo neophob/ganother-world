@@ -6,7 +6,6 @@
             const go = new Go();
             WebAssembly.instantiateStreaming(fetch("lib.wasm"), go.importObject)
                 .then((result) => {
-                    console.log('got result:', result);
                     go.run(result.instance);
                 });
         </script>
