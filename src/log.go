@@ -8,8 +8,7 @@ import (
 	"time"
 )
 
-// Log Format : [log_level] [time] [filename]:[line] [message]
-const FORMAT = "%s %s %s:%d\t\t%s\n"
+const LOG_FORMAT = "%5s %v %12s:%d\t\t%s\n"
 
 // Log Level: DEBUG INFO WARN ERROR FATAL
 const (
@@ -22,12 +21,13 @@ const (
 
 var LEVEL_STRINGS = [...]string{
 	"DEBUG",
-	" INFO",
-	" WARN",
-	"ERROR",
+	"\033[1;36mINFO\033[0m",
+	"\033[1;33mWARN\033[0m",
+	"\033[1;31mERROR\033[0m",
 	"FATAL",
 }
 
+var startTime time.Time = time.Now()
 var log_level = LEVEL_DEBUG
 
 // If SetLevel is not called , log_level is the default value : LEVEL_DEBUG (the lowest level)
@@ -59,8 +59,8 @@ func logByLevel(level int, message string) {
 	if level < log_level {
 		return
 	}
-	time_str := fmt.Sprintf("%s", time.Now())[:19]
+	timeDiff := time.Since(startTime)
 	_, filename, line, _ := runtime.Caller(2)
 	_, filename = path.Split(filename)
-	fmt.Printf(FORMAT, LEVEL_STRINGS[level], time_str, filename, line, message)
+	fmt.Printf(LOG_FORMAT, LEVEL_STRINGS[level], timeDiff, filename, line, message)
 }
