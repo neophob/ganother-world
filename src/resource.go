@@ -3,12 +3,8 @@ Resource handling: load files needed for game, unpack data
 */
 package main
 
-import (
-	"fmt"
-)
-
 const (
-	MemlistEntrySize int = 20
+	memlistEntrySize int = 20
 )
 
 type MemlistEntry struct {
@@ -32,7 +28,7 @@ func unmarshallingMemlistBin(data []uint8) (map[int]MemlistEntry, MemlistStatist
 	resourceMap := make(map[int]MemlistEntry)
 	memlistStatistic := MemlistStatistic{resourceTypeMap: make(map[int]int)}
 
-	for i := 0; i < len(data); i += MemlistEntrySize {
+	for i := 0; i < len(data); i += memlistEntrySize {
 		entry := MemlistEntry{
 			resourceType: data[i+1],
 			rankNum:      data[i+6],
@@ -45,7 +41,7 @@ func unmarshallingMemlistBin(data []uint8) (map[int]MemlistEntry, MemlistStatist
 		if entry.resourceType == 0xFF {
 			break
 		}
-		fmt.Printf("R:%#02x, %-17s size=%5d (%5d)  bank=%2d  offset=%6d\n", memlistStatistic.entryCount,
+		Debug("R:%#02x, %-17s size=%5d (%5d)  bank=%2d  offset=%6d", memlistStatistic.entryCount,
 			getResourceTypeName(int(entry.resourceType)), entry.unpackedSize, entry.packedSize, entry.bankID, entry.bankOffset)
 		resourceMap[memlistStatistic.entryCount] = entry
 		memlistStatistic.entryCount++

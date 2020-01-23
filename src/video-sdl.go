@@ -4,8 +4,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -22,17 +20,20 @@ type SDLRenderer struct {
 
 func buildSDLRenderer() *SDLRenderer {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
+		Error("SDL INIT FAILED")
 		panic(err)
 	}
 
 	window, err := sdl.CreateWindow("ganother world", sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED,
 		WINDOW_WIDTH, WINDOW_HEIGHT, sdl.WINDOW_ALLOW_HIGHDPI)
 	if err != nil {
+		Error("SDL CREATE WINDOW FAILED")
 		panic(err)
 	}
 
 	renderer, err := sdl.CreateRenderer(window, -1, sdl.RENDERER_SOFTWARE)
 	if err != nil {
+		Error("SDL CREATE RENDERER FAILED")
 		panic(err)
 	}
 	renderer.SetLogicalSize(WIDTH, HEIGHT)
@@ -41,6 +42,7 @@ func buildSDLRenderer() *SDLRenderer {
 
 	surface, err := window.GetSurface()
 	if err != nil {
+		Error("SDL GET SURFACE FAILED")
 		panic(err)
 	}
 
@@ -76,9 +78,9 @@ func (render *SDLRenderer) eventLoop(frameCount int) bool {
 		switch t := event.(type) {
 		case *sdl.QuitEvent:
 			exitRequested = true
-			fmt.Println(">render.exitAppReq", exitRequested)
+			Debug(">render.exitAppReq", exitRequested)
 		case *sdl.KeyboardEvent:
-			fmt.Println(">render.exitAppReq2", t.Keysym.Sym)
+			Debug(">render.exitAppReq2", t.Keysym.Sym)
 			if t.Keysym.Sym == sdl.K_ESCAPE && t.State == 1 {
 				exitRequested = true
 			}

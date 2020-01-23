@@ -1,19 +1,15 @@
 //dummy video implementation, text output
 package main
 
-import (
-	"fmt"
-)
-
 type DummyRenderer struct {
 }
 
 func (render DummyRenderer) blitPage(buffer [64000]Color) {
-	fmt.Println(">VID: BLITPAGE")
+	Info(">VID: BLITPAGE")
 }
 
 func (render DummyRenderer) eventLoop(frameCount int) bool {
-	fmt.Println(">VID: EVENTLOOP", frameCount)
+	Info(">VID: EVENTLOOP %i", frameCount)
 	return frameCount > 128
 }
 

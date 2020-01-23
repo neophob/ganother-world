@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 // implements actual rendering
 type Renderer interface {
 	blitPage(buffer [64000]Color)
@@ -45,7 +43,7 @@ func (video *Video) getColor(colorIndex, page, ofs int) uint8 {
 		i := video.rawBuffer[0][ofs]
 		return i & 0x0F
 	}
-	fmt.Println(">VID: UNKNOWN PIXEL", colorIndex)
+	Warn(">VID: UNKNOWN PIXEL %d", colorIndex)
 	return uint8(colorIndex)
 }
 
@@ -70,7 +68,7 @@ func (video *Video) copyPage(src, dst, vscroll int) {
 }
 
 func (video *Video) setWorkPagePtr(page int) {
-	fmt.Println(">VID: SETWORKPAGEPTR", page)
+	Debug(">VID: SETWORKPAGEPTR %d", page)
 	video.workerPage = getWorkerPage(page)
 }
 
@@ -79,7 +77,7 @@ func (video *Video) setWorkPagePtr(page int) {
 // step 2 is updating the sdl buffers
 func (video *Video) updateDisplay(page int) {
 	workerPage := getWorkerPage(page)
-	fmt.Println(">VID: UPDATEDISPLAY", workerPage)
+	Debug(">VID: UPDATEDISPLAY %d", workerPage)
 
 	var outputBuffer [WIDTH * HEIGHT]Color
 	for i := range video.rawBuffer[workerPage] {
@@ -98,14 +96,14 @@ func getWorkerPage(page int) int {
 	case 0xFE:
 		return 1
 	default:
-		fmt.Println("updateWorkerPage != [0,1,2,3,0xFF,0xFE] ==", page)
+		Warn("updateWorkerPage != [0,1,2,3,0xFF,0xFE] == %d", page)
 		return 0
 	}
 }
 
 func (video *Video) drawString(color, posX, posY, stringID int) {
 	text := getText(stringID)
-	fmt.Printf(">VID: DRAWSTRING color:%d, x:%d, y:%d, text:%s\n", color, posX, posY, text)
+	Debug(">VID: DRAWSTRING color:%d, x:%d, y:%d, text:%s", color, posX, posY, text)
 	//setWorkPagePtr(buffer);?
 
 	video.setColor(color)
@@ -123,7 +121,7 @@ func (video *Video) drawString(color, posX, posY, stringID int) {
 }
 
 func (video *Video) drawChar(posX, posY int32, char byte) {
-	fmt.Printf(">VID: DRAWCHAR char:%c, x:%d, y:%d\n", char, posX, posY)
+	Debug(">VID: DRAWCHAR char:%c, x:%d, y:%d", char, posX, posY)
 
 	fontOffset := 8 * (int32(char) - 0x20)
 	for j := int32(0); j < 8; j++ {
@@ -141,7 +139,7 @@ func (video *Video) drawShape(color, offset, zoom, posX, posY int) {
 	video.videoAssets.videoPC = offset
 	i := video.videoAssets.fetchByte()
 
-	fmt.Printf(">VID: DRAWSHAPE i:%d, color:%d, offset:%d, x:%d, y:%d, zoom:%d\n", i, color, offset, posX, posY, zoom)
+	Debug(">VID: DRAWSHAPE i:%d, color:%d, offset:%d, x:%d, y:%d, zoom:%d", i, color, offset, posX, posY, zoom)
 
 	if i >= 0xC0 {
 		if color&0x80 > 0 {
@@ -153,7 +151,7 @@ func (video *Video) drawShape(color, offset, zoom, posX, posY int) {
 		if i == 2 {
 			video.drawShapeParts(zoom, posX, posY)
 		} else {
-			fmt.Printf("drawShape INVALID! (%d != 2)\n", i)
+			Warn("drawShape INVALID! (%d != 2)\n", i)
 		}
 	}
 }
@@ -162,14 +160,14 @@ func (video *Video) drawShapeParts(zoom, posX, posY int) {
 	x := posX - int(video.videoAssets.fetchByte())*zoom/64
 	y := posY - int(video.videoAssets.fetchByte())*zoom/64
 	n := int16(video.videoAssets.fetchByte())
-	fmt.Printf(">VID: DRAWSHAPEPARTS x:%d, y:%d, n:%d\n", x, y, n)
+	Debug(">VID: DRAWSHAPEPARTS x:%d, y:%d, n:%d", x, y, n)
 
 	for ; n >= 0; n-- {
 		off := video.videoAssets.fetchWord()
 		_x := x + int(video.videoAssets.fetchByte())*zoom/64
 		_y := y + int(video.videoAssets.fetchByte())*zoom/64
 
-		fmt.Printf(">VID: DRAWSHAPEPARTS off:%d at %d/%d\n", off, _x, _y)
+		Debug(">VID: DRAWSHAPEPARTS off:%d at %d/%d", off, _x, _y)
 
 		var color uint16 = 0xFF
 		if off&0x8000 > 0 {
@@ -186,7 +184,7 @@ func (video *Video) drawShapeParts(zoom, posX, posY int) {
 }
 
 func (video *Video) drawFilledPolygon(col, zoom, posX, posY int) {
-	fmt.Printf(">VID: FILLPOLYGON color:%d, x:%d, y:%d, zoom:%d\n", col, posX, posY, zoom)
+	Debug(">VID: FILLPOLYGON color:%d, x:%d, y:%d, zoom:%d", col, posX, posY, zoom)
 
 	bbw := int(video.videoAssets.fetchByte()) * zoom / 64
 	bbh := int(video.videoAssets.fetchByte()) * zoom / 64
@@ -197,14 +195,14 @@ func (video *Video) drawFilledPolygon(col, zoom, posX, posY int) {
 	y2 := posY + bbh/2
 
 	if x1 > 319 || x2 < 0 || y1 > 199 || y2 < 0 {
-		fmt.Println(">VID: FILLPOLYGON INVALID")
+		Warn(">VID: FILLPOLYGON INVALID")
 		return
 	}
 
 	numVertices := int(video.videoAssets.fetchByte())
 
 	if numVertices > 70 {
-		fmt.Println(">VID: TOOMANY", numVertices)
+		Warn(">VID: TOOMANY %d", numVertices)
 		panic("UNEXPECTED_AMOUNT_OF_VERTICES")
 	}
 
@@ -214,13 +212,13 @@ func (video *Video) drawFilledPolygon(col, zoom, posX, posY int) {
 		vy[i] = int16(y1 + int(video.videoAssets.fetchByte())*zoom/64)
 	}
 
-	fmt.Println(">VID: FILLPOLYGON", video.workerPage, numVertices, col, vx, vy)
+	Debug(">VID: FILLPOLYGON WorkerPage: %d, numVert: %d, col: %d, %v/%v", video.workerPage, numVertices, col, vx, vy)
 	video.drawFilledPolygons(video.workerPage, vx, vy, col)
 }
 
 func (video *Video) setPalette(index int) {
 	video.colors = video.videoAssets.getPalette(index >> 8)
-	fmt.Println(">VID: SETPALETTE", index>>8)
+	Debug(">VID: SETPALETTE %d", index>>8)
 }
 
 func (video *Video) eventLoop(frameCount int) bool {

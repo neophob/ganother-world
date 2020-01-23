@@ -7,7 +7,6 @@ import (
 	"math"
 	"time"
 
-	//"math/rand"
 	"os"
 	"sort"
 )
@@ -24,9 +23,9 @@ func initVideo() Video {
 }
 
 func main() {
-	log.SetFlags(log.Lshortfile | log.Lmicroseconds)
-
-	log.Println("- load memlist.bin")
+	//SetLogLevel(LEVEL_INFO)
+	Info("# GANOTHER WORLD vDEV")
+	Info("- load memlist.bin")
 	data := readFile("./assets/memlist.bin")
 	resourceMap, resourceStatistics := unmarshallingMemlistBin(data)
 	printResourceStats(resourceStatistics)
@@ -40,10 +39,10 @@ func main() {
 		loadedResources: make(map[int][]uint8),
 	}
 
-	log.Println("- create state")
+	Info("- create state")
 	vmState := createNewState(assets)
 
-	log.Println("- setup game")
+	Info("- setup game")
 	/*
 		all: polygon clipping issues
 		1: intro okish, elevator scene is weird (channel id issue?)
@@ -88,7 +87,7 @@ func loadGamePart(vmState *VMState, partID int) {
 func readFile(filename string) []byte {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Println("File reading error", err)
+		Error("File reading error %v", err)
 		os.Exit(1)
 	}
 	return data
@@ -98,7 +97,7 @@ func createBankMap(assetPath string) map[int][]byte {
 	bankFilesMap := make(map[int][]byte)
 	for i := 0x01; i < 0x0e; i++ {
 		name := fmt.Sprintf("%sbank%02x", assetPath, i)
-		log.Println("- load file", name)
+		Debug("- load file %s", name)
 		entry := readFile(name)
 		bankFilesMap[i] = entry
 	}
@@ -106,16 +105,15 @@ func createBankMap(assetPath string) map[int][]byte {
 }
 
 func printResourceStats(memlistStatistic MemlistStatistic) {
-	log.Println(memlistStatistic)
-	fmt.Println("Total # resources:", memlistStatistic.entryCount)
-	fmt.Println("Compressed       :", memlistStatistic.compressedEntries)
-	fmt.Println("Uncompressed     :", memlistStatistic.entryCount-memlistStatistic.compressedEntries)
+	Debug("Total # resources: %d", memlistStatistic.entryCount)
+	Debug("Compressed       : %d", memlistStatistic.compressedEntries)
+	Debug("Uncompressed     : %d", memlistStatistic.entryCount-memlistStatistic.compressedEntries)
 	var compressionRatio float64 = 100 / float64(memlistStatistic.entryCount) * float64(memlistStatistic.compressedEntries)
-	fmt.Printf("Note: %.0f%% of resources are compressed.\n\n", math.Round(compressionRatio))
-	fmt.Printf("Total size (uncompressed) : %d bytes.\n", memlistStatistic.sizeUncompressed)
-	fmt.Printf("Total size (compressed)   : %d bytes.\n", memlistStatistic.sizeCompressed)
+	Debug("Note: %.0f%% of resources are compressed.", math.Round(compressionRatio))
+	Debug("Total size (uncompressed) : %d bytes.", memlistStatistic.sizeUncompressed)
+	Debug("Total size (compressed)   : %d bytes.", memlistStatistic.sizeCompressed)
 	var compressionGain float64 = 100 * (1 - float64(memlistStatistic.sizeCompressed)/float64(memlistStatistic.sizeUncompressed))
-	fmt.Printf("Note: Overall compression gain is : %.0f%%.\n\n", math.Round(compressionGain))
+	Debug("Note: Overall compression gain is : %.0f%%.", math.Round(compressionGain))
 
 	sortedKeys := sortedKeys(memlistStatistic.resourceTypeMap)
 	for i := 0; i < len(sortedKeys); i++ {
@@ -124,7 +122,7 @@ func printResourceStats(memlistStatistic MemlistStatistic) {
 		if len(resourceName) < 1 {
 			resourceName = fmt.Sprintf("RT_UNKOWNN_%d", k)
 		}
-		fmt.Printf("Total %20s, files: %d\n", resourceName, memlistStatistic.resourceTypeMap[k])
+		Debug("Total %20s, files: %d", resourceName, memlistStatistic.resourceTypeMap[k])
 	}
 }
 

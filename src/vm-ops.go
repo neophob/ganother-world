@@ -1,23 +1,19 @@
 package main
 
-import (
-	"fmt"
-)
-
 //Implementation of all VM ops
 
 //Continues the code execution at the indicated address.
 func (state *VMState) opJmp() {
 	offset := state.fetchWord()
 	state.pc = uint16(offset)
-	fmt.Println("#op_jmp() jump to", state.pc)
+	Debug("#op_jmp() jump to %d", state.pc)
 }
 
 //Set.i variable, value - Initialises the variable with an integer value from -32768 to 32767.
 func (state *VMState) opMovConst() {
 	index := state.fetchByte()
 	value := int16(state.fetchWord())
-	fmt.Println("#op_movConst", index, value)
+	Debug("#op_movConst %d %d", index, value)
 	state.variables[index] = value
 }
 
@@ -25,14 +21,14 @@ func (state *VMState) opMovConst() {
 func (state *VMState) opMov() {
 	dest := state.fetchByte()
 	source := state.fetchByte()
-	fmt.Println("#op_mov", source, dest, state.variables[source])
+	Debug("#op_mov %d %d %d", source, dest, state.variables[source])
 	state.variables[dest] = state.variables[source]
 }
 
 //Variable = Variable + Integer value
 func (state *VMState) opAddConst() {
 	if state.gamePart == 5 && state.pc == 0x6D48 {
-		fmt.Println("TODO Script::op_addConst() workaround for infinite looping gun sound")
+		Debug("TODO Script::op_addConst() workaround for infinite looping gun sound")
 		// The script 0x27 slot 0x17 doesn't stop the gun sound from looping.
 		// This is a bug in the original game code, confirmed by Eric Chahi and
 		// addressed with the anniversary editions.
@@ -42,7 +38,7 @@ func (state *VMState) opAddConst() {
 	}
 	index := state.fetchByte()
 	value := int16(state.fetchWord())
-	fmt.Printf("#op_addConst() index=%d, value=%d, add=%d\n", index, state.variables[index], value)
+	Debug("#op_addConst() index=%d, value=%d, add=%d", index, state.variables[index], value)
 	state.variables[index] += value
 }
 
@@ -50,7 +46,7 @@ func (state *VMState) opAddConst() {
 func (state *VMState) opAdd() {
 	dest := state.fetchByte()
 	source := state.fetchByte()
-	fmt.Printf("#op_add() index=%d, var1=%d, var2=%d\n", dest, state.variables[dest], state.variables[source])
+	Debug("#op_add() index=%d, var1=%d, var2=%d", dest, state.variables[dest], state.variables[source])
 	state.variables[dest] += state.variables[source]
 }
 
@@ -58,7 +54,7 @@ func (state *VMState) opAdd() {
 func (state *VMState) opSub() {
 	dest := state.fetchByte()
 	source := state.fetchByte()
-	fmt.Println("#op_sub()", dest, state.variables[source])
+	Debug("#op_sub() %d %d", dest, state.variables[source])
 	state.variables[dest] -= state.variables[source]
 }
 
@@ -66,7 +62,7 @@ func (state *VMState) opSub() {
 func (state *VMState) opAnd() {
 	index := state.fetchByte()
 	value := state.fetchWord()
-	fmt.Println("#op_and()", index, value)
+	Debug("#op_and() %d %d", index, value)
 	state.variables[index] &= int16(value)
 }
 
@@ -74,7 +70,7 @@ func (state *VMState) opAnd() {
 func (state *VMState) opOr() {
 	index := state.fetchByte()
 	value := state.fetchWord()
-	fmt.Println("#op_or()", index, value)
+	Debug("#op_or() %d %d", index, value)
 	state.variables[index] |= int16(value)
 }
 
@@ -83,7 +79,7 @@ func (state *VMState) opShl() {
 	index := state.fetchByte()
 	value := state.fetchWord()
 	state.variables[index] <<= uint(value)
-	fmt.Println("#op_shl()", index, value, state.variables[index])
+	Debug("#op_shl() %d %d %d", index, value, state.variables[index])
 }
 
 //Makes a N bit rotation to the right on the variable.
@@ -91,7 +87,7 @@ func (state *VMState) opShr() {
 	index := state.fetchByte()
 	value := state.fetchWord()
 	state.variables[index] >>= uint(value)
-	fmt.Println("#op_shr()", index, value, state.variables[index])
+	Debug("#op_shr() %d %d %d", index, value, state.variables[index])
 }
 
 //Jsr Adress - Executes the subroutine located at the indicated address.
@@ -99,13 +95,13 @@ func (state *VMState) opCall() {
 	newPC := state.fetchWord()
 	state.saveSP()
 	state.pc = newPC
-	fmt.Println("#op_call(), jump to pc:", state.pc)
+	Debug("#op_call(), jump to pc: %d", state.pc)
 }
 
 //End of a subroutine.
 func (state *VMState) opRet() {
 	state.restoreSP()
-	fmt.Println("#op_ret(), pc:", state.pc)
+	Debug("#op_ret(), pc: %d", state.pc)
 }
 
 //Setvec "numéro de canal", address - Initialises a channel with a code address to execute
@@ -113,19 +109,19 @@ func (state *VMState) opRet() {
 func (state *VMState) opInstallTask() {
 	channelID := state.fetchByte()
 	address := state.fetchWord()
-	fmt.Println("#opInstallTask", channelID, address)
+	Debug("#opInstallTask %d %d", channelID, address)
 	state.nextLoopChannelPC[channelID] = address
 }
 
 //Break - Temporarily stops the executing channel and goes to the next.
 func (state *VMState) opYieldTask() {
-	fmt.Println("#opYieldTask")
+	Debug("#opYieldTask")
 	state.paused = true
 }
 
 //Bigend - Permanently stops the executing channel and goes to the next.
 func (state *VMState) opRemoveTask() {
-	fmt.Println("#opRemoveTask", state.channelID)
+	Debug("#opRemoveTask %d", state.channelID)
 	state.pc = VM_INACTIVE_THREAD
 	state.paused = true
 }
@@ -135,7 +131,7 @@ func (state *VMState) opChangeTaskState() {
 	channelIDStart := state.fetchByte()
 	channelIDEnd := state.fetchByte()
 	changeType := state.fetchByte()
-	fmt.Println("#opChangeTaskState", channelIDStart, channelIDEnd, changeType)
+	Debug("#opChangeTaskState %d %d %d", channelIDStart, channelIDEnd, changeType)
 	for i := channelIDStart; i <= channelIDEnd; i++ {
 		switch changeType {
 		case 0:
@@ -152,7 +148,7 @@ func (state *VMState) opChangeTaskState() {
 func (state *VMState) opJmpIfVar() {
 	index := state.fetchByte()
 	state.variables[index]--
-	fmt.Println("#opJmpIfVar", state.variables[index])
+	Debug("#opJmpIfVar %d", state.variables[index])
 	if state.variables[index] != 0 {
 		state.opJmp()
 	} else {
@@ -173,13 +169,13 @@ func (state *VMState) opCondJmp() {
 	} else {
 		newVariable = int16(state.fetchByte())
 	}
-	fmt.Printf("> step #op_condJmp (%d, 0x%02X, 0x%02X) var=0x%02X\n", op, currentVariable, newVariable, variableID)
+	Debug("> step #op_condJmp (%d, 0x%02X, 0x%02X) var=0x%02X", op, currentVariable, newVariable, variableID)
 	expr := false
 	switch op & 7 {
 	case 0:
 		expr = (currentVariable == newVariable)
 		if variableID == 0x29 && op&0x80 != 0 {
-			fmt.Println("TODO BYPASS PROTECTION!")
+			Debug("TODO BYPASS PROTECTION!")
 			/*				// 4 symbols
 							_scriptVars[0x29] = _scriptVars[0x1E];
 							_scriptVars[0x2A] = _scriptVars[0x1F];
@@ -202,10 +198,10 @@ func (state *VMState) opCondJmp() {
 	case 5:
 		expr = (currentVariable <= newVariable)
 	default:
-		fmt.Println("#op_condJmp: Invalid condition!")
+		Debug("#op_condJmp: Invalid condition!")
 	}
 	if expr {
-		fmt.Printf("> step: TRUE!ILLJUMP\n")
+		Debug("> step: TRUE!ILLJUMP")
 		state.opJmp()
 		//fixUpPalette_changeScreen(_res->_currentPart, _scriptVars[VAR_SCREEN_NUM]);
 	} else {
@@ -253,7 +249,7 @@ func (state *VMState) opVidUpdatePage() {
 	page := int(state.fetchByte())
 	//TODO inp_handleSpecialKeys();
 	if state.gamePart == 0 && state.variables[0x67] == 1 {
-		fmt.Println("opVidUpdatePage: BYPASS PROTECTION", page)
+		Debug("opVidUpdatePage: BYPASS PROTECTION %d", page)
 		state.variables[0xDC] = 33
 	}
 
@@ -269,7 +265,7 @@ func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
 		posY = 199
 		posX += height
 	}
-	fmt.Println("opVidDrawPolyBackground", opcode, offset)
+	Debug("opVidDrawPolyBackground %d %d", opcode, offset)
 	video.drawShape(0xFF, int(offset), 0x40, posX, posY)
 }
 
@@ -302,7 +298,7 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 	if opcode&2 == 0 {
 		if opcode&1 == 0 {
 			state.pc--
-			fmt.Println("zoom decreased PC", state.pc)
+			Debug("zoom decreased PC %d", state.pc)
 			zoom = 0x40
 		} else {
 			zoom = uint16(state.variables[zoom])
@@ -311,11 +307,11 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 		if opcode&1 > 0 {
 			useSecondVideoResource = true
 			state.pc--
-			fmt.Println("useSecondVideoResource! zoom decreased PC", state.pc)
+			Debug("useSecondVideoResource! zoom decreased PC: %d", state.pc)
 			zoom = 0x40
 		}
 	}
-	fmt.Printf("opVidDrawPolySprite %d", offset)
+	Debug("opVidDrawPolySprite %d", offset)
 	//video.renderer.setDataBuffer(useSecondVideoResource, int(offset))
 	//TODO implement useSecondVideoResource
 	if useSecondVideoResource == false {
@@ -328,7 +324,7 @@ func (state *VMState) opPlayMusic() {
 	resNum := int(state.fetchWord())
 	delay := int(state.fetchWord())
 	pos := int(state.fetchByte())
-	fmt.Printf("op_playMusic(0x%X, %d, %d)\n", resNum, delay, pos)
+	Debug("op_playMusic(0x%X, %d, %d)", resNum, delay, pos)
 	//TODO snd_playMusic(resNum, delay, pos);
 }
 
@@ -338,20 +334,20 @@ func (state *VMState) opPlaySound() {
 	freq := int(state.fetchByte())
 	vol := int(state.fetchByte())
 	channel := int(state.fetchByte())
-	fmt.Printf("op_playSound(0x%X, %d, %d, %d)\n", resNum, freq, vol, channel)
+	Debug("op_playSound(0x%X, %d, %d, %d)", resNum, freq, vol, channel)
 	//TODO snd_playSound(resNum, freq, vol, channel);
 }
 
 func (state *VMState) opUpdateResource() {
 	id := int(state.fetchWord())
-	fmt.Println("opUpdateResource", id)
+	Debug("opUpdateResource %d", id)
 	if id >= GAME_PART_ID_1 {
-		fmt.Println("should load next part", id)
+		Debug("should load next part %d", id)
 		state.loadNextPart = id
 		return
 	}
 	if id == 0 {
-		fmt.Println("opUpdateResource TODO! INVALIDATE DATA", id)
+		Debug("opUpdateResource TODO! INVALIDATE DATA %d", id)
 		//_ply->stop();
 		//_mix->stopAll();
 		//_res->invalidateRes();
