@@ -137,7 +137,7 @@ func (state *VMState) setupGamePart(newGamePart int) {
 
 // gamePart is the int between 0 and 10
 func (state *VMState) loadGameParts(gamePart int) {
-	Debug("LOAD GAME PART", gamePart)
+	Debug("LOAD GAME PART %d", gamePart)
 	state.gamePart = gamePart
 
 	gamePartAsset := state.assets.gameParts[gamePart]
