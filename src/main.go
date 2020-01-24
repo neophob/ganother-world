@@ -53,26 +53,26 @@ func main() {
 		7: works
 	*/
 
-	loadGamePart(&vmState, GAME_PART_ID_1+1)
+	loadGamePart(&vmState, GAME_PART_ID_1+2)
 
 	//start main loop
-	exit := uint32(0)
-	for i := 0; exit&KEY_ESC == 0; i++ {
+	keyPresses := uint32(0)
+	for i := 0; keyPresses&KEY_ESC == 0; i++ {
 		/*if i%30 == rand.Intn(30) {
 			loadGamePart(&vmState, GAME_PART_ID_1+rand.Intn(9))
 		}*/
 
 		//game run at approx 25 fps
 		time.Sleep(40 * time.Millisecond)
-		vmState.mainLoop()
+		vmState.mainLoop(keyPresses)
 
 		if vmState.loadNextPart > 0 {
 			Info("- load next part", vmState.loadNextPart)
 			loadGamePart(&vmState, vmState.loadNextPart)
 		}
 
-		exit = video.eventLoop(i)
-		Debug("exit=%d", exit)
+		keyPresses = video.eventLoop(i)
+		Debug("exit=%d", keyPresses)
 	}
 
 	video.shutdown()

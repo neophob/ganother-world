@@ -148,7 +148,9 @@ func (state *VMState) loadGameParts(gamePart int) {
 }
 
 // Run the Virtual Machine for every active threads
-func (state *VMState) mainLoop() {
+func (state *VMState) mainLoop(keypresses uint32) {
+	state.handleKeypress(keypresses)
+
 	//TODO check if next part needs to be loaded!
 	state.setupChannels()
 	for channelID := 0; channelID < VM_NUM_THREADS; channelID++ {
@@ -172,6 +174,42 @@ func (state *VMState) mainLoop() {
 		}
 	}
 	Debug("> --- MAINLOOP DONE")
+}
+
+func (state *VMState) handleKeypress(keypresses uint32) {
+	leftRight := int16(0)
+	upDown := int16(0)
+	mask := int16(0)
+	if keypresses&KEY_UP > 0 {
+		upDown = -1
+		mask |= 1
+	}
+	if keypresses&KEY_DOWN > 0 {
+		upDown = 1
+		mask |= 2
+	}
+	if keypresses&KEY_LEFT > 0 {
+		leftRight = -1
+		mask |= 4
+	}
+	if keypresses&KEY_RIGHT > 0 {
+		leftRight = 1
+		mask |= 8
+	}
+
+	state.variables[VM_VARIABLE_HERO_POS_UP_DOWN] = upDown
+	state.variables[VM_VARIABLE_HERO_POS_JUMP_DOWN] = upDown
+	state.variables[VM_VARIABLE_HERO_POS_LEFT_RIGHT] = leftRight
+	state.variables[VM_VARIABLE_HERO_POS_MASK] = mask
+
+	/*	int16_t button = 0;
+		if (_stub->_pi.button) { // inpButton
+			button = 1;
+			m |= 0x80;
+		}
+		_scriptVars[VAR_HERO_ACTION] = button;
+		_scriptVars[VAR_HERO_ACTION_POS_MASK] = m;*/
+
 }
 
 //no pending tasks when starting a loop

@@ -71,7 +71,7 @@ func (render *SDLRenderer) blitPage(buffer [64000]Color) {
 	render.renderer.Present()
 }
 
-// check if app should exit, needs more functionality soon (key values..)
+// check keyboard input
 func (render *SDLRenderer) eventLoop(frameCount int) uint32 {
 	keyPress := uint32(0x0)
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
@@ -104,7 +104,7 @@ func (render *SDLRenderer) eventLoop(frameCount int) uint32 {
 	return keyPress
 }
 
-// cleanup
+// exit application, lets cleanup...
 func (render *SDLRenderer) shutdown() {
 	render.window.Destroy()
 	sdl.Quit()
