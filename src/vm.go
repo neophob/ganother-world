@@ -202,14 +202,14 @@ func (state *VMState) handleKeypress(keypresses uint32) {
 	state.variables[VM_VARIABLE_HERO_POS_LEFT_RIGHT] = leftRight
 	state.variables[VM_VARIABLE_HERO_POS_MASK] = mask
 
-	/*	int16_t button = 0;
-		if (_stub->_pi.button) { // inpButton
-			button = 1;
-			m |= 0x80;
-		}
-		_scriptVars[VAR_HERO_ACTION] = button;
-		_scriptVars[VAR_HERO_ACTION_POS_MASK] = m;*/
+	fireButton := int16(0)
+	if keypresses&KEY_FIRE > 0 {
+		fireButton = 1
+		mask |= 80
+	}
 
+	state.variables[VM_VARIABLE_HERO_ACTION] = fireButton
+	state.variables[VM_VARIABLE_HERO_POS_MASK] = mask
 }
 
 //no pending tasks when starting a loop
