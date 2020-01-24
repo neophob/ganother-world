@@ -13,7 +13,7 @@ GOFILES := $(wildcard *.go)
 RELEASE := -ldflags "-s -w -X project.name=anotherworld"
 SRC := src/main.go src/resource.go src/vm.go src/parts.go src/decrunch.go \
 	src/vm-ops.go src/assets.go src/video.go src/video-dummy.go src/video-sdl.go src/text.go \
-	src/font.go src/debug.go src/videoassets.go
+	src/font.go src/log.go src/videoassets.go src/polygon.go
 SRCDIR := ./src
 
 ## build: build go binary in dev mode
