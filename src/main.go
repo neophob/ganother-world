@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"math"
 	"time"
 
@@ -57,8 +56,8 @@ func main() {
 	loadGamePart(&vmState, GAME_PART_ID_1+1)
 
 	//start main loop
-	exit := false
-	for i := 0; exit == false; i++ {
+	exit := uint32(0)
+	for i := 0; exit&KEY_ESC == 0; i++ {
 		/*if i%30 == rand.Intn(30) {
 			loadGamePart(&vmState, GAME_PART_ID_1+rand.Intn(9))
 		}*/
@@ -68,11 +67,12 @@ func main() {
 		vmState.mainLoop()
 
 		if vmState.loadNextPart > 0 {
-			log.Println("- load next part", vmState.loadNextPart)
+			Info("- load next part", vmState.loadNextPart)
 			loadGamePart(&vmState, vmState.loadNextPart)
 		}
 
 		exit = video.eventLoop(i)
+		Debug("exit=%d", exit)
 	}
 
 	video.shutdown()

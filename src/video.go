@@ -3,7 +3,7 @@ package main
 // implements actual rendering
 type Renderer interface {
 	blitPage(buffer [64000]Color)
-	eventLoop(frameCount int) bool
+	eventLoop(frameCount int) uint32
 	shutdown()
 }
 
@@ -12,6 +12,15 @@ const (
 	HEIGHT        int32 = 200
 	COLOR_ALPHA   int   = 16
 	COLOR_BUFFER0 int   = 17
+)
+
+const (
+	KEY_ESC   uint32 = 0x1
+	KEY_LEFT  uint32 = 0x2
+	KEY_RIGHT uint32 = 0x4
+	KEY_UP    uint32 = 0x8
+	KEY_DOWN  uint32 = 0x10
+	KEY_FIRE  uint32 = 0x20
 )
 
 // implements buffer handling (4 buffers) and game specific alpha/buffer0 handling
@@ -221,7 +230,7 @@ func (video *Video) setPalette(index int) {
 	Debug(">VID: SETPALETTE %d", index>>8)
 }
 
-func (video *Video) eventLoop(frameCount int) bool {
+func (video *Video) eventLoop(frameCount int) uint32 {
 	return video.renderer.eventLoop(frameCount)
 }
 
