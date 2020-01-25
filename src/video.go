@@ -204,7 +204,7 @@ func (video *Video) drawFilledPolygon(col, zoom, posX, posY int) {
 	y2 := posY + bbh/2
 
 	if x1 > 319 || x2 < 0 || y1 > 199 || y2 < 0 {
-		Warn(">VID: FILLPOLYGON INVALID")
+		//Warn(">VID: FILLPOLYGON INVALID")
 		return
 	}
 

@@ -301,6 +301,6 @@ func (state *VMState) executeOp() {
 		state.opPlayMusic()
 	default:
 		state.countNoOps++
-		Warn("NO_OP", opcode)
+		Warn("NO_OP: %d", opcode)
 	}
 }

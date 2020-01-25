@@ -23,7 +23,7 @@ func run(gamepart, steps int) VMState {
 	vmState.setupGamePart(GAME_PART_ID_1 + gamepart)
 
 	for i := 0; i < steps; i++ {
-		vmState.mainLoop()
+		vmState.mainLoop(0)
 	}
 	return vmState
 }

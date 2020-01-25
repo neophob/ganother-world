@@ -9,7 +9,7 @@ func (render DummyRenderer) blitPage(buffer [64000]Color) {
 }
 
 func (render DummyRenderer) eventLoop(frameCount int) uint32 {
-	Info(">VID: EVENTLOOP %i", frameCount)
+	Info(">VID: EVENTLOOP %d", frameCount)
 	if frameCount < 128 {
 		return 0
 	}

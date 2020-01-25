@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"math"
@@ -11,19 +12,28 @@ import (
 )
 
 // video is a global variable that needs to implement the Renderer interface
-var video Video = initVideo()
+var video Video
 
-func initVideo() Video {
+func initVideo(noVideoOutput bool) Video {
 	// start with env VIDEO="SDL" ./main to enable SDL
-	if os.Getenv("VIDEO") == "SDL" {
+	if noVideoOutput == false {
 		return Video{renderer: buildSDLRenderer()}
 	}
 	return Video{renderer: DummyRenderer{}}
 }
 
 func main() {
-	//SetLogLevel(LEVEL_INFO)
 	Info("# GANOTHER WORLD vDEV")
+
+	noVideoOutput := flag.Bool("t", false, "Use Text only output (no SDL needed)")
+	debug := flag.Bool("d", false, "Enable Debug Mode")
+	flag.Parse()
+
+	if *debug == false {
+		SetLogLevel(LEVEL_INFO)
+	}
+	video = initVideo(*noVideoOutput)
+
 	Info("- load memlist.bin")
 	data := readFile("./assets/memlist.bin")
 	resourceMap, resourceStatistics := unmarshallingMemlistBin(data)
@@ -67,7 +77,7 @@ func main() {
 		vmState.mainLoop(keyPresses)
 
 		if vmState.loadNextPart > 0 {
-			Info("- load next part", vmState.loadNextPart)
+			Info("- load next part %d", vmState.loadNextPart)
 			loadGamePart(&vmState, vmState.loadNextPart)
 		}
 
