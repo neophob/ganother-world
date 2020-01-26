@@ -1,12 +1,5 @@
 package main
 
-// implements actual rendering
-type Renderer interface {
-	blitPage(buffer [64000]Color)
-	eventLoop(frameCount int) uint32
-	shutdown()
-}
-
 const (
 	WIDTH         int32 = 320
 	HEIGHT        int32 = 200
@@ -22,6 +15,13 @@ const (
 	KEY_DOWN  uint32 = 0x10
 	KEY_FIRE  uint32 = 0x20
 )
+
+// implements actual rendering
+type Renderer interface {
+	blitPage(buffer [64000]Color)
+	eventLoop(frameCount int) uint32
+	shutdown()
+}
 
 // implements buffer handling (4 buffers) and game specific alpha/buffer0 handling
 type Video struct {
