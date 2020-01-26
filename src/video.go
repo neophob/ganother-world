@@ -67,8 +67,16 @@ func (video *Video) fillPage(page, colorIndex int) {
 	}
 }
 
-//TODO no clue why vscroll is used
 func (video *Video) copyPage(src, dst, vscroll int) {
+	//TODO respect vscroll
+	/*
+			const int dy = yScale(vscroll);
+		if (dy < 0) {
+			memcpy(getPagePtr(dst), getPagePtr(src) - dy * _w * _byteDepth, (_h + dy) * _w * _byteDepth);
+		} else {
+			memcpy(getPagePtr(dst) + dy * _w * _byteDepth, getPagePtr(src), (_h - dy) * _w * _byteDepth);
+		}
+	*/
 	workerPageSrc := getWorkerPage(src)
 	workerPageDst := getWorkerPage(dst)
 	for i := range video.rawBuffer[workerPageSrc] {
