@@ -27,6 +27,7 @@ func main() {
 
 	noVideoOutput := flag.Bool("t", false, "Use Text only output (no SDL needed)")
 	debug := flag.Bool("d", false, "Enable Debug Mode")
+	startPart := flag.Int("p", 1, "Game part to start from (0-9)")
 	flag.Parse()
 
 	if *debug == false {
@@ -63,7 +64,7 @@ func main() {
 		7: works
 	*/
 
-	loadGamePart(&vmState, GAME_PART_ID_1+2)
+	loadGamePart(&vmState, GAME_PART_ID_1+*startPart)
 
 	//start main loop
 	keyPresses := uint32(0)
