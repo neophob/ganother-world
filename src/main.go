@@ -55,9 +55,9 @@ func main() {
 	Info("- setup game")
 	/*
 		all: polygon clipping issues
-		1: intro okish, elevator scene is weird (channel id issue?)
+		1: intro okish, some blitting issues: artefacts visible when lab scene starts
 		2: looks ok
-		3: weird flickering / rendering issues (alien body is missing)
+		3: rendering issues (big eyes visible when they should not, alien body is missing)
 		4: character is not rendered, character not controllable
 		5: weird color, rendering issues
 		6: clipping issues
@@ -74,7 +74,7 @@ func main() {
 		}*/
 
 		//game run at approx 25 fps
-		time.Sleep(40 * time.Millisecond)
+		time.Sleep(20 * time.Millisecond)
 		vmState.mainLoop(keyPresses)
 
 		if vmState.loadNextPart > 0 {

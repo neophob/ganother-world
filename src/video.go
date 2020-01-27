@@ -107,8 +107,17 @@ func (video *Video) setWorkPagePtr(page int) {
 // step 1 is to convert the indexed color (0..15 for "normal" colors, 16 for translucent and 17 for buffer0 value) to an rgb value
 // step 2 is updating the sdl buffers
 func (video *Video) updateDisplay(page int) {
-	workerPage := getWorkerPage(page)
-	Debug(">VID: UPDATEDISPLAY %d", workerPage)
+	var workerPage int
+	if page != 0xFE {
+		if page == 0xFF {
+			//SWAP buffer 1 and 2
+			video.rawBuffer[1], video.rawBuffer[2] = video.rawBuffer[2], video.rawBuffer[1]
+			workerPage = 1
+		} else {
+			workerPage = getWorkerPage(page)
+		}
+	}
+	Debug(">VID: UPDATEDISPLAY %d(%d)", page, workerPage)
 
 	var outputBuffer [WIDTH * HEIGHT]Color
 	for i := range video.rawBuffer[workerPage] {
@@ -136,6 +145,9 @@ func getWorkerPage(page int) int {
 		return page
 	}
 	switch page {
+	case 0x40:
+		//this is a hack, rawgl does prevent this case
+		return 0
 	case 0xFF:
 		return 2
 	case 0xFE:
