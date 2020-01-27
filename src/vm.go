@@ -209,7 +209,7 @@ func (state *VMState) handleKeypress(keypresses uint32) {
 	}
 
 	state.variables[VM_VARIABLE_HERO_ACTION] = fireButton
-	state.variables[VM_VARIABLE_HERO_POS_MASK] = mask
+	state.variables[VM_VARIABLE_HERO_ACTION_POS_MASK] = mask
 }
 
 //no pending tasks when starting a loop
