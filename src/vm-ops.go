@@ -251,7 +251,6 @@ func (state *VMState) opVidCopyPage() {
 	} else {
 		sourceTranslated := int(source & 3)
 		vscroll := int(state.variables[VM_VARIABLE_SCROLL_Y])
-		Warn("VSCROLL %d", vscroll)
 		if vscroll >= -199 && vscroll <= 199 {
 			video.copyPage(sourceTranslated, int(dest), vscroll)
 		} else {

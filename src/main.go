@@ -58,7 +58,7 @@ func main() {
 		1: intro okish, elevator scene is weird (channel id issue?)
 		2: looks ok
 		3: weird flickering / rendering issues (alien body is missing)
-		4: looks ok
+		4: character is not rendered, character not controllable
 		5: weird color, rendering issues
 		6: clipping issues
 		7: works
