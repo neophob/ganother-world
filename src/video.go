@@ -18,7 +18,7 @@ const (
 
 // implements actual rendering
 type Renderer interface {
-	blitPage(buffer [64000]Color)
+	blitPage(buffer [64000]Color, posX, posY int)
 	eventLoop(frameCount int) uint32
 	shutdown()
 }
@@ -71,30 +71,30 @@ func (video *Video) copyPage(src, dst, vscroll int) {
 	workerPageSrc := getWorkerPage(src)
 	workerPageDst := getWorkerPage(dst)
 
-	if vscroll == 0 {
+	switch {
+	case vscroll == 0:
+		// copy full page
 		for i := range video.rawBuffer[workerPageSrc] {
 			video.rawBuffer[workerPageDst][i] = video.rawBuffer[workerPageSrc][i]
 		}
-		return
-	}
-
-	if vscroll < 0 {
-		offset := vscroll * int(WIDTH)
-		maxOffset := (int(HEIGHT) + vscroll) * int(WIDTH)
+	case vscroll < 0:
+		// copy upper part of screen
+		pixelToCopy := (int(HEIGHT) + vscroll) * int(WIDTH)
+		verticalOffset := vscroll * int(WIDTH)
 		destOffset := 0
-		for i := 0; i < maxOffset; i++ {
-			video.rawBuffer[workerPageDst][destOffset] = video.rawBuffer[workerPageSrc][i-offset]
+		for i := 0; i < pixelToCopy; i++ {
+			video.rawBuffer[workerPageDst][destOffset] = video.rawBuffer[workerPageSrc][i-verticalOffset]
 			destOffset++
 		}
-		return
-	}
-
-	offset := vscroll * int(WIDTH)
-	maxOffset := (int(HEIGHT) - vscroll) * int(WIDTH)
-	sourceOffset := 0
-	for i := 0; i < maxOffset; i++ {
-		video.rawBuffer[workerPageDst][offset+i] = video.rawBuffer[workerPageSrc][sourceOffset]
-		sourceOffset++
+	case vscroll > 0:
+		// copy lower part of screen
+		pixelToCopy := (int(HEIGHT) - vscroll) * int(WIDTH)
+		verticalOffset := vscroll * int(WIDTH)
+		sourceOffset := 0
+		for i := 0; i < pixelToCopy; i++ {
+			video.rawBuffer[workerPageDst][verticalOffset+i] = video.rawBuffer[workerPageSrc][sourceOffset]
+			sourceOffset++
+		}
 	}
 }
 
@@ -114,11 +114,25 @@ func (video *Video) updateDisplay(page int) {
 	for i := range video.rawBuffer[workerPage] {
 		outputBuffer[i] = video.colors[video.rawBuffer[workerPage][i]]
 	}
-	video.renderer.blitPage(outputBuffer)
+	video.renderer.blitPage(outputBuffer, 0, 0)
+
+	//DEBUG OUTPUT
+	for i := range video.rawBuffer[0] {
+		outputBuffer[i] = video.colors[video.rawBuffer[0][i]]
+	}
+	video.renderer.blitPage(outputBuffer, 320, 0)
+	for i := range video.rawBuffer[1] {
+		outputBuffer[i] = video.colors[video.rawBuffer[1][i]]
+	}
+	video.renderer.blitPage(outputBuffer, 0, 200)
+	for i := range video.rawBuffer[2] {
+		outputBuffer[i] = video.colors[video.rawBuffer[2][i]]
+	}
+	video.renderer.blitPage(outputBuffer, 320, 200)
 }
 
 func getWorkerPage(page int) int {
-	if page >= 0 && page <= 3 {
+	if page >= 0 && page < 4 {
 		return page
 	}
 	switch page {

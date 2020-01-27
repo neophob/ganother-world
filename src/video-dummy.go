@@ -4,8 +4,8 @@ package main
 type DummyRenderer struct {
 }
 
-func (render DummyRenderer) blitPage(buffer [64000]Color) {
-	Info(">VID: BLITPAGE")
+func (render DummyRenderer) blitPage(buffer [64000]Color, posX, posY int) {
+	Info(">VID: BLITPAGE %d %d", posX, posY)
 }
 
 func (render DummyRenderer) eventLoop(frameCount int) uint32 {

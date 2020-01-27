@@ -242,12 +242,12 @@ func (state *VMState) opVidCopyPage() {
 	source := state.fetchByte()
 	dest := state.fetchByte()
 
-	x40 := ^0x40
-	source2 := (source & uint8(x40)) & 0x80
-	//if source >= 0xFE || (source &= ~0x40) & 0x80) == 0 {
-	if source >= 0xFE || source2 == 0 {
+	not0x40 := ^0x40
+	isVscrollEnabled := (source & uint8(not0x40)) & 0x80
+	if source >= 0xFE || isVscrollEnabled == 0 {
 		// no vscroll
 		video.copyPage(int(source), int(dest), 0)
+		//video.copyPage(int(source&uint8(not0x40)), int(dest), 0)
 	} else {
 		sourceTranslated := int(source & 3)
 		vscroll := int(state.variables[VM_VARIABLE_SCROLL_Y])
