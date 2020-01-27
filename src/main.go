@@ -1,9 +1,9 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"math"
 	"time"
 
@@ -12,19 +12,29 @@ import (
 )
 
 // video is a global variable that needs to implement the Renderer interface
-var video Video = initVideo()
+var video Video
 
-func initVideo() Video {
+func initVideo(noVideoOutput bool) Video {
 	// start with env VIDEO="SDL" ./main to enable SDL
-	if os.Getenv("VIDEO") == "SDL" {
+	if noVideoOutput == false {
 		return Video{renderer: buildSDLRenderer()}
 	}
 	return Video{renderer: DummyRenderer{}}
 }
 
 func main() {
-	//SetLogLevel(LEVEL_INFO)
 	Info("# GANOTHER WORLD vDEV")
+
+	noVideoOutput := flag.Bool("t", false, "Use Text only output (no SDL needed)")
+	debug := flag.Bool("d", false, "Enable Debug Mode")
+	startPart := flag.Int("p", 1, "Game part to start from (0-9)")
+	flag.Parse()
+
+	if *debug == false {
+		SetLogLevel(LEVEL_INFO)
+	}
+	video = initVideo(*noVideoOutput)
+
 	Info("- load memlist.bin")
 	data := readFile("./assets/memlist.bin")
 	resourceMap, resourceStatistics := unmarshallingMemlistBin(data)
@@ -54,25 +64,26 @@ func main() {
 		7: works
 	*/
 
-	loadGamePart(&vmState, GAME_PART_ID_1+1)
+	loadGamePart(&vmState, GAME_PART_ID_1+*startPart)
 
 	//start main loop
-	exit := false
-	for i := 0; exit == false; i++ {
+	keyPresses := uint32(0)
+	for i := 0; keyPresses&KEY_ESC == 0; i++ {
 		/*if i%30 == rand.Intn(30) {
 			loadGamePart(&vmState, GAME_PART_ID_1+rand.Intn(9))
 		}*/
 
 		//game run at approx 25 fps
 		time.Sleep(40 * time.Millisecond)
-		vmState.mainLoop()
+		vmState.mainLoop(keyPresses)
 
 		if vmState.loadNextPart > 0 {
-			log.Println("- load next part", vmState.loadNextPart)
+			Info("- load next part %d", vmState.loadNextPart)
 			loadGamePart(&vmState, vmState.loadNextPart)
 		}
 
-		exit = video.eventLoop(i)
+		keyPresses = video.eventLoop(i)
+		Debug("exit=%d", keyPresses)
 	}
 
 	video.shutdown()

@@ -71,25 +71,40 @@ func (render *SDLRenderer) blitPage(buffer [64000]Color) {
 	render.renderer.Present()
 }
 
-// check if app should exit, needs more functionality soon (key values..)
-func (render *SDLRenderer) eventLoop(frameCount int) bool {
-	exitRequested := false
+// check keyboard input
+func (render *SDLRenderer) eventLoop(frameCount int) uint32 {
+	keyPress := uint32(0x0)
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 		switch t := event.(type) {
 		case *sdl.QuitEvent:
-			exitRequested = true
-			Debug(">render.exitAppReq", exitRequested)
+			keyPress |= KEY_ESC
+			Debug(">ESC")
 		case *sdl.KeyboardEvent:
-			Debug(">render.exitAppReq2", t.Keysym.Sym)
+			Debug(">KeyboardEvent %v", t.Keysym.Sym)
 			if t.Keysym.Sym == sdl.K_ESCAPE && t.State == 1 {
-				exitRequested = true
+				keyPress |= KEY_ESC
+			}
+			if t.Keysym.Sym == sdl.K_LEFT && t.State == 1 {
+				keyPress |= KEY_LEFT
+			}
+			if t.Keysym.Sym == sdl.K_RIGHT && t.State == 1 {
+				keyPress |= KEY_RIGHT
+			}
+			if t.Keysym.Sym == sdl.K_UP && t.State == 1 {
+				keyPress |= KEY_UP
+			}
+			if t.Keysym.Sym == sdl.K_DOWN && t.State == 1 {
+				keyPress |= KEY_DOWN
+			}
+			if t.Keysym.Sym == sdl.K_SPACE && t.State == 1 {
+				keyPress |= KEY_FIRE
 			}
 		}
 	}
-	return exitRequested
+	return keyPress
 }
 
-// cleanup
+// exit application, lets cleanup...
 func (render *SDLRenderer) shutdown() {
 	render.window.Destroy()
 	sdl.Quit()

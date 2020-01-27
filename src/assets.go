@@ -25,7 +25,7 @@ func (assets Assets) loadEntryFromBank(index int) []uint8 {
 
 func (assets *Assets) loadResource(id int) {
 	if len(assets.loadedResources[id]) > 0 {
-		Info("resource already loaded", id)
+		Info("resource [%d] already loaded", id)
 		return
 	}
 	assets.loadedResources[id] = assets.loadEntryFromBank(id)
