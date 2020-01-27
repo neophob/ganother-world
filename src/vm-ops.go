@@ -241,7 +241,22 @@ func (state *VMState) opVidFillPage() {
 func (state *VMState) opVidCopyPage() {
 	source := state.fetchByte()
 	dest := state.fetchByte()
-	video.copyPage(int(source), int(dest), int(state.variables[VM_VARIABLE_SCROLL_Y]))
+
+	not0x40 := ^0x40
+	isVscrollEnabled := (source & uint8(not0x40)) & 0x80
+	if source >= 0xFE || isVscrollEnabled == 0 {
+		// no vscroll
+		video.copyPage(int(source), int(dest), 0)
+		//video.copyPage(int(source&uint8(not0x40)), int(dest), 0)
+	} else {
+		sourceTranslated := int(source & 3)
+		vscroll := int(state.variables[VM_VARIABLE_SCROLL_Y])
+		if vscroll >= -199 && vscroll <= 199 {
+			video.copyPage(sourceTranslated, int(dest), vscroll)
+		} else {
+			Warn("Invalid VSCROLL %d", vscroll)
+		}
+	}
 }
 
 //Show "Screen number" - Displays the screen buffer specified in the next video frame.

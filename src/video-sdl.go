@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	WINDOW_WIDTH  int32 = 320 * 4
-	WINDOW_HEIGHT int32 = 200 * 3
+	WINDOW_WIDTH  int32 = 320 * 2
+	WINDOW_HEIGHT int32 = 200 * 2
 )
 
 type SDLRenderer struct {
@@ -36,7 +36,8 @@ func buildSDLRenderer() *SDLRenderer {
 		Error("SDL CREATE RENDERER FAILED")
 		panic(err)
 	}
-	renderer.SetLogicalSize(WIDTH, HEIGHT)
+	//renderer.SetLogicalSize(WIDTH, HEIGHT)
+	renderer.SetLogicalSize(WIDTH*2, HEIGHT*2)
 	renderer.Clear()
 	renderer.Present()
 
@@ -54,7 +55,7 @@ func buildSDLRenderer() *SDLRenderer {
 }
 
 // blit image
-func (render *SDLRenderer) blitPage(buffer [64000]Color) {
+func (render *SDLRenderer) blitPage(buffer [64000]Color, posX, posY int) {
 	lastSetColor := buffer[0]
 	render.renderer.SetDrawColor(buffer[0].r, buffer[0].g, buffer[0].b, 255)
 	offset := 0
@@ -64,7 +65,7 @@ func (render *SDLRenderer) blitPage(buffer [64000]Color) {
 				render.renderer.SetDrawColor(i.r, i.g, i.b, 255)
 				lastSetColor = i
 			}
-			render.renderer.DrawPoint(int32(x), int32(y))
+			render.renderer.DrawPoint(int32(x+posX), int32(y+posY))
 			offset++
 		}
 	}

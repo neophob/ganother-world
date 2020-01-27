@@ -18,7 +18,7 @@ const (
 
 // implements actual rendering
 type Renderer interface {
-	blitPage(buffer [64000]Color)
+	blitPage(buffer [64000]Color, posX, posY int)
 	eventLoop(frameCount int) uint32
 	shutdown()
 }
@@ -67,12 +67,34 @@ func (video *Video) fillPage(page, colorIndex int) {
 	}
 }
 
-//TODO no clue why vscroll is used
 func (video *Video) copyPage(src, dst, vscroll int) {
 	workerPageSrc := getWorkerPage(src)
 	workerPageDst := getWorkerPage(dst)
-	for i := range video.rawBuffer[workerPageSrc] {
-		video.rawBuffer[workerPageDst][i] = video.rawBuffer[workerPageSrc][i]
+
+	switch {
+	case vscroll == 0:
+		// copy full page
+		for i := range video.rawBuffer[workerPageSrc] {
+			video.rawBuffer[workerPageDst][i] = video.rawBuffer[workerPageSrc][i]
+		}
+	case vscroll < 0:
+		// copy upper part of screen
+		pixelToCopy := (int(HEIGHT) + vscroll) * int(WIDTH)
+		verticalOffset := vscroll * int(WIDTH)
+		destOffset := 0
+		for i := 0; i < pixelToCopy; i++ {
+			video.rawBuffer[workerPageDst][destOffset] = video.rawBuffer[workerPageSrc][i-verticalOffset]
+			destOffset++
+		}
+	case vscroll > 0:
+		// copy lower part of screen
+		pixelToCopy := (int(HEIGHT) - vscroll) * int(WIDTH)
+		verticalOffset := vscroll * int(WIDTH)
+		sourceOffset := 0
+		for i := 0; i < pixelToCopy; i++ {
+			video.rawBuffer[workerPageDst][verticalOffset+i] = video.rawBuffer[workerPageSrc][sourceOffset]
+			sourceOffset++
+		}
 	}
 }
 
@@ -85,21 +107,47 @@ func (video *Video) setWorkPagePtr(page int) {
 // step 1 is to convert the indexed color (0..15 for "normal" colors, 16 for translucent and 17 for buffer0 value) to an rgb value
 // step 2 is updating the sdl buffers
 func (video *Video) updateDisplay(page int) {
-	workerPage := getWorkerPage(page)
-	Debug(">VID: UPDATEDISPLAY %d", workerPage)
+	var workerPage int
+	if page != 0xFE {
+		if page == 0xFF {
+			//SWAP buffer 1 and 2
+			video.rawBuffer[1], video.rawBuffer[2] = video.rawBuffer[2], video.rawBuffer[1]
+			workerPage = 1
+		} else {
+			workerPage = getWorkerPage(page)
+		}
+	}
+	Debug(">VID: UPDATEDISPLAY %d(%d)", page, workerPage)
 
 	var outputBuffer [WIDTH * HEIGHT]Color
 	for i := range video.rawBuffer[workerPage] {
 		outputBuffer[i] = video.colors[video.rawBuffer[workerPage][i]]
 	}
-	video.renderer.blitPage(outputBuffer)
+	video.renderer.blitPage(outputBuffer, 0, 0)
+
+	//DEBUG OUTPUT
+	for i := range video.rawBuffer[0] {
+		outputBuffer[i] = video.colors[video.rawBuffer[0][i]]
+	}
+	video.renderer.blitPage(outputBuffer, 320, 0)
+	for i := range video.rawBuffer[1] {
+		outputBuffer[i] = video.colors[video.rawBuffer[1][i]]
+	}
+	video.renderer.blitPage(outputBuffer, 0, 200)
+	for i := range video.rawBuffer[2] {
+		outputBuffer[i] = video.colors[video.rawBuffer[2][i]]
+	}
+	video.renderer.blitPage(outputBuffer, 320, 200)
 }
 
 func getWorkerPage(page int) int {
-	if page >= 0 && page <= 3 {
+	if page >= 0 && page < 4 {
 		return page
 	}
 	switch page {
+	case 0x40:
+		//this is a hack, rawgl does prevent this case
+		return 0
 	case 0xFF:
 		return 2
 	case 0xFE:
