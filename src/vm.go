@@ -180,20 +180,20 @@ func (state *VMState) handleKeypress(keypresses uint32) {
 	leftRight := int16(0)
 	upDown := int16(0)
 	mask := int16(0)
-	if keypresses&KEY_UP > 0 {
-		upDown = -1
+	if keypresses&KEY_RIGHT > 0 {
+		leftRight = 1
 		mask |= 1
-	}
-	if keypresses&KEY_DOWN > 0 {
-		upDown = 1
-		mask |= 2
 	}
 	if keypresses&KEY_LEFT > 0 {
 		leftRight = -1
+		mask |= 2
+	}
+	if keypresses&KEY_DOWN > 0 {
+		upDown = 1
 		mask |= 4
 	}
-	if keypresses&KEY_RIGHT > 0 {
-		leftRight = 1
+	if keypresses&KEY_UP > 0 {
+		upDown = -1
 		mask |= 8
 	}
 
@@ -205,7 +205,7 @@ func (state *VMState) handleKeypress(keypresses uint32) {
 	fireButton := int16(0)
 	if keypresses&KEY_FIRE > 0 {
 		fireButton = 1
-		mask |= 80
+		mask |= 0x80
 	}
 
 	state.variables[VM_VARIABLE_HERO_ACTION] = fireButton
