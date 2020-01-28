@@ -1,11 +1,16 @@
 package main
 
-import "syscall/js"
+import (
+	"syscall/js"
+)
 
 func addTitle() {
+	// TOOD: how can I import this
+	// gameTitle := GetTitle()
+
 	document := js.Global().Get("document")
 	h1 := document.Call("createElement", "h1")
-	h1.Set("innerHTML", "Another World")
+	h1.Set("innerHTML", "Another-World")
 	document.Get("body").Call("appendChild", h1)
 }
 
