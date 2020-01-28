@@ -273,15 +273,15 @@ func (state *VMState) opVidUpdatePage() {
 
 func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
 	offset := ((uint16(opcode) << 8) | uint16(state.fetchByte())) << 1
-	posX := int(state.fetchByte())
-	posY := int(state.fetchByte())
+	posX := int16(state.fetchByte())
+	posY := int16(state.fetchByte())
 	height := posY - 199
 	if height > 0 {
 		posY = 199
 		posX += height
 	}
 	Debug("opVidDrawPolyBackground %d %d", opcode, offset)
-	video.drawShape(0xFF, int(offset), 0x40, posX, posY)
+	video.drawShape(0xFF, int(offset), 0x40, int(posX), int(posY))
 }
 
 //Spr "'object name" , x, y, z - In the work screen, draws the graphics tool at the coordinates x,y and the zoom factor z. A polygon, a group of polygons...
@@ -322,7 +322,7 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 		if opcode&1 > 0 {
 			useSecondVideoResource = true
 			state.pc--
-			Debug("useSecondVideoResource! zoom decreased PC: %d", state.pc)
+			Warn("useSecondVideoResource! zoom decreased PC: %d", state.pc)
 			zoom = 0x40
 		}
 	}

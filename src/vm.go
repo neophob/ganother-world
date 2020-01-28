@@ -196,7 +196,6 @@ func (state *VMState) handleKeypress(keypresses uint32) {
 		upDown = -1
 		mask |= 8
 	}
-
 	state.variables[VM_VARIABLE_HERO_POS_UP_DOWN] = upDown
 	state.variables[VM_VARIABLE_HERO_POS_JUMP_DOWN] = upDown
 	state.variables[VM_VARIABLE_HERO_POS_LEFT_RIGHT] = leftRight
@@ -207,7 +206,6 @@ func (state *VMState) handleKeypress(keypresses uint32) {
 		fireButton = 1
 		mask |= 0x80
 	}
-
 	state.variables[VM_VARIABLE_HERO_ACTION] = fireButton
 	state.variables[VM_VARIABLE_HERO_ACTION_POS_MASK] = mask
 }
