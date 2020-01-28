@@ -34,42 +34,33 @@ type Video struct {
 }
 
 type VideoDataFetcher struct {
-	asset           *VideoAssets
-	useVideo2Source bool
-	readOffset      int
+	asset      *[]uint8
+	readOffset int
 }
 
 func (reader *VideoDataFetcher) fetchByte() uint8 {
-	if reader.useVideo2Source {
-		result := reader.asset.video2[reader.readOffset]
-		reader.readOffset++
-		return result
-	}
-	result := reader.asset.cinematic[reader.readOffset]
+	result := (*reader.asset)[reader.readOffset]
 	reader.readOffset++
 	return result
 }
 
 func (reader *VideoDataFetcher) fetchWord() uint16 {
-	if reader.useVideo2Source {
-		b1 := reader.asset.video2[reader.readOffset]
-		b2 := reader.asset.video2[reader.readOffset+1]
-		reader.readOffset += 2
-		return toUint16BE(b1, b2)
-	}
-	b1 := reader.asset.cinematic[reader.readOffset]
-	b2 := reader.asset.cinematic[reader.readOffset+1]
+	b1 := (*reader.asset)[reader.readOffset]
+	b2 := (*reader.asset)[reader.readOffset+1]
 	reader.readOffset += 2
 	return toUint16BE(b1, b2)
 }
 
 func (reader *VideoDataFetcher) cloneWithUpdatedOffset(readOffset int) VideoDataFetcher {
-	return VideoDataFetcher{reader.asset, reader.useVideo2Source, readOffset}
+	return VideoDataFetcher{reader.asset, readOffset}
 }
 
 func (video *Video) buildReader(useVideo2Source bool, readOffset int) VideoDataFetcher {
 	videoAssets := video.videoAssets
-	return VideoDataFetcher{&videoAssets, useVideo2Source, readOffset}
+	if useVideo2Source {
+		return VideoDataFetcher{&videoAssets.video2, readOffset}
+	}
+	return VideoDataFetcher{&videoAssets.cinematic, readOffset}
 }
 
 func (video *Video) updateGamePart(videoAssets VideoAssets) {
