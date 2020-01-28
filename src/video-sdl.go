@@ -16,6 +16,7 @@ type SDLRenderer struct {
 	surface  *sdl.Surface
 	renderer *sdl.Renderer
 	window   *sdl.Window
+	holdKeys map[uint32]bool
 }
 
 func buildSDLRenderer() *SDLRenderer {
@@ -51,6 +52,7 @@ func buildSDLRenderer() *SDLRenderer {
 		surface:  surface,
 		window:   window,
 		renderer: renderer,
+		holdKeys: make(map[uint32]bool),
 	}
 }
 
@@ -81,27 +83,54 @@ func (render *SDLRenderer) eventLoop(frameCount int) uint32 {
 			keyPress |= KEY_ESC
 			Debug(">ESC")
 		case *sdl.KeyboardEvent:
-			Debug(">KeyboardEvent %v", t.Keysym.Sym)
-			if t.Keysym.Sym == sdl.K_ESCAPE && t.State == 1 {
+			Debug(">KeyboardEvent %v %v", t.State, t.Keysym.Scancode)
+			isKeyPressed := t.State == sdl.PRESSED
+			if t.Keysym.Sym == sdl.K_ESCAPE {
 				keyPress |= KEY_ESC
+				render.holdKeys[KEY_ESC] = isKeyPressed
 			}
-			if t.Keysym.Sym == sdl.K_LEFT && t.State == 1 {
+			if t.Keysym.Sym == sdl.K_LEFT {
 				keyPress |= KEY_LEFT
+				render.holdKeys[KEY_LEFT] = isKeyPressed
 			}
-			if t.Keysym.Sym == sdl.K_RIGHT && t.State == 1 {
+			if t.Keysym.Sym == sdl.K_RIGHT {
 				keyPress |= KEY_RIGHT
+				render.holdKeys[KEY_RIGHT] = isKeyPressed
 			}
-			if t.Keysym.Sym == sdl.K_UP && t.State == 1 {
+			if t.Keysym.Sym == sdl.K_UP {
 				keyPress |= KEY_UP
+				render.holdKeys[KEY_UP] = isKeyPressed
 			}
-			if t.Keysym.Sym == sdl.K_DOWN && t.State == 1 {
+			if t.Keysym.Sym == sdl.K_DOWN {
 				keyPress |= KEY_DOWN
+				render.holdKeys[KEY_DOWN] = isKeyPressed
 			}
-			if t.Keysym.Sym == sdl.K_SPACE && t.State == 1 {
+			if t.Keysym.Sym == sdl.K_SPACE {
 				keyPress |= KEY_FIRE
+				render.holdKeys[KEY_FIRE] = isKeyPressed
 			}
 		}
 	}
+
+	if render.holdKeys[KEY_ESC] {
+		keyPress |= KEY_ESC
+	}
+	if render.holdKeys[KEY_LEFT] {
+		keyPress |= KEY_LEFT
+	}
+	if render.holdKeys[KEY_RIGHT] {
+		keyPress |= KEY_RIGHT
+	}
+	if render.holdKeys[KEY_UP] {
+		keyPress |= KEY_UP
+	}
+	if render.holdKeys[KEY_DOWN] {
+		keyPress |= KEY_DOWN
+	}
+	if render.holdKeys[KEY_FIRE] {
+		keyPress |= KEY_FIRE
+	}
+
 	return keyPress
 }
 

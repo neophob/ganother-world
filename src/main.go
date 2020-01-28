@@ -72,8 +72,7 @@ func main() {
 			loadGamePart(&vmState, GAME_PART_ID_1+rand.Intn(9))
 		}*/
 
-		//game run at approx 25 fps
-		//time.Sleep(20 * time.Millisecond)
+		keyPresses = video.eventLoop(i)
 		vmState.mainLoop(keyPresses)
 
 		if vmState.loadNextPart > 0 {
@@ -81,8 +80,9 @@ func main() {
 			loadGamePart(&vmState, vmState.loadNextPart)
 		}
 
-		keyPresses = video.eventLoop(i)
 		Debug("exit=%d", keyPresses)
+		//game run at approx 25 fps
+		//time.Sleep(20 * time.Millisecond)
 	}
 
 	video.shutdown()
