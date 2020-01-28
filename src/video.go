@@ -33,6 +33,45 @@ type Video struct {
 	drawColor   uint8
 }
 
+type VideoDataFetcher struct {
+	asset           *VideoAssets
+	useVideo2Source bool
+	readOffset      int
+}
+
+func (reader *VideoDataFetcher) fetchByte() uint8 {
+	if reader.useVideo2Source {
+		result := reader.asset.video2[reader.readOffset]
+		reader.readOffset++
+		return result
+	}
+	result := reader.asset.cinematic[reader.readOffset]
+	reader.readOffset++
+	return result
+}
+
+func (reader *VideoDataFetcher) fetchWord() uint16 {
+	if reader.useVideo2Source {
+		b1 := reader.asset.video2[reader.readOffset]
+		b2 := reader.asset.video2[reader.readOffset+1]
+		reader.readOffset += 2
+		return toUint16BE(b1, b2)
+	}
+	b1 := reader.asset.cinematic[reader.readOffset]
+	b2 := reader.asset.cinematic[reader.readOffset+1]
+	reader.readOffset += 2
+	return toUint16BE(b1, b2)
+}
+
+func (reader *VideoDataFetcher) cloneWithUpdatedOffset(readOffset int) VideoDataFetcher {
+	return VideoDataFetcher{reader.asset, reader.useVideo2Source, readOffset}
+}
+
+func (video *Video) buildReader(useVideo2Source bool, readOffset int) VideoDataFetcher {
+	videoAssets := video.videoAssets
+	return VideoDataFetcher{&videoAssets, useVideo2Source, readOffset}
+}
+
 func (video *Video) updateGamePart(videoAssets VideoAssets) {
 	video.videoAssets = videoAssets
 	video.colors = videoAssets.getPalette(0)
@@ -52,8 +91,8 @@ func (video *Video) getColor(colorIndex, page, ofs int) uint8 {
 		i := video.rawBuffer[0][ofs]
 		return i & 0x0F
 	}
-	Warn(">VID: UNKNOWN PIXEL %d", colorIndex)
-	return uint8(colorIndex)
+	Warn(">VID: UNKNOWN PIXEL COLOR %d", colorIndex)
+	return uint8(colorIndex & 0x0F)
 }
 
 func (video *Video) setColor(colorIndex int) {
@@ -192,59 +231,61 @@ func (video *Video) drawChar(posX, posY int32, char byte) {
 	}
 }
 
-func (video *Video) drawShape(color, offset, zoom, posX, posY int) {
-	video.videoAssets.videoPC = offset
-	i := video.videoAssets.fetchByte()
-
-	Debug(">VID: DRAWSHAPE i:%d, color:%d, offset:%d, x:%d, y:%d, zoom:%d", i, color, offset, posX, posY, zoom)
+func (video *Video) drawShape(videoDataFetcher VideoDataFetcher, color, zoom, posX, posY int) {
+	//video.videoAssets.videoPC = offset
+	//i := video.videoAssets.fetchByte()
+	i := videoDataFetcher.fetchByte()
+	Debug(">VID: DRAWSHAPE i:%d, color:%d, fetcher:%v, x:%d, y:%d, zoom:%d",
+		i, color, videoDataFetcher, posX, posY, zoom)
 
 	if i >= 0xC0 {
 		if color&0x80 > 0 {
 			color = int(i & 0x3F)
 		}
-		video.drawFilledPolygon(color, zoom, posX, posY)
+		video.drawFilledPolygon(videoDataFetcher, color, zoom, posX, posY)
 	} else {
 		i &= 0x3F
 		if i == 2 {
-			video.drawShapeParts(zoom, posX, posY)
+			video.drawShapeParts(videoDataFetcher, zoom, posX, posY)
 		} else {
 			Warn("drawShape INVALID! (%d != 2)\n", i)
 		}
 	}
 }
 
-func (video *Video) drawShapeParts(zoom, posX, posY int) {
-	x := posX - int(video.videoAssets.fetchByte())*zoom/64
-	y := posY - int(video.videoAssets.fetchByte())*zoom/64
-	n := int16(video.videoAssets.fetchByte())
+func (video *Video) drawShapeParts(videoDataFetcher VideoDataFetcher, zoom, posX, posY int) {
+	x := posX - int(videoDataFetcher.fetchByte())*zoom/64
+	y := posY - int(videoDataFetcher.fetchByte())*zoom/64
+	n := int16(videoDataFetcher.fetchByte())
 	Debug(">VID: DRAWSHAPEPARTS x:%d, y:%d, n:%d", x, y, n)
 
 	for ; n >= 0; n-- {
-		off := video.videoAssets.fetchWord()
-		_x := x + int(video.videoAssets.fetchByte())*zoom/64
-		_y := y + int(video.videoAssets.fetchByte())*zoom/64
+		off := videoDataFetcher.fetchWord()
+		_x := x + int(videoDataFetcher.fetchByte())*zoom/64
+		_y := y + int(videoDataFetcher.fetchByte())*zoom/64
 
 		Debug(">VID: DRAWSHAPEPARTS off:%d at %d/%d", off, _x, _y)
 
 		var color uint16 = 0xFF
 		if off&0x8000 > 0 {
-			color = uint16(video.videoAssets.cinematic[video.videoAssets.videoPC] & 0x7F)
+			color = uint16(video.videoAssets.cinematic[videoDataFetcher.readOffset] & 0x7F)
 			//TODO display head.. WTF is this?
-			video.videoAssets.fetchWord()
+			videoDataFetcher.fetchWord()
 		}
 		off &= 0x7FFF
 
-		oldVideoPc := video.videoAssets.videoPC
-		video.drawShape(int(color), int(off*2), zoom, _x, _y)
-		video.videoAssets.videoPC = oldVideoPc
+		//oldVideoPc := video.videoAssets.videoPC
+		xxx := videoDataFetcher.cloneWithUpdatedOffset(int(off * 2))
+		video.drawShape(xxx, int(color), zoom, _x, _y)
+		//video.videoAssets.videoPC = oldVideoPc
 	}
 }
 
-func (video *Video) drawFilledPolygon(col, zoom, posX, posY int) {
+func (video *Video) drawFilledPolygon(videoDataFetcher VideoDataFetcher, col, zoom, posX, posY int) {
 	Debug(">VID: FILLPOLYGON color:%d, x:%d, y:%d, zoom:%d", col, posX, posY, zoom)
 
-	bbw := int(video.videoAssets.fetchByte()) * zoom / 64
-	bbh := int(video.videoAssets.fetchByte()) * zoom / 64
+	bbw := int(videoDataFetcher.fetchByte()) * zoom / 64
+	bbh := int(videoDataFetcher.fetchByte()) * zoom / 64
 
 	x1 := posX - bbw/2
 	x2 := posX + bbw/2
@@ -256,7 +297,7 @@ func (video *Video) drawFilledPolygon(col, zoom, posX, posY int) {
 		return
 	}
 
-	numVertices := int(video.videoAssets.fetchByte())
+	numVertices := int(videoDataFetcher.fetchByte())
 
 	if numVertices > 70 {
 		Warn(">VID: TOOMANY %d", numVertices)
@@ -265,8 +306,8 @@ func (video *Video) drawFilledPolygon(col, zoom, posX, posY int) {
 
 	var vx, vy = make([]int16, numVertices), make([]int16, numVertices)
 	for i := 0; i < numVertices; i++ {
-		vx[i] = int16(x1 + int(video.videoAssets.fetchByte())*zoom/64)
-		vy[i] = int16(y1 + int(video.videoAssets.fetchByte())*zoom/64)
+		vx[i] = int16(x1 + int(videoDataFetcher.fetchByte())*zoom/64)
+		vy[i] = int16(y1 + int(videoDataFetcher.fetchByte())*zoom/64)
 	}
 
 	Debug(">VID: FILLPOLYGON WorkerPage: %d, numVert: %d, col: %d, %v/%v", video.workerPage, numVertices, col, vx, vy)

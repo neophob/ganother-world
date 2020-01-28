@@ -281,7 +281,8 @@ func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
 		posX += height
 	}
 	Debug("opVidDrawPolyBackground %d %d", opcode, offset)
-	video.drawShape(0xFF, int(offset), 0x40, int(posX), int(posY))
+	videoDataFetcher := video.buildReader(false, int(offset))
+	video.drawShape(videoDataFetcher, 0xFF, 0x40, int(posX), int(posY))
 }
 
 //Spr "'object name" , x, y, z - In the work screen, draws the graphics tool at the coordinates x,y and the zoom factor z. A polygon, a group of polygons...
@@ -327,11 +328,8 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 		}
 	}
 	Debug("opVidDrawPolySprite %d", offset)
-	//video.renderer.setDataBuffer(useSecondVideoResource, int(offset))
-	//TODO implement useSecondVideoResource
-	if useSecondVideoResource == false {
-		video.drawShape(0xFF, int(offset), int(zoom), int(posX), int(posY))
-	}
+	videoDataFetcher := video.buildReader(useSecondVideoResource, int(offset))
+	video.drawShape(videoDataFetcher, 0xFF, int(zoom), int(posX), int(posY))
 }
 
 //Initialises a song.

@@ -4,30 +4,10 @@ type VideoAssets struct {
 	palette   []uint8
 	cinematic []uint8
 	video2    []uint8
-	videoPC   int
 }
 
 type Color struct {
 	r, g, b uint8
-}
-
-func (asset *VideoAssets) fetchByte() uint8 {
-	if len(asset.cinematic) == 0 {
-		return 0
-	}
-	result := asset.cinematic[asset.videoPC]
-	asset.videoPC++
-	return result
-}
-
-func (asset *VideoAssets) fetchWord() uint16 {
-	if len(asset.cinematic) == 0 {
-		return 0
-	}
-	b1 := asset.cinematic[asset.videoPC]
-	b2 := asset.cinematic[asset.videoPC+1]
-	asset.videoPC += 2
-	return toUint16BE(b1, b2)
 }
 
 // each asset is 2048 bytes long, a palette stores 16 colors
