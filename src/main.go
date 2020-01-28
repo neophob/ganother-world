@@ -1,32 +1,41 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"math"
 	"time"
 
-	//"math/rand"
 	"os"
 	"sort"
 )
 
 // video is a global variable that needs to implement the Renderer interface
-var video Video = initVideo()
+var video Video
 
-func initVideo() Video {
+func initVideo(noVideoOutput bool) Video {
 	// start with env VIDEO="SDL" ./main to enable SDL
-	if os.Getenv("VIDEO") == "SDL" {
+	if noVideoOutput == false {
 		return Video{renderer: buildSDLRenderer()}
 	}
 	return Video{renderer: DummyRenderer{}}
 }
 
 func main() {
-	log.SetFlags(log.Lshortfile | log.Lmicroseconds)
+	Info("# GANOTHER WORLD vDEV")
 
-	log.Println("- load memlist.bin")
+	noVideoOutput := flag.Bool("t", false, "Use Text only output (no SDL needed)")
+	debug := flag.Bool("d", false, "Enable Debug Mode")
+	startPart := flag.Int("p", 1, "Game part to start from (0-9)")
+	flag.Parse()
+
+	if *debug == false {
+		SetLogLevel(LEVEL_INFO)
+	}
+	video = initVideo(*noVideoOutput)
+
+	Info("- load memlist.bin")
 	data := readFile("./assets/memlist.bin")
 	resourceMap, resourceStatistics := unmarshallingMemlistBin(data)
 	printResourceStats(resourceStatistics)
@@ -40,41 +49,41 @@ func main() {
 		loadedResources: make(map[int][]uint8),
 	}
 
-	log.Println("- create state")
+	Info("- create state")
 	vmState := createNewState(assets)
 
-	log.Println("- setup game")
+	Info("- setup game")
 	/*
-		1: intro okish, rendering issues, wrong colors, black screen at the end
-		2: looks ok, wrong colors
-		3: weird flickering / rendering issues
-		4: just crap
+		all: polygon clipping issues
+		1: intro okish, some blitting issues: artefacts visible when lab scene starts
+		2: looks ok
+		3: rendering issues (big eyes visible when they should not, alien body is missing)
+		4: character is not rendered, character not controllable
 		5: weird color, rendering issues
 		6: clipping issues
-		7: crash!
+		7: works
 	*/
 
-	loadGamePart(&vmState, GAME_PART_ID_1+1)
+	loadGamePart(&vmState, GAME_PART_ID_1+*startPart)
 
 	//start main loop
-	exit := false
-	for i := 0; exit == false; i++ {
-		/*		if i % 50 == rand.Intn(50) {
-				vmState.setupGamePart(GAME_PART_ID_1 + rand.Intn(9))
-				videoAssets := vmState.buildVideoAssets()
-				renderer.updateGamePart(videoAssets)
-			}*/
+	keyPresses := uint32(0)
+	for i := 0; keyPresses&KEY_ESC == 0; i++ {
+		/*if i%30 == rand.Intn(30) {
+			loadGamePart(&vmState, GAME_PART_ID_1+rand.Intn(9))
+		}*/
 
 		//game run at approx 25 fps
-		time.Sleep(40 * time.Millisecond)
-		vmState.mainLoop()
+		time.Sleep(20 * time.Millisecond)
+		vmState.mainLoop(keyPresses)
 
 		if vmState.loadNextPart > 0 {
-			log.Println("- load next part", vmState.loadNextPart)
+			Info("- load next part %d", vmState.loadNextPart)
 			loadGamePart(&vmState, vmState.loadNextPart)
 		}
 
-		exit = video.eventLoop(i)
+		keyPresses = video.eventLoop(i)
+		Debug("exit=%d", keyPresses)
 	}
 
 	video.shutdown()
@@ -89,7 +98,7 @@ func loadGamePart(vmState *VMState, partID int) {
 func readFile(filename string) []byte {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Println("File reading error", err)
+		Error("File reading error %v", err)
 		os.Exit(1)
 	}
 	return data
@@ -99,7 +108,7 @@ func createBankMap(assetPath string) map[int][]byte {
 	bankFilesMap := make(map[int][]byte)
 	for i := 0x01; i < 0x0e; i++ {
 		name := fmt.Sprintf("%sbank%02x", assetPath, i)
-		log.Println("- load file", name)
+		Debug("- load file %s", name)
 		entry := readFile(name)
 		bankFilesMap[i] = entry
 	}
@@ -107,16 +116,15 @@ func createBankMap(assetPath string) map[int][]byte {
 }
 
 func printResourceStats(memlistStatistic MemlistStatistic) {
-	log.Println(memlistStatistic)
-	fmt.Println("Total # resources:", memlistStatistic.entryCount)
-	fmt.Println("Compressed       :", memlistStatistic.compressedEntries)
-	fmt.Println("Uncompressed     :", memlistStatistic.entryCount-memlistStatistic.compressedEntries)
+	Debug("Total # resources: %d", memlistStatistic.entryCount)
+	Debug("Compressed       : %d", memlistStatistic.compressedEntries)
+	Debug("Uncompressed     : %d", memlistStatistic.entryCount-memlistStatistic.compressedEntries)
 	var compressionRatio float64 = 100 / float64(memlistStatistic.entryCount) * float64(memlistStatistic.compressedEntries)
-	fmt.Printf("Note: %.0f%% of resources are compressed.\n\n", math.Round(compressionRatio))
-	fmt.Printf("Total size (uncompressed) : %d bytes.\n", memlistStatistic.sizeUncompressed)
-	fmt.Printf("Total size (compressed)   : %d bytes.\n", memlistStatistic.sizeCompressed)
+	Debug("Note: %.0f%% of resources are compressed.", math.Round(compressionRatio))
+	Debug("Total size (uncompressed) : %d bytes.", memlistStatistic.sizeUncompressed)
+	Debug("Total size (compressed)   : %d bytes.", memlistStatistic.sizeCompressed)
 	var compressionGain float64 = 100 * (1 - float64(memlistStatistic.sizeCompressed)/float64(memlistStatistic.sizeUncompressed))
-	fmt.Printf("Note: Overall compression gain is : %.0f%%.\n\n", math.Round(compressionGain))
+	Debug("Note: Overall compression gain is : %.0f%%.", math.Round(compressionGain))
 
 	sortedKeys := sortedKeys(memlistStatistic.resourceTypeMap)
 	for i := 0; i < len(sortedKeys); i++ {
@@ -125,7 +133,7 @@ func printResourceStats(memlistStatistic MemlistStatistic) {
 		if len(resourceName) < 1 {
 			resourceName = fmt.Sprintf("RT_UNKOWNN_%d", k)
 		}
-		fmt.Printf("Total %20s, files: %d\n", resourceName, memlistStatistic.resourceTypeMap[k])
+		Debug("Total %20s, files: %d", resourceName, memlistStatistic.resourceTypeMap[k])
 	}
 }
 

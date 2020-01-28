@@ -13,6 +13,8 @@ var bankFilesMap = createBankMap("../assets/")
 var gameParts = getGameParts()
 
 func run(gamepart, steps int) VMState {
+	video = Video{renderer: DummyRenderer{}}
+
 	assets := Assets{
 		memList:         resourceMap,
 		gameParts:       gameParts,
@@ -21,9 +23,11 @@ func run(gamepart, steps int) VMState {
 	}
 	vmState := createNewState(assets)
 	vmState.setupGamePart(GAME_PART_ID_1 + gamepart)
+	videoAssets := vmState.buildVideoAssets()
+	video.updateGamePart(videoAssets)
 
 	for i := 0; i < steps; i++ {
-		vmState.mainLoop()
+		vmState.mainLoop(0)
 	}
 	return vmState
 }

@@ -1,9 +1,5 @@
 package main
 
-import (
-	"fmt"
-)
-
 const (
 	//TODO rename me to channel
 	VM_NUM_THREADS   int = 64
@@ -141,7 +137,7 @@ func (state *VMState) setupGamePart(newGamePart int) {
 
 // gamePart is the int between 0 and 10
 func (state *VMState) loadGameParts(gamePart int) {
-	fmt.Println("LOAD GAME PART", gamePart)
+	Debug("LOAD GAME PART %d", gamePart)
 	state.gamePart = gamePart
 
 	gamePartAsset := state.assets.gameParts[gamePart]
@@ -152,7 +148,9 @@ func (state *VMState) loadGameParts(gamePart int) {
 }
 
 // Run the Virtual Machine for every active threads
-func (state *VMState) mainLoop() {
+func (state *VMState) mainLoop(keypresses uint32) {
+	state.handleKeypress(keypresses)
+
 	//TODO check if next part needs to be loaded!
 	state.setupChannels()
 	for channelID := 0; channelID < VM_NUM_THREADS; channelID++ {
@@ -168,14 +166,50 @@ func (state *VMState) mainLoop() {
 			for state.paused == false {
 				state.executeOp()
 			}
-			fmt.Printf("> step: PAUSED, pc[%5d], channel[%2d] >>> \n", state.pc-1, channelID)
+			Debug("> step: PAUSED, pc[%5d], channel[%2d] >>> ", state.pc-1, channelID)
 			if state.sp > 0 {
 				state.countSPNotZero++
 			}
 			state.channelPC[channelID] = state.pc
 		}
 	}
-	fmt.Println("> --- MAINLOOP DONE")
+	Debug("> --- MAINLOOP DONE")
+}
+
+func (state *VMState) handleKeypress(keypresses uint32) {
+	leftRight := int16(0)
+	upDown := int16(0)
+	mask := int16(0)
+	if keypresses&KEY_RIGHT > 0 {
+		leftRight = 1
+		mask |= 1
+	}
+	if keypresses&KEY_LEFT > 0 {
+		leftRight = -1
+		mask |= 2
+	}
+	if keypresses&KEY_DOWN > 0 {
+		upDown = 1
+		mask |= 4
+	}
+	if keypresses&KEY_UP > 0 {
+		upDown = -1
+		mask |= 8
+	}
+
+	state.variables[VM_VARIABLE_HERO_POS_UP_DOWN] = upDown
+	state.variables[VM_VARIABLE_HERO_POS_JUMP_DOWN] = upDown
+	state.variables[VM_VARIABLE_HERO_POS_LEFT_RIGHT] = leftRight
+	state.variables[VM_VARIABLE_HERO_POS_MASK] = mask
+
+	fireButton := int16(0)
+	if keypresses&KEY_FIRE > 0 {
+		fireButton = 1
+		mask |= 0x80
+	}
+
+	state.variables[VM_VARIABLE_HERO_ACTION] = fireButton
+	state.variables[VM_VARIABLE_HERO_ACTION_POS_MASK] = mask
 }
 
 //no pending tasks when starting a loop
@@ -190,7 +224,7 @@ func (state *VMState) setupChannels() {
 
 func (state *VMState) executeOp() {
 	opcode := state.fetchByte()
-	fmt.Printf("> step: opcode[%2d], pc[%5d], channel[%2d] >>> ", opcode, state.pc-1, state.channelID)
+	Debug("> step: opcode[%2d], pc[%5d], channel[%2d] >>> ", opcode, state.pc-1, state.channelID)
 
 	state.countOps++
 
@@ -267,6 +301,6 @@ func (state *VMState) executeOp() {
 		state.opPlayMusic()
 	default:
 		state.countNoOps++
-		fmt.Println("NO_OP", opcode)
+		Warn("NO_OP: %d", opcode)
 	}
 }
