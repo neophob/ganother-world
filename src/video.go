@@ -223,8 +223,6 @@ func (video *Video) drawChar(posX, posY int32, char byte) {
 }
 
 func (video *Video) drawShape(videoDataFetcher VideoDataFetcher, color, zoom, posX, posY int) {
-	//video.videoAssets.videoPC = offset
-	//i := video.videoAssets.fetchByte()
 	i := videoDataFetcher.fetchByte()
 	Debug(">VID: DRAWSHAPE i:%d, color:%d, fetcher:%v, x:%d, y:%d, zoom:%d",
 		i, color, videoDataFetcher, posX, posY, zoom)
@@ -259,16 +257,14 @@ func (video *Video) drawShapeParts(videoDataFetcher VideoDataFetcher, zoom, posX
 
 		var color uint16 = 0xFF
 		if off&0x8000 > 0 {
-			color = uint16(video.videoAssets.cinematic[videoDataFetcher.readOffset] & 0x7F)
+			color = uint16((*videoDataFetcher.asset)[videoDataFetcher.readOffset] & 0x7F)
 			//TODO display head.. WTF is this?
 			videoDataFetcher.fetchWord()
 		}
 		off &= 0x7FFF
 
-		//oldVideoPc := video.videoAssets.videoPC
-		xxx := videoDataFetcher.cloneWithUpdatedOffset(int(off * 2))
-		video.drawShape(xxx, int(color), zoom, _x, _y)
-		//video.videoAssets.videoPC = oldVideoPc
+		clonedVideoDataFetcher := videoDataFetcher.cloneWithUpdatedOffset(int(off * 2))
+		video.drawShape(clonedVideoDataFetcher, int(color), zoom, _x, _y)
 	}
 }
 

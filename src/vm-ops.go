@@ -323,7 +323,7 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 		if opcode&1 > 0 {
 			useSecondVideoResource = true
 			state.pc--
-			Warn("useSecondVideoResource! zoom decreased PC: %d", state.pc)
+			Debug("useSecondVideoResource! zoom decreased PC: %d", state.pc)
 			zoom = 0x40
 		}
 	}
