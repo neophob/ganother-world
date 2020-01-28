@@ -53,6 +53,7 @@ doc:
 clean:
 	@rm -f ./main
 	@rm -f ./main.release
+	@rm -r ./dist/*
 
 .PHONY: help
 all: help

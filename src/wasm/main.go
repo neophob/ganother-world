@@ -2,20 +2,22 @@ package main
 
 import (
 	"syscall/js"
+	"github.com/neophob/ganother-world/gamelib"
 )
 
 func addTitle() {
-	// TOOD: how can I import this
-	// gameTitle := GetTitle()
+	gameTitle := gamelib.GetTitle()
 
 	document := js.Global().Get("document")
 	h1 := document.Call("createElement", "h1")
-	h1.Set("innerHTML", "Another-World")
+	h1.Set("innerHTML", gameTitle)
 	document.Get("body").Call("appendChild", h1)
 }
 
 func main() {
-	println("Hello Another-World")
+	gameTitle := gamelib.GetTitle()
+
+	println("Hello " + gameTitle)
 
 	addTitle()
 
