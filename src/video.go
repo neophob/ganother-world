@@ -18,7 +18,7 @@ const (
 
 // implements actual rendering
 type Renderer interface {
-	blitPage(buffer [64000]Color, posX, posY int)
+	blitPage(buffer [WIDTH * HEIGHT]Color, posX, posY int)
 	eventLoop(frameCount int) uint32
 	shutdown()
 }

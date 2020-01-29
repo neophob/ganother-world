@@ -55,7 +55,7 @@ func buildSDLRenderer() *SDLRenderer {
 }
 
 // blit image
-func (render *SDLRenderer) blitPage(buffer [64000]Color, posX, posY int) {
+func (render *SDLRenderer) blitPage(buffer [WIDTH * HEIGHT]Color, posX, posY int) {
 	lastSetColor := buffer[0]
 	render.renderer.SetDrawColor(buffer[0].r, buffer[0].g, buffer[0].b, 255)
 	offset := 0

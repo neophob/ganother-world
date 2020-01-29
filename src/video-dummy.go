@@ -4,7 +4,7 @@ package main
 type DummyRenderer struct {
 }
 
-func (render DummyRenderer) blitPage(buffer [64000]Color, posX, posY int) {
+func (render DummyRenderer) blitPage(buffer [WIDTH * HEIGHT]Color, posX, posY int) {
 	Info(">VID: BLITPAGE %d %d", posX, posY)
 }
 
