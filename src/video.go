@@ -14,6 +14,9 @@ const (
 	KEY_UP    uint32 = 0x8
 	KEY_DOWN  uint32 = 0x10
 	KEY_FIRE  uint32 = 0x20
+	KEY_PAUSE uint32 = 0x40
+	KEY_SAVE  uint32 = 0x80
+	KEY_LOAD  uint32 = 0x100
 )
 
 // implements actual rendering

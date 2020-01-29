@@ -107,6 +107,15 @@ func (render *SDLRenderer) eventLoop(frameCount int) uint32 {
 				keyPress |= KEY_FIRE
 				render.holdKeys[KEY_FIRE] = isKeyPressed
 			}
+			if isKeyPressed && t.Keysym.Sym == sdl.K_p {
+				keyPress |= KEY_PAUSE
+			}
+			if isKeyPressed && t.Keysym.Sym == sdl.K_s {
+				keyPress |= KEY_SAVE
+			}
+			if isKeyPressed && t.Keysym.Sym == sdl.K_l {
+				keyPress |= KEY_LOAD
+			}
 		}
 	}
 
