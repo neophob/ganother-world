@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-const STEPS_TO_RUN int = 1024
+const STEPS_TO_RUN int = 1
 
 var data = readFile("../assets/memlist.bin")
 var resourceMap, _ = unmarshallingMemlistBin(data)
