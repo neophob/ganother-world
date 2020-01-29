@@ -1,5 +1,3 @@
-# gother-world
-
 ![Screenshot](logo.png)
 
 GOAL:
