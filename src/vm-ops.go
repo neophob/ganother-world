@@ -134,11 +134,11 @@ func (state *VMState) opChangeTaskState() {
 	Debug("#opChangeTaskState %d %d %d", channelIDStart, channelIDEnd, changeType)
 	for i := channelIDStart; i <= channelIDEnd; i++ {
 		switch changeType {
-		case 0:
+		case 2:
 			state.nextLoopChannelPC[i] = VM_INACTIVE_THREAD
 		case 1:
 			state.channelPaused[i] = true
-		case 2:
+		case 0:
 			state.channelPaused[i] = false
 		}
 	}

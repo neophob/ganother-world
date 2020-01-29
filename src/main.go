@@ -48,8 +48,8 @@ func main() {
 		all: polygon clipping issues
 		1: intro okish, some blitting issues: artefacts visible when lab scene starts
 		2: looks ok
-		3: rendering issues (big eyes visible when they should not, alien body is missing)
-		4: character is not rendered, character not controllable
+		3: looks ok
+		4: looks ok
 		5: weird color, rendering issues
 		6: clipping issues
 		7: works
