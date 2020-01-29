@@ -13,14 +13,6 @@ import (
 // video is a global variable that needs to implement the Renderer interface
 var video Video
 
-func initVideo(noVideoOutput bool) Video {
-	// start with env VIDEO="SDL" ./main to enable SDL
-	if noVideoOutput == false {
-		return Video{renderer: buildSDLRenderer()}
-	}
-	return Video{renderer: DummyRenderer{}}
-}
-
 func main() {
 	Info("# GANOTHER WORLD vDEV")
 

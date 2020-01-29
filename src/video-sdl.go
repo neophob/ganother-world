@@ -1,6 +1,4 @@
 //SDL video implementation
-//TODO: implement multiple pages
-//TODO: split me away from the core lib here
 package main
 
 import (

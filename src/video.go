@@ -33,6 +33,13 @@ type Video struct {
 	drawColor   uint8
 }
 
+func initVideo(noVideoOutput bool) Video {
+	if noVideoOutput == false {
+		return Video{renderer: buildSDLRenderer(), workerPage: 0xFE}
+	}
+	return Video{renderer: DummyRenderer{}, workerPage: 0xFE}
+}
+
 func (video *Video) updateGamePart(videoAssets VideoAssets) {
 	video.videoAssets = videoAssets
 	video.colors = videoAssets.getPalette(0)
@@ -273,6 +280,8 @@ func (video *Video) drawFilledPolygon(videoDataFetcher VideoDataFetcher, col, zo
 
 func (video *Video) setPalette(index int) {
 	video.colors = video.videoAssets.getPalette(index >> 8)
+	//TODO fixup palette
+	//part 16004 and palette 0x47 -> ret 8, part 16006 and palette 0x4a -> ret 1
 	Debug(">VID: SETPALETTE %d", index>>8)
 }
 

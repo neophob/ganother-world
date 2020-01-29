@@ -360,7 +360,7 @@ func (state *VMState) opUpdateResource() {
 		return
 	}
 	if id == 0 {
-		Debug("opUpdateResource TODO! INVALIDATE DATA %d", id)
+		Warn("opUpdateResource TODO! INVALIDATE DATA %d", id)
 		//_ply->stop();
 		//_mix->stopAll();
 		//_res->invalidateRes();
