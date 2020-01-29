@@ -35,8 +35,8 @@ func buildSDLRenderer() *SDLRenderer {
 		Error("SDL CREATE RENDERER FAILED")
 		panic(err)
 	}
-	//renderer.SetLogicalSize(WIDTH, HEIGHT)
-	renderer.SetLogicalSize(WIDTH*2, HEIGHT*2)
+	renderer.SetLogicalSize(WIDTH, HEIGHT)
+	//renderer.SetLogicalSize(WIDTH*2, HEIGHT*2)
 	renderer.Clear()
 	renderer.Present()
 

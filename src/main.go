@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math"
+	"time"
 
 	"os"
 	"sort"
@@ -44,17 +45,6 @@ func main() {
 	vmState := createNewState(assets)
 
 	Info("- setup game")
-	/*
-		all: polygon clipping issues
-		1: intro okish, some blitting issues: artefacts visible when lab scene starts
-		2: looks ok
-		3: looks ok
-		4: looks ok
-		5: weird color, rendering issues
-		6: clipping issues
-		7: works
-	*/
-
 	loadGamePart(&vmState, GAME_PART_ID_1+*startPart)
 
 	//start main loop
@@ -74,7 +64,7 @@ func main() {
 
 		Debug("exit=%d", keyPresses)
 		//game run at approx 25 fps
-		//time.Sleep(20 * time.Millisecond)
+		time.Sleep(20 * time.Millisecond)
 	}
 
 	video.shutdown()

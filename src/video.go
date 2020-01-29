@@ -133,18 +133,18 @@ func (video *Video) updateDisplay(page int) {
 	video.renderer.blitPage(outputBuffer, 0, 0)
 
 	//DEBUG OUTPUT
-	for i := range video.rawBuffer[0] {
-		outputBuffer[i] = video.colors[video.rawBuffer[0][i]]
-	}
-	video.renderer.blitPage(outputBuffer, 320, 0)
-	for i := range video.rawBuffer[1] {
-		outputBuffer[i] = video.colors[video.rawBuffer[1][i]]
-	}
-	video.renderer.blitPage(outputBuffer, 0, 200)
-	for i := range video.rawBuffer[2] {
-		outputBuffer[i] = video.colors[video.rawBuffer[2][i]]
-	}
-	video.renderer.blitPage(outputBuffer, 320, 200)
+	/*	for i := range video.rawBuffer[0] {
+			outputBuffer[i] = video.colors[video.rawBuffer[0][i]]
+		}
+		video.renderer.blitPage(outputBuffer, 320, 0)
+		for i := range video.rawBuffer[1] {
+			outputBuffer[i] = video.colors[video.rawBuffer[1][i]]
+		}
+		video.renderer.blitPage(outputBuffer, 0, 200)
+		for i := range video.rawBuffer[2] {
+			outputBuffer[i] = video.colors[video.rawBuffer[2][i]]
+		}
+		video.renderer.blitPage(outputBuffer, 320, 200)*/
 }
 
 func getWorkerPage(page int) int {
