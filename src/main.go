@@ -15,7 +15,7 @@ import (
 var video Video
 
 func main() {
-	Info("# GANOTHER WORLD vDEV")
+	Info("# GOTHER WORLD vDEV")
 
 	noVideoOutput := flag.Bool("t", false, "Use Text only output (no SDL needed)")
 	debug := flag.Bool("d", false, "Enable Debug Mode")
