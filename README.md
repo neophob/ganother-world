@@ -1,4 +1,6 @@
-# ganother-world
+# gother-world
+
+![Screenshot](logo.png)
 
 GOAL:
 - Learn GO and implement "something fun"
