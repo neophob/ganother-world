@@ -11,8 +11,14 @@ import (
 	"sort"
 )
 
+type GameState struct {
+	vm    VMState
+	video Video
+}
+
 // video is a global variable that needs to implement the Renderer interface
 var video Video
+var gameState GameState
 
 func main() {
 	Info("# GOTHER WORLD vDEV")
@@ -56,6 +62,20 @@ func main() {
 
 		keyPresses = video.eventLoop(i)
 		vmState.mainLoop(keyPresses)
+
+		if keyPresses&KEY_SAVE > 0 {
+			Info("SAVE STATE")
+			gameState = GameState{vmState, video}
+		}
+		if keyPresses&KEY_LOAD > 0 {
+			Info("LOAD STATE")
+			vmState.variables = gameState.vm.variables
+			vmState.channelPC = gameState.vm.channelPC
+			vmState.nextLoopChannelPC = gameState.vm.nextLoopChannelPC
+			vmState.channelPaused = gameState.vm.channelPaused
+			vmState.stackCalls = gameState.vm.stackCalls
+			video = gameState.video
+		}
 
 		if vmState.loadNextPart > 0 {
 			Info("- load next part %d", vmState.loadNextPart)

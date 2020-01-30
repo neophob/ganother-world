@@ -1,9 +1,5 @@
 package main
 
-import (
-	"fmt"
-)
-
 const (
 	//TODO rename me to channel
 	VM_NUM_THREADS   int = 64
@@ -30,8 +26,6 @@ const (
 	VM_VARIABLE_HERO_ACTION_POS_MASK int = 0xFE
 	VM_VARIABLE_PAUSE_SLICES         int = 0xFF
 )
-
-var savedState VMState
 
 type VMState struct {
 	assets            Assets
@@ -65,19 +59,12 @@ func (state *VMState) clone() VMState {
 	p := state.channelPC
 	np := state.nextLoopChannelPC
 	return VMState{
-		assets:            state.assets,
 		variables:         v,
 		channelPC:         p,
 		nextLoopChannelPC: np,
 		channelPaused:     state.channelPaused,
 		stackCalls:        state.stackCalls,
 		gamePart:          state.gamePart,
-		loadNextPart:      state.loadNextPart,
-
-		palette:   state.palette,
-		bytecode:  state.bytecode,
-		cinematic: state.cinematic,
-		video2:    state.video2,
 	}
 }
 
@@ -235,17 +222,6 @@ func (state *VMState) handleKeypress(keypresses uint32) {
 	}
 	state.variables[VM_VARIABLE_HERO_ACTION] = fireButton
 	state.variables[VM_VARIABLE_HERO_ACTION_POS_MASK] = mask
-
-	if keypresses&KEY_LOAD > 0 {
-		Info("Load state")
-		state = &savedState
-		fmt.Println("POST", state.channelPC)
-	}
-	if keypresses&KEY_SAVE > 0 {
-		savedState = state.clone()
-		fmt.Println("SAVED:", savedState.channelPC)
-	}
-
 }
 
 //no pending tasks when starting a loop
