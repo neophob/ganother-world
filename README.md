@@ -1,5 +1,7 @@
 ![Screenshot](logo.png)
 
+![](assets/gow.gif)
+
 GOAL:
 - Learn GO and implement "something fun"
 - "something fun" - interpret the old game another world and create a web version!
