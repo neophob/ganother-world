@@ -54,20 +54,6 @@ type VMState struct {
 	countSPNotZero int
 }
 
-func (state *VMState) clone() VMState {
-	v := state.variables
-	p := state.channelPC
-	np := state.nextLoopChannelPC
-	return VMState{
-		variables:         v,
-		channelPC:         p,
-		nextLoopChannelPC: np,
-		channelPaused:     state.channelPaused,
-		stackCalls:        state.stackCalls,
-		gamePart:          state.gamePart,
-	}
-}
-
 func createNewState(assets Assets) VMState {
 	state := VMState{gamePart: -1, assets: assets}
 	state.variables[VM_VARIABLE_RANDOM_SEED] = 42

@@ -28,6 +28,10 @@ func main() {
 	startPart := flag.Int("p", 1, "Game part to start from (0-9)")
 	flag.Parse()
 
+	Info("# KEYBOARD MAPPING:")
+	Info("- L: Load State")
+	Info("- S: Save State")
+
 	if *debug == false {
 		SetLogLevel(LEVEL_INFO)
 	}
@@ -67,8 +71,9 @@ func main() {
 			Info("SAVE STATE")
 			gameState = GameState{vmState, video}
 		}
-		if keyPresses&KEY_LOAD > 0 {
+		if gameState.vm.gamePart > 0 && keyPresses&KEY_LOAD > 0 {
 			Info("LOAD STATE")
+			vmState.loadGameParts(gameState.vm.gamePart)
 			vmState.variables = gameState.vm.variables
 			vmState.channelPC = gameState.vm.channelPC
 			vmState.nextLoopChannelPC = gameState.vm.nextLoopChannelPC
