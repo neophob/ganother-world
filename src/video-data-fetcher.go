@@ -24,7 +24,7 @@ func (reader *VideoDataFetcher) cloneWithUpdatedOffset(readOffset int) VideoData
 
 func (video *Video) buildReader(useVideo2Source bool, readOffset int) VideoDataFetcher {
 	videoAssets := video.videoAssets
-	if useVideo2Source {
+	if useVideo2Source == true {
 		return VideoDataFetcher{&videoAssets.video2, readOffset}
 	}
 	return VideoDataFetcher{&videoAssets.cinematic, readOffset}
