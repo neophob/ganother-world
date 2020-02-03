@@ -142,6 +142,14 @@ func (render *SDLHAL) eventLoop(frameCount int) uint32 {
 	return keyPress
 }
 
+func (render *SDLHAL) playMusic(resNum, delay, pos int) {
+	Info(">SND: playMusic res:%d del:%d pos:%d", resNum, delay, pos)
+}
+
+func (render *SDLHAL) playSound(resNum, freq, vol, channel int) {
+	Info(">SND: playSound res:%d frq:%d vol:%d c:%d", resNum, freq, vol, channel)
+}
+
 // exit application, lets cleanup...
 func (render *SDLHAL) shutdown() {
 	render.window.Destroy()

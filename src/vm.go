@@ -292,11 +292,11 @@ func (state *VMState) executeOp(video *Video) {
 		state.opShr()
 
 	case 0x18:
-		state.opPlaySound()
+		state.opPlaySound(video)
 	case 0x19:
 		state.opUpdateResource()
 	case 0x1A:
-		state.opPlayMusic()
+		state.opPlayMusic(video)
 	default:
 		state.countNoOps++
 		Warn("NO_OP: %d", opcode)

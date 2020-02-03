@@ -19,3 +19,11 @@ func (render DummyHAL) eventLoop(frameCount int) uint32 {
 func (render DummyHAL) shutdown() {
 	//nothin to see here, move on!
 }
+
+func (render DummyHAL) playMusic(resNum, delay, pos int) {
+	Info(">SND: playMusic res:%d del:%d pos:%d", resNum, delay, pos)
+}
+
+func (render DummyHAL) playSound(resNum, freq, vol, channel int) {
+	Info(">SND: playSound res:%d frq:%d vol:%d c:%d", resNum, freq, vol, channel)
+}

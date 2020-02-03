@@ -269,6 +269,14 @@ func (video *Video) setPalette(index int) {
 	Debug(">VID: SETPALETTE %d", index>>8)
 }
 
+func (video *Video) playSound(resNum, freq, vol, channel int) {
+	video.hal.playSound(resNum, freq, vol, channel)
+}
+
+func (video *Video) playMusic(resNum, delay, pos int) {
+	video.hal.playMusic(resNum, delay, pos)
+}
+
 func (video *Video) eventLoop(frameCount int) uint32 {
 	return video.hal.eventLoop(frameCount)
 }

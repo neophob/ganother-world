@@ -333,22 +333,22 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8, video *Video) {
 }
 
 //Initialises a song.
-func (state *VMState) opPlayMusic() {
+func (state *VMState) opPlayMusic(video *Video) {
 	resNum := int(state.fetchWord())
 	delay := int(state.fetchWord())
 	pos := int(state.fetchByte())
-	Debug("op_playMusic(0x%X, %d, %d)", resNum, delay, pos)
-	//TODO snd_playMusic(resNum, delay, pos);
+	//TODO naming is hard!
+	video.playMusic(resNum, delay, pos)
 }
 
 //Plays the sound file on one of the four game audio channels with specific height and volume.
-func (state *VMState) opPlaySound() {
+func (state *VMState) opPlaySound(video *Video) {
 	resNum := int(state.fetchWord())
 	freq := int(state.fetchByte())
 	vol := int(state.fetchByte())
 	channel := int(state.fetchByte())
-	Debug("op_playSound(0x%X, %d, %d, %d)", resNum, freq, vol, channel)
-	//TODO snd_playSound(resNum, freq, vol, channel);
+	//TODO naming is hard!
+	video.playSound(resNum, freq, vol, channel)
 }
 
 func (state *VMState) opUpdateResource() {
