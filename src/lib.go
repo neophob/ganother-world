@@ -6,7 +6,7 @@ import (
 	"sort"
 )
 
-//Root object, hold the whole world
+//GotherWorld is the root object, it holds the whole world
 type GotherWorld struct {
 	video      Video
 	vm         VMState
@@ -74,6 +74,10 @@ func (app *GotherWorld) loadGamePart(partID int) {
 	app.vm.setupGamePart(partID)
 	videoAssets := app.vm.buildVideoAssets()
 	app.video.updateGamePart(videoAssets)
+}
+
+func (app *GotherWorld) shutdown() {
+	app.video.shutdown()
 }
 
 func printResourceStats(memlistStatistic MemlistStatistic) {

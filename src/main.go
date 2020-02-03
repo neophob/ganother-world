@@ -45,7 +45,7 @@ func main() {
 		time.Sleep(20 * time.Millisecond)
 	}
 
-	app.video.shutdown()
+	app.shutdown()
 }
 
 func readFile(filename string) []byte {

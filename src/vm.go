@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 const (
 	//TODO rename me to channel
 	VM_NUM_THREADS   int = 64
@@ -270,9 +268,7 @@ func (state *VMState) executeOp(video *Video) {
 	case 0x0C:
 		state.opChangeTaskState()
 	case 0x0D:
-		fmt.Println("WAA", video.workerPage)
 		state.opVidSelectPage(video)
-		fmt.Println("WA22A", video.workerPage)
 	case 0x0E:
 		state.opVidFillPage(video)
 	case 0x0F:

@@ -28,7 +28,7 @@ type HAL interface {
 
 //Video implements buffer handling (4 buffers) and game specific alpha/buffer0 handling
 type Video struct {
-	renderer    HAL
+	hal         HAL
 	videoAssets VideoAssets
 	workerPage  int
 	colors      [16]Color
@@ -38,9 +38,9 @@ type Video struct {
 
 func initVideo(noVideoOutput bool) Video {
 	if noVideoOutput == false {
-		return Video{renderer: buildSDLHAL(), workerPage: 0xFE}
+		return Video{hal: buildSDLHAL(), workerPage: 0xFE}
 	}
-	return Video{renderer: DummyHAL{}}
+	return Video{hal: DummyHAL{}}
 }
 
 func (video *Video) updateGamePart(videoAssets VideoAssets) {
@@ -133,21 +133,21 @@ func (video *Video) updateDisplay(page int) {
 	for i := range video.rawBuffer[workerPage] {
 		outputBuffer[i] = video.colors[video.rawBuffer[workerPage][i]]
 	}
-	video.renderer.blitPage(outputBuffer, 0, 0)
+	video.hal.blitPage(outputBuffer, 0, 0)
 
 	//DEBUG OUTPUT
 	/*	for i := range video.rawBuffer[0] {
 			outputBuffer[i] = video.colors[video.rawBuffer[0][i]]
 		}
-		video.renderer.blitPage(outputBuffer, 320, 0)
+		video.hal.blitPage(outputBuffer, 320, 0)
 		for i := range video.rawBuffer[1] {
 			outputBuffer[i] = video.colors[video.rawBuffer[1][i]]
 		}
-		video.renderer.blitPage(outputBuffer, 0, 200)
+		video.hal.blitPage(outputBuffer, 0, 200)
 		for i := range video.rawBuffer[2] {
 			outputBuffer[i] = video.colors[video.rawBuffer[2][i]]
 		}
-		video.renderer.blitPage(outputBuffer, 320, 200)*/
+		video.hal.blitPage(outputBuffer, 320, 200)*/
 }
 
 func getWorkerPage(page int) int {
@@ -289,9 +289,9 @@ func (video *Video) setPalette(index int) {
 }
 
 func (video *Video) eventLoop(frameCount int) uint32 {
-	return video.renderer.eventLoop(frameCount)
+	return video.hal.eventLoop(frameCount)
 }
 
 func (video *Video) shutdown() {
-	video.renderer.shutdown()
+	video.hal.shutdown()
 }
