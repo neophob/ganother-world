@@ -11,6 +11,7 @@ import (
 	"sort"
 )
 
+//GameState used to save and load a game state
 type GameState struct {
 	vm    VMState
 	video Video

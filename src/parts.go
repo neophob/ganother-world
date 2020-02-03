@@ -1,7 +1,6 @@
 package main
 
-//AW has 10 different game parts. here we map which assets (code, video, palettes) belong to which level
-
+//GamePartContent -AW has 10 different game parts. here we map which assets (code, video, palettes) belong to which level
 type GamePartContent struct {
 	palette   int
 	bytecode  int

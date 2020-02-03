@@ -7,6 +7,7 @@ const (
 	memlistEntrySize int = 20
 )
 
+//MemlistEntry is a pointer to game resources
 type MemlistEntry struct {
 	resourceType uint8  //ofs: 1
 	rankNum      uint8  //ofs: 6
@@ -16,6 +17,7 @@ type MemlistEntry struct {
 	unpackedSize uint32 //ofs: 16
 }
 
+//MemlistStatistic contains statistics about resources
 type MemlistStatistic struct {
 	resourceTypeMap   map[int]int
 	entryCount        int
