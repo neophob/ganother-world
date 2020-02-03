@@ -42,18 +42,18 @@ func initGotherWorld(memlistData []byte, bankFilesMap map[int][]byte, noVideoOut
 }
 
 func (app *GotherWorld) exitRequested() bool {
-	return app.keyPresses&KEY_ESC > 0
+	return app.keyPresses&KeyEsc > 0
 }
 
 func (app *GotherWorld) mainLoop(i int) {
 	app.keyPresses = app.video.eventLoop(i)
 	app.vm.mainLoop(app.keyPresses, &app.video)
 
-	if app.keyPresses&KEY_SAVE > 0 {
+	if app.keyPresses&KeySave > 0 {
 		Info("SAVE STATE")
 		app.gameState = GameState{app.vm, app.video}
 	}
-	if app.gameState.vm.gamePart > 0 && app.keyPresses&KEY_LOAD > 0 {
+	if app.gameState.vm.gamePart > 0 && app.keyPresses&KeyLoad > 0 {
 		Info("LOAD STATE")
 		app.vm.loadGameParts(app.gameState.vm.gamePart)
 		app.vm.variables = app.gameState.vm.variables

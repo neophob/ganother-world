@@ -7,25 +7,6 @@ const (
 	COLOR_BUFFER0 int   = 17
 )
 
-const (
-	KEY_ESC   uint32 = 0x1
-	KEY_LEFT  uint32 = 0x2
-	KEY_RIGHT uint32 = 0x4
-	KEY_UP    uint32 = 0x8
-	KEY_DOWN  uint32 = 0x10
-	KEY_FIRE  uint32 = 0x20
-	KEY_PAUSE uint32 = 0x40
-	KEY_SAVE  uint32 = 0x80
-	KEY_LOAD  uint32 = 0x100
-)
-
-//HAL implements HAL (audio, video, io)
-type HAL interface {
-	blitPage(buffer [WIDTH * HEIGHT]Color, posX, posY int)
-	eventLoop(frameCount int) uint32
-	shutdown()
-}
-
 //Video implements buffer handling (4 buffers) and game specific alpha/buffer0 handling
 type Video struct {
 	hal         HAL

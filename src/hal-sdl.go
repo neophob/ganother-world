@@ -79,64 +79,64 @@ func (render *SDLHAL) eventLoop(frameCount int) uint32 {
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 		switch t := event.(type) {
 		case *sdl.QuitEvent:
-			keyPress |= KEY_ESC
+			keyPress |= KeyEsc
 			Debug(">ESC")
 		case *sdl.KeyboardEvent:
 			Debug(">KeyboardEvent %v %v", t.State, t.Keysym.Scancode)
 			isKeyPressed := t.State == sdl.PRESSED
 			if t.Keysym.Sym == sdl.K_ESCAPE {
-				keyPress |= KEY_ESC
-				render.holdKeys[KEY_ESC] = isKeyPressed
+				keyPress |= KeyEsc
+				render.holdKeys[KeyEsc] = isKeyPressed
 			}
 			if t.Keysym.Sym == sdl.K_LEFT {
-				keyPress |= KEY_LEFT
-				render.holdKeys[KEY_LEFT] = isKeyPressed
+				keyPress |= KeyLeft
+				render.holdKeys[KeyLeft] = isKeyPressed
 			}
 			if t.Keysym.Sym == sdl.K_RIGHT {
-				keyPress |= KEY_RIGHT
-				render.holdKeys[KEY_RIGHT] = isKeyPressed
+				keyPress |= KeyRight
+				render.holdKeys[KeyRight] = isKeyPressed
 			}
 			if t.Keysym.Sym == sdl.K_UP {
-				keyPress |= KEY_UP
-				render.holdKeys[KEY_UP] = isKeyPressed
+				keyPress |= KeyUp
+				render.holdKeys[KeyUp] = isKeyPressed
 			}
 			if t.Keysym.Sym == sdl.K_DOWN {
-				keyPress |= KEY_DOWN
-				render.holdKeys[KEY_DOWN] = isKeyPressed
+				keyPress |= KeyDown
+				render.holdKeys[KeyDown] = isKeyPressed
 			}
 			if t.Keysym.Sym == sdl.K_SPACE {
-				keyPress |= KEY_FIRE
-				render.holdKeys[KEY_FIRE] = isKeyPressed
+				keyPress |= KeyFire
+				render.holdKeys[KeyFire] = isKeyPressed
 			}
 			if isKeyPressed && t.Keysym.Sym == sdl.K_p {
-				keyPress |= KEY_PAUSE
+				keyPress |= KeyPause
 			}
 			if isKeyPressed && t.Keysym.Sym == sdl.K_s {
-				keyPress |= KEY_SAVE
+				keyPress |= KeySave
 			}
 			if isKeyPressed && t.Keysym.Sym == sdl.K_l {
-				keyPress |= KEY_LOAD
+				keyPress |= KeyLoad
 			}
 		}
 	}
 
-	if render.holdKeys[KEY_ESC] {
-		keyPress |= KEY_ESC
+	if render.holdKeys[KeyEsc] {
+		keyPress |= KeyEsc
 	}
-	if render.holdKeys[KEY_LEFT] {
-		keyPress |= KEY_LEFT
+	if render.holdKeys[KeyLeft] {
+		keyPress |= KeyLeft
 	}
-	if render.holdKeys[KEY_RIGHT] {
-		keyPress |= KEY_RIGHT
+	if render.holdKeys[KeyRight] {
+		keyPress |= KeyRight
 	}
-	if render.holdKeys[KEY_UP] {
-		keyPress |= KEY_UP
+	if render.holdKeys[KeyUp] {
+		keyPress |= KeyUp
 	}
-	if render.holdKeys[KEY_DOWN] {
-		keyPress |= KEY_DOWN
+	if render.holdKeys[KeyDown] {
+		keyPress |= KeyDown
 	}
-	if render.holdKeys[KEY_FIRE] {
-		keyPress |= KEY_FIRE
+	if render.holdKeys[KeyFire] {
+		keyPress |= KeyFire
 	}
 
 	return keyPress

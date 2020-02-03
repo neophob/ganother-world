@@ -2,9 +2,8 @@ package main
 
 const (
 	//TODO rename me to channel
-	VM_NUM_THREADS   int = 64
-	VM_NUM_VARIABLES int = 256
-
+	VM_NUM_THREADS    int = 64
+	VM_NUM_VARIABLES  int = 256
 	VM_MAX_STACK_SIZE int = 64
 
 	VM_NO_SETVEC_REQUESTED uint16 = 0xFFFF
@@ -181,19 +180,19 @@ func (state *VMState) handleKeypress(keypresses uint32) {
 	leftRight := int16(0)
 	upDown := int16(0)
 	mask := int16(0)
-	if keypresses&KEY_RIGHT > 0 {
+	if keypresses&KeyRight > 0 {
 		leftRight = 1
 		mask |= 1
 	}
-	if keypresses&KEY_LEFT > 0 {
+	if keypresses&KeyLeft > 0 {
 		leftRight = -1
 		mask |= 2
 	}
-	if keypresses&KEY_DOWN > 0 {
+	if keypresses&KeyDown > 0 {
 		upDown = 1
 		mask |= 4
 	}
-	if keypresses&KEY_UP > 0 {
+	if keypresses&KeyUp > 0 {
 		upDown = -1
 		mask |= 8
 	}
@@ -203,7 +202,7 @@ func (state *VMState) handleKeypress(keypresses uint32) {
 	state.variables[VM_VARIABLE_HERO_POS_MASK] = mask
 
 	fireButton := int16(0)
-	if keypresses&KEY_FIRE > 0 {
+	if keypresses&KeyFire > 0 {
 		fireButton = 1
 		mask |= 0x80
 	}

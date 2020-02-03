@@ -13,7 +13,7 @@ func (render DummyHAL) eventLoop(frameCount int) uint32 {
 	if frameCount < 128 {
 		return 0
 	}
-	return KEY_ESC
+	return KeyEsc
 }
 
 func (render DummyHAL) shutdown() {
