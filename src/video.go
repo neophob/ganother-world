@@ -19,14 +19,14 @@ const (
 	KEY_LOAD  uint32 = 0x100
 )
 
-// implements actual rendering
+//Renderer implements HAL (audio, video, io)
 type Renderer interface {
 	blitPage(buffer [WIDTH * HEIGHT]Color, posX, posY int)
 	eventLoop(frameCount int) uint32
 	shutdown()
 }
 
-// implements buffer handling (4 buffers) and game specific alpha/buffer0 handling
+//Video implements buffer handling (4 buffers) and game specific alpha/buffer0 handling
 type Video struct {
 	renderer    Renderer
 	videoAssets VideoAssets

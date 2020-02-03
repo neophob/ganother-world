@@ -28,7 +28,7 @@ func (state *VMState) opMov() {
 //Variable = Variable + Integer value
 func (state *VMState) opAddConst() {
 	if state.gamePart == 5 && state.pc == 0x6D48 {
-		Debug("TODO Script::op_addConst() workaround for infinite looping gun sound")
+		Warn("TODO Script::op_addConst() workaround for infinite looping gun sound")
 		// The script 0x27 slot 0x17 doesn't stop the gun sound from looping.
 		// This is a bug in the original game code, confirmed by Eric Chahi and
 		// addressed with the anniversary editions.
@@ -175,7 +175,7 @@ func (state *VMState) opCondJmp() {
 	case 0:
 		expr = (currentVariable == newVariable)
 		if variableID == 0x29 && op&0x80 != 0 {
-			Debug("TODO BYPASS PROTECTION!")
+			Warn("TODO BYPASS PROTECTION!")
 			/*				// 4 symbols
 							_scriptVars[0x29] = _scriptVars[0x1E];
 							_scriptVars[0x2A] = _scriptVars[0x1F];

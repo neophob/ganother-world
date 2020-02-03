@@ -1,5 +1,6 @@
 package main
 
+//VideoDataFetcher is the DTO for polygon drawing
 type VideoDataFetcher struct {
 	asset      *[]uint8
 	readOffset int
