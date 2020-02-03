@@ -10,14 +10,14 @@ const (
 	WINDOW_HEIGHT int32 = 200 * 2
 )
 
-type SDLRenderer struct {
+type SDLHAL struct {
 	surface  *sdl.Surface
 	renderer *sdl.Renderer
 	window   *sdl.Window
 	holdKeys map[uint32]bool
 }
 
-func buildSDLRenderer() *SDLRenderer {
+func buildSDLHAL() *SDLHAL {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		Error("SDL INIT FAILED")
 		panic(err)
@@ -46,7 +46,7 @@ func buildSDLRenderer() *SDLRenderer {
 		panic(err)
 	}
 
-	return &SDLRenderer{
+	return &SDLHAL{
 		surface:  surface,
 		window:   window,
 		renderer: renderer,
@@ -55,7 +55,7 @@ func buildSDLRenderer() *SDLRenderer {
 }
 
 // blit image
-func (render *SDLRenderer) blitPage(buffer [WIDTH * HEIGHT]Color, posX, posY int) {
+func (render *SDLHAL) blitPage(buffer [WIDTH * HEIGHT]Color, posX, posY int) {
 	lastSetColor := buffer[0]
 	render.renderer.SetDrawColor(buffer[0].r, buffer[0].g, buffer[0].b, 255)
 	offset := 0
@@ -73,7 +73,7 @@ func (render *SDLRenderer) blitPage(buffer [WIDTH * HEIGHT]Color, posX, posY int
 }
 
 // check keyboard input
-func (render *SDLRenderer) eventLoop(frameCount int) uint32 {
+func (render *SDLHAL) eventLoop(frameCount int) uint32 {
 	keyPress := uint32(0x0)
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 		switch t := event.(type) {
@@ -142,7 +142,7 @@ func (render *SDLRenderer) eventLoop(frameCount int) uint32 {
 }
 
 // exit application, lets cleanup...
-func (render *SDLRenderer) shutdown() {
+func (render *SDLHAL) shutdown() {
 	render.window.Destroy()
 	sdl.Quit()
 }

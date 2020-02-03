@@ -19,8 +19,8 @@ const (
 	KEY_LOAD  uint32 = 0x100
 )
 
-//Renderer implements HAL (audio, video, io)
-type Renderer interface {
+//HAL implements HAL (audio, video, io)
+type HAL interface {
 	blitPage(buffer [WIDTH * HEIGHT]Color, posX, posY int)
 	eventLoop(frameCount int) uint32
 	shutdown()
@@ -28,7 +28,7 @@ type Renderer interface {
 
 //Video implements buffer handling (4 buffers) and game specific alpha/buffer0 handling
 type Video struct {
-	renderer    Renderer
+	renderer    HAL
 	videoAssets VideoAssets
 	workerPage  int
 	colors      [16]Color
@@ -38,9 +38,9 @@ type Video struct {
 
 func initVideo(noVideoOutput bool) Video {
 	if noVideoOutput == false {
-		return Video{renderer: buildSDLRenderer(), workerPage: 0xFE}
+		return Video{renderer: buildSDLHAL(), workerPage: 0xFE}
 	}
-	return Video{renderer: DummyRenderer{}, workerPage: 0xFE}
+	return Video{renderer: DummyHAL{}}
 }
 
 func (video *Video) updateGamePart(videoAssets VideoAssets) {
