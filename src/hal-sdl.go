@@ -6,10 +6,11 @@ import (
 )
 
 const (
-	WINDOW_WIDTH  int32 = 320 * 2
-	WINDOW_HEIGHT int32 = 200 * 2
+	windowWidth  int32 = 320 * 2
+	windowHeight int32 = 200 * 2
 )
 
+//SDLHAL implements the HAL using ... SDL2
 type SDLHAL struct {
 	surface  *sdl.Surface
 	renderer *sdl.Renderer
@@ -24,7 +25,7 @@ func buildSDLHAL() *SDLHAL {
 	}
 
 	window, err := sdl.CreateWindow("ganother world", sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED,
-		WINDOW_WIDTH, WINDOW_HEIGHT, sdl.WINDOW_ALLOW_HIGHDPI)
+		windowWidth, windowHeight, sdl.WINDOW_ALLOW_HIGHDPI)
 	if err != nil {
 		Error("SDL CREATE WINDOW FAILED")
 		panic(err)

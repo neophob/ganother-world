@@ -1,11 +1,13 @@
 package main
 
+//VideoAssets holds the assets for the currently active game part
 type VideoAssets struct {
 	palette   []uint8
 	cinematic []uint8
 	video2    []uint8
 }
 
+//Color represents an indexed color palette
 type Color struct {
 	r, g, b uint8
 }

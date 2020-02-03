@@ -27,6 +27,7 @@ const (
 	VM_VARIABLE_PAUSE_SLICES         int = 0xFF
 )
 
+//VMState implements the state of the the VM
 type VMState struct {
 	assets            Assets
 	variables         [VM_NUM_VARIABLES]int16

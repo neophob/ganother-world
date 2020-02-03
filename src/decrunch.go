@@ -1,5 +1,6 @@
 package main
 
+//UnpackCtx encapsulate a decompress operation
 type UnpackCtx struct {
 	size         uint32
 	crc          uint32
