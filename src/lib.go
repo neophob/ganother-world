@@ -37,7 +37,7 @@ func initGotherWorld(memlistData []byte, bankFilesMap map[int][]byte, noVideoOut
 	video := initVideo(noVideoOutput)
 
 	app := GotherWorld{video: video, vm: vmState}
-	//	app.loadGamePart(GAME_PART_FIRST)
+	app.loadGamePart(GAME_PART_FIRST)
 	return app
 }
 
@@ -46,14 +46,12 @@ func (app *GotherWorld) exitRequested() bool {
 }
 
 func (app *GotherWorld) mainLoop(i int) {
-	//TODO remove global VIDEO!
-	//app.keyPresses = app.video.eventLoop(i)
-	app.keyPresses = video.eventLoop(i)
-	app.vm.mainLoop(app.keyPresses)
+	app.keyPresses = app.video.eventLoop(i)
+	app.vm.mainLoop(app.keyPresses, &app.video)
 
 	if app.keyPresses&KEY_SAVE > 0 {
 		Info("SAVE STATE")
-		app.gameState = GameState{app.vm, video}
+		app.gameState = GameState{app.vm, app.video}
 	}
 	if app.gameState.vm.gamePart > 0 && app.keyPresses&KEY_LOAD > 0 {
 		Info("LOAD STATE")
@@ -63,7 +61,7 @@ func (app *GotherWorld) mainLoop(i int) {
 		app.vm.nextLoopChannelPC = app.gameState.vm.nextLoopChannelPC
 		app.vm.channelPaused = app.gameState.vm.channelPaused
 		app.vm.stackCalls = app.gameState.vm.stackCalls
-		video = app.gameState.video
+		app.video = app.gameState.video
 	}
 
 	if app.vm.loadNextPart > 0 {
@@ -75,7 +73,7 @@ func (app *GotherWorld) mainLoop(i int) {
 func (app *GotherWorld) loadGamePart(partID int) {
 	app.vm.setupGamePart(partID)
 	videoAssets := app.vm.buildVideoAssets()
-	video.updateGamePart(videoAssets)
+	app.video.updateGamePart(videoAssets)
 }
 
 func printResourceStats(memlistStatistic MemlistStatistic) {

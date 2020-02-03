@@ -9,9 +9,6 @@ import (
 	"os"
 )
 
-// video is a global variable that needs to implement the Renderer interface
-var video Video
-
 func main() {
 	Info("# GOTHER WORLD vDEV")
 
@@ -33,7 +30,6 @@ func main() {
 	bankFilesMap := createBankMap("./assets/")
 
 	app := initGotherWorld(data, bankFilesMap, *noVideoOutput)
-	video = app.video
 
 	Info("- setup game")
 	app.loadGamePart(GAME_PART_ID_1 + *startPart)
@@ -49,7 +45,7 @@ func main() {
 		time.Sleep(20 * time.Millisecond)
 	}
 
-	video.shutdown()
+	app.video.shutdown()
 }
 
 func readFile(filename string) []byte {

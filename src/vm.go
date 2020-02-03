@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 const (
 	//TODO rename me to channel
 	VM_NUM_THREADS   int = 64
@@ -149,7 +151,7 @@ func (state *VMState) loadGameParts(gamePart int) {
 }
 
 // Run the Virtual Machine for every active threads
-func (state *VMState) mainLoop(keypresses uint32) {
+func (state *VMState) mainLoop(keypresses uint32, video *Video) {
 	state.handleKeypress(keypresses)
 
 	//TODO check if next part needs to be loaded!
@@ -165,7 +167,7 @@ func (state *VMState) mainLoop(keypresses uint32) {
 			state.sp = 0
 			//loop channel until finished
 			for state.paused == false {
-				state.executeOp()
+				state.executeOp(video)
 			}
 			Debug("> step: PAUSED, pc[%5d], channel[%2d] >>> ", state.pc-1, channelID)
 			if state.sp > 0 {
@@ -221,18 +223,18 @@ func (state *VMState) setupChannels() {
 	}
 }
 
-func (state *VMState) executeOp() {
+func (state *VMState) executeOp(video *Video) {
 	opcode := state.fetchByte()
 	Debug("> step: opcode[%2d], pc[%5d], channel[%2d] >>> ", opcode, state.pc-1, state.channelID)
 
 	state.countOps++
 
 	if opcode > 0x7F {
-		state.opVidDrawPolyBackground(opcode)
+		state.opVidDrawPolyBackground(opcode, video)
 		return
 	}
 	if opcode > 0x3F {
-		state.opVidDrawPolySprite(opcode)
+		state.opVidDrawPolySprite(opcode, video)
 		return
 	}
 
@@ -263,23 +265,25 @@ func (state *VMState) executeOp() {
 	case 0x0A:
 		state.opCondJmp()
 	case 0x0B:
-		state.opVidSetPalette()
+		state.opVidSetPalette(video)
 
 	case 0x0C:
 		state.opChangeTaskState()
 	case 0x0D:
-		state.opVidSelectPage()
+		fmt.Println("WAA", video.workerPage)
+		state.opVidSelectPage(video)
+		fmt.Println("WA22A", video.workerPage)
 	case 0x0E:
-		state.opVidFillPage()
+		state.opVidFillPage(video)
 	case 0x0F:
-		state.opVidCopyPage()
+		state.opVidCopyPage(video)
 
 	case 0x10:
-		state.opVidUpdatePage()
+		state.opVidUpdatePage(video)
 	case 0x11:
 		state.opRemoveTask()
 	case 0x12:
-		state.opVidDrawString()
+		state.opVidDrawString(video)
 	case 0x13:
 		state.opSub()
 
