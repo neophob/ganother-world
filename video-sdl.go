@@ -24,13 +24,6 @@ type Video struct {
 	drawColor   uint8
 }
 
-func initVideo(noVideoOutput bool) Video {
-	if noVideoOutput == false {
-		return Video{hal: buildSDLHAL(), workerPage: 0xFE}
-	}
-	return Video{hal: anotherworld.DummyHAL{}}
-}
-
 func (video *Video) updateGamePart(videoAssets anotherworld.VideoAssets) {
 	video.videoAssets = videoAssets
 	video.colors = videoAssets.GetPalette(0)

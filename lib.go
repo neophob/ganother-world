@@ -23,7 +23,7 @@ type GameState struct {
 	video Video
 }
 
-func initGotherWorld(memlistData []byte, bankFilesMap map[int][]byte, noVideoOutput bool) GotherWorld {
+func initGotherWorld(memlistData []byte, bankFilesMap map[int][]byte, videoDriver Video) GotherWorld {
 	resourceMap, resourceStatistics := anotherworld.UnmarshallingMemlistBin(memlistData)
 	printResourceStats(resourceStatistics)
 
@@ -37,9 +37,7 @@ func initGotherWorld(memlistData []byte, bankFilesMap map[int][]byte, noVideoOut
 
 	logger.Info("- create state")
 	vmState := createNewState(assets)
-	video := initVideo(noVideoOutput)
-
-	app := GotherWorld{video: video, vm: vmState}
+	app := GotherWorld{video: videoDriver, vm: vmState}
 	app.loadGamePart(anotherworld.GAME_PART_FIRST)
 	return app
 }

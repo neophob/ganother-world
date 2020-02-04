@@ -13,7 +13,8 @@ var memlist = readFile("./assets/memlist.bin")
 var bankFilesMap = createBankMap("./assets/")
 
 func run(gamepart int) GotherWorld {
-	app := initGotherWorld(memlist, bankFilesMap, true)
+	videoDriver := Video{hal: anotherworld.DummyHAL{}}
+	app := initGotherWorld(memlist, bankFilesMap, videoDriver)
 	app.loadGamePart(anotherworld.GAME_PART_ID_1 + gamepart)
 	for i := 0; i < stepsToRun; i++ {
 		app.mainLoop(i)

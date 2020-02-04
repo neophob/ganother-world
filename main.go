@@ -32,7 +32,14 @@ func main() {
 	data := readFile("./assets/memlist.bin")
 	bankFilesMap := createBankMap("./assets/")
 
-	app := initGotherWorld(data, bankFilesMap, *noVideoOutput)
+	var videoDriver Video
+	if *noVideoOutput == true {
+		videoDriver = Video{hal: anotherworld.DummyHAL{}}
+	} else {
+		videoDriver = Video{hal: buildSDLHAL(), workerPage: 0xFE}
+	}
+
+	app := initGotherWorld(data, bankFilesMap, videoDriver)
 
 	logger.Info("- setup game")
 	app.loadGamePart(anotherworld.GAME_PART_ID_1 + *startPart)
