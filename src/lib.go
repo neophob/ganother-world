@@ -72,6 +72,9 @@ func (app *GotherWorld) mainLoop(i int) {
 
 func (app *GotherWorld) loadGamePart(partID int) {
 	app.vm.setupGamePart(partID)
+	//TODO rename videoAssets to game part assets
+	//TODO rename video struct to game??
+	//TODO add audio stuff
 	videoAssets := app.vm.buildVideoAssets()
 	app.video.updateGamePart(videoAssets)
 }

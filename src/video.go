@@ -270,6 +270,12 @@ func (video *Video) setPalette(index int) {
 }
 
 func (video *Video) playSound(resNum, freq, vol, channel int) {
+	if vol == 0 || resNum == 0 || resNum == 5000 {
+		//TODO STOP music
+		return
+	}
+
+	Info("playSound resNum %d", resNum)
 	video.hal.playSound(resNum, freq, vol, channel)
 }
 

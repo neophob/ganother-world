@@ -338,6 +338,7 @@ func (state *VMState) opPlayMusic(video *Video) {
 	delay := int(state.fetchWord())
 	pos := int(state.fetchByte())
 	//TODO naming is hard!
+	state.assets.loadResource(resNum)
 	video.playMusic(resNum, delay, pos)
 }
 
@@ -348,6 +349,7 @@ func (state *VMState) opPlaySound(video *Video) {
 	vol := int(state.fetchByte())
 	channel := int(state.fetchByte())
 	//TODO naming is hard!
+	state.assets.loadResource(resNum)
 	video.playSound(resNum, freq, vol, channel)
 }
 

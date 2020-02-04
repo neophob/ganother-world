@@ -37,7 +37,7 @@ func main() {
 	//start main loop
 	for i := 0; app.exitRequested() == false; i++ {
 		/*if i%30 == rand.Intn(30) {
-			loadGamePart(&vmState, GAME_PART_ID_1+rand.Intn(9))
+			app.loadGamePart(GAME_PART_ID_1+rand.Intn(9))
 		}*/
 		app.mainLoop(i)
 
