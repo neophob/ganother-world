@@ -1,4 +1,6 @@
-# ganother-world
+![Screenshot](logo.png)
+
+![](assets/gow.gif)
 
 GOAL:
 - Learn GO and implement "something fun"

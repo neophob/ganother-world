@@ -2,9 +2,8 @@ package main
 
 const (
 	//TODO rename me to channel
-	VM_NUM_THREADS   int = 64
-	VM_NUM_VARIABLES int = 256
-
+	VM_NUM_THREADS    int = 64
+	VM_NUM_VARIABLES  int = 256
 	VM_MAX_STACK_SIZE int = 64
 
 	VM_NO_SETVEC_REQUESTED uint16 = 0xFFFF
@@ -27,6 +26,7 @@ const (
 	VM_VARIABLE_PAUSE_SLICES         int = 0xFF
 )
 
+//VMState implements the state of the the VM
 type VMState struct {
 	assets            Assets
 	variables         [VM_NUM_VARIABLES]int16
@@ -148,7 +148,7 @@ func (state *VMState) loadGameParts(gamePart int) {
 }
 
 // Run the Virtual Machine for every active threads
-func (state *VMState) mainLoop(keypresses uint32) {
+func (state *VMState) mainLoop(keypresses uint32, video *Video) {
 	state.handleKeypress(keypresses)
 
 	//TODO check if next part needs to be loaded!
@@ -164,7 +164,7 @@ func (state *VMState) mainLoop(keypresses uint32) {
 			state.sp = 0
 			//loop channel until finished
 			for state.paused == false {
-				state.executeOp()
+				state.executeOp(video)
 			}
 			Debug("> step: PAUSED, pc[%5d], channel[%2d] >>> ", state.pc-1, channelID)
 			if state.sp > 0 {
@@ -180,34 +180,32 @@ func (state *VMState) handleKeypress(keypresses uint32) {
 	leftRight := int16(0)
 	upDown := int16(0)
 	mask := int16(0)
-	if keypresses&KEY_RIGHT > 0 {
+	if keypresses&KeyRight > 0 {
 		leftRight = 1
 		mask |= 1
 	}
-	if keypresses&KEY_LEFT > 0 {
+	if keypresses&KeyLeft > 0 {
 		leftRight = -1
 		mask |= 2
 	}
-	if keypresses&KEY_DOWN > 0 {
+	if keypresses&KeyDown > 0 {
 		upDown = 1
 		mask |= 4
 	}
-	if keypresses&KEY_UP > 0 {
+	if keypresses&KeyUp > 0 {
 		upDown = -1
 		mask |= 8
 	}
-
 	state.variables[VM_VARIABLE_HERO_POS_UP_DOWN] = upDown
 	state.variables[VM_VARIABLE_HERO_POS_JUMP_DOWN] = upDown
 	state.variables[VM_VARIABLE_HERO_POS_LEFT_RIGHT] = leftRight
 	state.variables[VM_VARIABLE_HERO_POS_MASK] = mask
 
 	fireButton := int16(0)
-	if keypresses&KEY_FIRE > 0 {
+	if keypresses&KeyFire > 0 {
 		fireButton = 1
 		mask |= 0x80
 	}
-
 	state.variables[VM_VARIABLE_HERO_ACTION] = fireButton
 	state.variables[VM_VARIABLE_HERO_ACTION_POS_MASK] = mask
 }
@@ -222,18 +220,18 @@ func (state *VMState) setupChannels() {
 	}
 }
 
-func (state *VMState) executeOp() {
+func (state *VMState) executeOp(video *Video) {
 	opcode := state.fetchByte()
 	Debug("> step: opcode[%2d], pc[%5d], channel[%2d] >>> ", opcode, state.pc-1, state.channelID)
 
 	state.countOps++
 
 	if opcode > 0x7F {
-		state.opVidDrawPolyBackground(opcode)
+		state.opVidDrawPolyBackground(opcode, video)
 		return
 	}
 	if opcode > 0x3F {
-		state.opVidDrawPolySprite(opcode)
+		state.opVidDrawPolySprite(opcode, video)
 		return
 	}
 
@@ -264,23 +262,23 @@ func (state *VMState) executeOp() {
 	case 0x0A:
 		state.opCondJmp()
 	case 0x0B:
-		state.opVidSetPalette()
+		state.opVidSetPalette(video)
 
 	case 0x0C:
 		state.opChangeTaskState()
 	case 0x0D:
-		state.opVidSelectPage()
+		state.opVidSelectPage(video)
 	case 0x0E:
-		state.opVidFillPage()
+		state.opVidFillPage(video)
 	case 0x0F:
-		state.opVidCopyPage()
+		state.opVidCopyPage(video)
 
 	case 0x10:
-		state.opVidUpdatePage()
+		state.opVidUpdatePage(video)
 	case 0x11:
 		state.opRemoveTask()
 	case 0x12:
-		state.opVidDrawString()
+		state.opVidDrawString(video)
 	case 0x13:
 		state.opSub()
 

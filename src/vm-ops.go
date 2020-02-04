@@ -28,7 +28,7 @@ func (state *VMState) opMov() {
 //Variable = Variable + Integer value
 func (state *VMState) opAddConst() {
 	if state.gamePart == 5 && state.pc == 0x6D48 {
-		Debug("TODO Script::op_addConst() workaround for infinite looping gun sound")
+		Warn("TODO Script::op_addConst() workaround for infinite looping gun sound")
 		// The script 0x27 slot 0x17 doesn't stop the gun sound from looping.
 		// This is a bug in the original game code, confirmed by Eric Chahi and
 		// addressed with the anniversary editions.
@@ -135,11 +135,11 @@ func (state *VMState) opChangeTaskState() {
 	for i := channelIDStart; i <= channelIDEnd; i++ {
 		switch changeType {
 		case 0:
-			state.nextLoopChannelPC[i] = VM_INACTIVE_THREAD
+			state.channelPaused[i] = false
 		case 1:
 			state.channelPaused[i] = true
 		case 2:
-			state.channelPaused[i] = false
+			state.nextLoopChannelPC[i] = VM_INACTIVE_THREAD
 		}
 	}
 }
@@ -175,7 +175,7 @@ func (state *VMState) opCondJmp() {
 	case 0:
 		expr = (currentVariable == newVariable)
 		if variableID == 0x29 && op&0x80 != 0 {
-			Debug("TODO BYPASS PROTECTION!")
+			Warn("TODO BYPASS PROTECTION!")
 			/*				// 4 symbols
 							_scriptVars[0x29] = _scriptVars[0x1E];
 							_scriptVars[0x2A] = _scriptVars[0x1F];
@@ -210,13 +210,13 @@ func (state *VMState) opCondJmp() {
 }
 
 // Fade "palette number" - Changes of colour palette
-func (state *VMState) opVidSetPalette() {
+func (state *VMState) opVidSetPalette(video *Video) {
 	index := state.fetchWord()
 	video.setPalette(int(index))
 }
 
 //Text "text number", x, y, color - Displays in the work screen the specified text for the coordinates x,y.
-func (state *VMState) opVidDrawString() {
+func (state *VMState) opVidDrawString(video *Video) {
 	stringID := int(state.fetchWord())
 	x := int(state.fetchByte())
 	y := int(state.fetchByte())
@@ -225,20 +225,20 @@ func (state *VMState) opVidDrawString() {
 }
 
 //SetWS "Screen number" - Sets the work screen, which is where the polygons will be drawn by default.
-func (state *VMState) opVidSelectPage() {
+func (state *VMState) opVidSelectPage(video *Video) {
 	page := int(state.fetchByte())
 	video.setWorkPagePtr(page)
 }
 
 //Clr "Screen number", Color - Deletes a screen with one colour. Ingame, there are 4 screen buffers
-func (state *VMState) opVidFillPage() {
+func (state *VMState) opVidFillPage(video *Video) {
 	page := int(state.fetchByte())
 	color := int(state.fetchByte())
 	video.fillPage(page, color)
 }
 
 //Copy "Screen number A", "Screen number B" - Copies screen buffer A to screen buffer B.
-func (state *VMState) opVidCopyPage() {
+func (state *VMState) opVidCopyPage(video *Video) {
 	source := state.fetchByte()
 	dest := state.fetchByte()
 
@@ -247,7 +247,7 @@ func (state *VMState) opVidCopyPage() {
 	if source >= 0xFE || isVscrollEnabled == 0 {
 		// no vscroll
 		video.copyPage(int(source), int(dest), 0)
-		//video.copyPage(int(source&uint8(not0x40)), int(dest), 0)
+		//app.video.copyPage(int(source&uint8(not0x40)), int(dest), 0)
 	} else {
 		sourceTranslated := int(source & 3)
 		vscroll := int(state.variables[VM_VARIABLE_SCROLL_Y])
@@ -260,7 +260,7 @@ func (state *VMState) opVidCopyPage() {
 }
 
 //Show "Screen number" - Displays the screen buffer specified in the next video frame.
-func (state *VMState) opVidUpdatePage() {
+func (state *VMState) opVidUpdatePage(video *Video) {
 	page := int(state.fetchByte())
 	//TODO inp_handleSpecialKeys();
 	if state.gamePart == 0 && state.variables[0x67] == 1 {
@@ -271,21 +271,22 @@ func (state *VMState) opVidUpdatePage() {
 	video.updateDisplay(page)
 }
 
-func (state *VMState) opVidDrawPolyBackground(opcode uint8) {
+func (state *VMState) opVidDrawPolyBackground(opcode uint8, video *Video) {
 	offset := ((uint16(opcode) << 8) | uint16(state.fetchByte())) << 1
-	posX := int(state.fetchByte())
-	posY := int(state.fetchByte())
+	posX := int16(state.fetchByte())
+	posY := int16(state.fetchByte())
 	height := posY - 199
 	if height > 0 {
 		posY = 199
 		posX += height
 	}
 	Debug("opVidDrawPolyBackground %d %d", opcode, offset)
-	video.drawShape(0xFF, int(offset), 0x40, posX, posY)
+	videoDataFetcher := video.buildReader(false, int(offset))
+	video.drawShape(videoDataFetcher, 0xFF, 0x40, int(posX), int(posY))
 }
 
 //Spr "'object name" , x, y, z - In the work screen, draws the graphics tool at the coordinates x,y and the zoom factor z. A polygon, a group of polygons...
-func (state *VMState) opVidDrawPolySprite(opcode uint8) {
+func (state *VMState) opVidDrawPolySprite(opcode uint8, video *Video) {
 	useSecondVideoResource := false
 	offsetHi := state.fetchByte()
 	offset := ((uint16(offsetHi) << 8) | uint16(state.fetchByte())) << 1
@@ -327,11 +328,8 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8) {
 		}
 	}
 	Debug("opVidDrawPolySprite %d", offset)
-	//video.renderer.setDataBuffer(useSecondVideoResource, int(offset))
-	//TODO implement useSecondVideoResource
-	if useSecondVideoResource == false {
-		video.drawShape(0xFF, int(offset), int(zoom), int(posX), int(posY))
-	}
+	videoDataFetcher := video.buildReader(useSecondVideoResource, int(offset))
+	video.drawShape(videoDataFetcher, 0xFF, int(zoom), int(posX), int(posY))
 }
 
 //Initialises a song.
@@ -362,7 +360,7 @@ func (state *VMState) opUpdateResource() {
 		return
 	}
 	if id == 0 {
-		Debug("opUpdateResource TODO! INVALIDATE DATA %d", id)
+		Warn("opUpdateResource TODO! INVALIDATE DATA %d", id)
 		//_ply->stop();
 		//_mix->stopAll();
 		//_res->invalidateRes();
