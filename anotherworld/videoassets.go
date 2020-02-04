@@ -1,33 +1,29 @@
-package main
-
-import (
-	"github.com/neophob/ganother-world/anotherworld"
-)
+package anotherworld
 
 //VideoAssets holds the assets for the currently active game part
 type VideoAssets struct {
-	palette   []uint8
-	cinematic []uint8
-	video2    []uint8
+	Palette   []uint8
+	Cinematic []uint8
+	Video2    []uint8
 }
 
 //Color represents an indexed color palette
 type Color struct {
-	r, g, b uint8
+	R, G, B uint8
 }
 
 // each asset is 2048 bytes long, a palette stores 16 colors
 // each palette file contains multiple palette files which can be selected using the index
-func (asset VideoAssets) getPalette(index int) [16]Color {
+func (asset VideoAssets) GetPalette(index int) [16]Color {
 	var palette [16]Color
 
-	if len(asset.palette) == 0 {
+	if len(asset.Palette) == 0 {
 		return palette
 	}
 
 	ofs := index * 32
 	for i := 0; i < 16; i++ {
-		color := anotherworld.ToUint16BE(asset.palette[ofs], asset.palette[ofs+1])
+		color := ToUint16BE(asset.Palette[ofs], asset.Palette[ofs+1])
 		ofs += 2
 		r := uint8(((color >> 8) & 0xF) << 4)
 		g := uint8(((color >> 4) & 0xF) << 4)
@@ -38,5 +34,5 @@ func (asset VideoAssets) getPalette(index int) [16]Color {
 }
 
 func (color Color) toUint32() uint32 {
-	return uint32(0xFF000000) + uint32(color.r)<<16 + uint32(color.g)<<8 + uint32(color.b)
+	return uint32(0xFF000000) + uint32(color.R)<<16 + uint32(color.G)<<8 + uint32(color.B)
 }

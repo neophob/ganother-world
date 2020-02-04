@@ -1,6 +1,9 @@
 package main
 
-import "github.com/neophob/ganother-world/logger"
+import (
+	"github.com/neophob/ganother-world/anotherworld"
+	"github.com/neophob/ganother-world/logger"
+)
 
 //Implementation of all VM ops
 
@@ -351,14 +354,14 @@ func (state *VMState) opPlaySound(video *Video) {
 	vol := int(state.fetchByte())
 	channel := int(state.fetchByte())
     //TODO naming is hard!
-    state.assets.loadResource(resNum)
+    state.assets.LoadResource(resNum)
     video.playSound(resNum, freq, vol, channel)
 }
 
 func (state *VMState) opUpdateResource() {
 	id := int(state.fetchWord())
 	logger.Debug("opUpdateResource %d", id)
-	if id >= GAME_PART_ID_1 {
+	if id >= anotherworld.GAME_PART_ID_1 {
 		logger.Debug("should load next part %d", id)
 		state.loadNextPart = id
 		return
@@ -370,5 +373,5 @@ func (state *VMState) opUpdateResource() {
 		//_res->invalidateRes();
 		return
 	}
-	state.assets.loadResource(id)
+	state.assets.LoadResource(id)
 }

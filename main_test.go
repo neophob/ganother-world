@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"testing"
+
+	"github.com/neophob/ganother-world/anotherworld"
 )
 
 const stepsToRun int = 1
@@ -12,7 +14,7 @@ var bankFilesMap = createBankMap("./assets/")
 
 func run(gamepart int) GotherWorld {
 	app := initGotherWorld(memlist, bankFilesMap, true)
-	app.loadGamePart(GAME_PART_ID_1 + gamepart)
+	app.loadGamePart(anotherworld.GAME_PART_ID_1 + gamepart)
 	for i := 0; i < stepsToRun; i++ {
 		app.mainLoop(i)
 	}

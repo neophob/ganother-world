@@ -27,12 +27,12 @@ func initGotherWorld(memlistData []byte, bankFilesMap map[int][]byte, noVideoOut
 	resourceMap, resourceStatistics := anotherworld.UnmarshallingMemlistBin(memlistData)
 	printResourceStats(resourceStatistics)
 
-	gameParts := getGameParts()
-	assets := Assets{
-		memList:         resourceMap,
-		gameParts:       gameParts,
-		bank:            bankFilesMap,
-		loadedResources: make(map[int][]uint8),
+	gameParts := anotherworld.GetGameParts()
+	assets := anotherworld.Assets{
+		MemList:         resourceMap,
+		GameParts:       gameParts,
+		Bank:            bankFilesMap,
+		LoadedResources: make(map[int][]uint8),
 	}
 
 	logger.Info("- create state")
@@ -40,23 +40,23 @@ func initGotherWorld(memlistData []byte, bankFilesMap map[int][]byte, noVideoOut
 	video := initVideo(noVideoOutput)
 
 	app := GotherWorld{video: video, vm: vmState}
-	app.loadGamePart(GAME_PART_FIRST)
+	app.loadGamePart(anotherworld.GAME_PART_FIRST)
 	return app
 }
 
 func (app *GotherWorld) exitRequested() bool {
-	return app.keyPresses&KeyEsc > 0
+	return app.keyPresses&anotherworld.KeyEsc > 0
 }
 
 func (app *GotherWorld) mainLoop(i int) {
-	app.keyPresses = app.video.eventLoop(i)
+	app.keyPresses = app.video.EventLoop(i)
 	app.vm.mainLoop(app.keyPresses, &app.video)
 
-	if app.keyPresses&KeySave > 0 {
+	if app.keyPresses&anotherworld.KeySave > 0 {
 		logger.Info("SAVE STATE")
 		app.gameState = GameState{app.vm, app.video}
 	}
-	if app.gameState.vm.gamePart > 0 && app.keyPresses&KeyLoad > 0 {
+	if app.gameState.vm.gamePart > 0 && app.keyPresses&anotherworld.KeyLoad > 0 {
 		logger.Info("LOAD STATE")
 		app.vm.loadGameParts(app.gameState.vm.gamePart)
 		app.vm.variables = app.gameState.vm.variables

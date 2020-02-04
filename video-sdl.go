@@ -1,7 +1,11 @@
 package main
 
-import "github.com/neophob/ganother-world/logger"
+import (
+	"github.com/neophob/ganother-world/anotherworld"
+	"github.com/neophob/ganother-world/logger"
+)
 
+// TODO get from anotherworld?
 const (
 	WIDTH         int32 = 320
 	HEIGHT        int32 = 200
@@ -10,11 +14,12 @@ const (
 )
 
 //Video implements buffer handling (4 buffers) and game specific alpha/buffer0 handling
+// TODO move def to another world
 type Video struct {
-	hal         HAL
-	videoAssets VideoAssets
+	hal         anotherworld.HAL
+	videoAssets anotherworld.VideoAssets
 	workerPage  int
-	colors      [16]Color
+	colors      [16]anotherworld.Color
 	rawBuffer   [4][WIDTH * HEIGHT]uint8
 	drawColor   uint8
 }
@@ -23,12 +28,12 @@ func initVideo(noVideoOutput bool) Video {
 	if noVideoOutput == false {
 		return Video{hal: buildSDLHAL(), workerPage: 0xFE}
 	}
-	return Video{hal: DummyHAL{}}
+	return Video{hal: anotherworld.DummyHAL{}}
 }
 
-func (video *Video) updateGamePart(videoAssets VideoAssets) {
+func (video *Video) updateGamePart(videoAssets anotherworld.VideoAssets) {
 	video.videoAssets = videoAssets
-	video.colors = videoAssets.getPalette(0)
+	video.colors = videoAssets.GetPalette(0)
 }
 
 func (video *Video) getColor(colorIndex, page, ofs int) uint8 {
@@ -112,25 +117,25 @@ func (video *Video) updateDisplay(page int) {
 	}
 	logger.Debug(">VID: UPDATEDISPLAY %d(%d)", page, workerPage)
 
-	var outputBuffer [WIDTH * HEIGHT]Color
+	var outputBuffer [WIDTH * HEIGHT]anotherworld.Color
 	for i := range video.rawBuffer[workerPage] {
 		outputBuffer[i] = video.colors[video.rawBuffer[workerPage][i]]
 	}
-	video.hal.blitPage(outputBuffer, 0, 0)
+	video.hal.BlitPage(outputBuffer, 0, 0)
 
 	//DEBUG OUTPUT
 	/*	for i := range video.rawBuffer[0] {
 			outputBuffer[i] = video.colors[video.rawBuffer[0][i]]
 		}
-		video.hal.blitPage(outputBuffer, 320, 0)
+		video.hal.BlitPage(outputBuffer, 320, 0)
 		for i := range video.rawBuffer[1] {
 			outputBuffer[i] = video.colors[video.rawBuffer[1][i]]
 		}
-		video.hal.blitPage(outputBuffer, 0, 200)
+		video.hal.BlitPage(outputBuffer, 0, 200)
 		for i := range video.rawBuffer[2] {
 			outputBuffer[i] = video.colors[video.rawBuffer[2][i]]
 		}
-		video.hal.blitPage(outputBuffer, 320, 200)*/
+		video.hal.BlitPage(outputBuffer, 320, 200)*/
 }
 
 func getWorkerPage(page int) int {
@@ -152,7 +157,7 @@ func getWorkerPage(page int) int {
 }
 
 func (video *Video) drawString(color, posX, posY, stringID int) {
-	text := getText(stringID)
+	text := anotherworld.GetText(stringID)
 	logger.Debug(">VID: DRAWSTRING color:%d, x:%d, y:%d, text:%s", color, posX, posY, text)
 	//setWorkPagePtr(buffer);?
 
@@ -265,7 +270,7 @@ func (video *Video) drawFilledPolygon(videoDataFetcher VideoDataFetcher, col, zo
 }
 
 func (video *Video) setPalette(index int) {
-	video.colors = video.videoAssets.getPalette(index >> 8)
+	video.colors = video.videoAssets.GetPalette(index >> 8)
 	//TODO fixup palette
 	//part 16004 and palette 0x47 -> ret 8, part 16006 and palette 0x4a -> ret 1
 	logger.Debug(">VID: SETPALETTE %d", index>>8)
@@ -278,17 +283,17 @@ func (video *Video) playSound(resNum, freq, vol, channel int) {
 	}
 
 	logger.Info("playSound resNum %d", resNum)
-	video.hal.playSound(resNum, freq, vol, channel)
+	video.hal.PlaySound(resNum, freq, vol, channel)
 }
 
 func (video *Video) playMusic(resNum, delay, pos int) {
-	video.hal.playMusic(resNum, delay, pos)
+	video.hal.PlayMusic(resNum, delay, pos)
 }
 
-func (video *Video) eventLoop(frameCount int) uint32 {
-	return video.hal.eventLoop(frameCount)
+func (video *Video) EventLoop(frameCount int) uint32 {
+	return video.hal.EventLoop(frameCount)
 }
 
 func (video *Video) shutdown() {
-	video.hal.shutdown()
+	video.hal.Shutdown()
 }

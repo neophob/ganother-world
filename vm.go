@@ -33,7 +33,7 @@ const (
 
 //VMState implements the state of the the VM
 type VMState struct {
-	assets            Assets
+	assets            anotherworld.Assets
 	variables         [VM_NUM_VARIABLES]int16
 	channelPC         [VM_NUM_THREADS]uint16
 	nextLoopChannelPC [VM_NUM_THREADS]uint16
@@ -59,7 +59,7 @@ type VMState struct {
 	countSPNotZero int
 }
 
-func createNewState(assets Assets) VMState {
+func createNewState(assets anotherworld.Assets) VMState {
 	state := VMState{gamePart: -1, assets: assets}
 	state.variables[VM_VARIABLE_RANDOM_SEED] = 42
 	//WTF? whats this? -> create const
@@ -77,11 +77,11 @@ func createNewState(assets Assets) VMState {
 }
 
 //TODO integrate with setupGamePart
-func (state VMState) buildVideoAssets() VideoAssets {
-	return VideoAssets{
-		palette:   state.palette,
-		cinematic: state.cinematic,
-		video2:    state.video2,
+func (state VMState) buildVideoAssets() anotherworld.VideoAssets {
+	return anotherworld.VideoAssets{
+		Palette:   state.palette,
+		Cinematic: state.cinematic,
+		Video2:    state.video2,
 	}
 }
 
@@ -115,16 +115,16 @@ func (state *VMState) fetchWord() uint16 {
 }
 
 func (state *VMState) setupGamePart(newGamePart int) {
-	if newGamePart < GAME_PART_FIRST || newGamePart > GAME_PART_LAST {
+	if newGamePart < anotherworld.GAME_PART_FIRST || newGamePart > anotherworld.GAME_PART_LAST {
 		panic("INVALID_GAME_PART")
 	}
-	if newGamePart == GAME_PART_FIRST {
+	if newGamePart == anotherworld.GAME_PART_FIRST {
 		// VAR(0x54) indicates if the "Out of this World" title screen should be presented
 		// language setting?
 		state.variables[VM_VARIABLE_TITLESCREEN] = 0x81
 	}
 
-	state.loadGameParts(newGamePart - GAME_PART_FIRST)
+	state.loadGameParts(newGamePart - anotherworld.GAME_PART_FIRST)
 
 	//Set all thread to inactive (pc at 0xFFFF or 0xFFFE )
 	for i := range state.channelPC {
@@ -145,11 +145,11 @@ func (state *VMState) loadGameParts(gamePart int) {
 	logger.Debug("LOAD GAME PART %d", gamePart)
 	state.gamePart = gamePart
 
-	gamePartAsset := state.assets.gameParts[gamePart]
-	state.bytecode = state.assets.loadEntryFromBank(gamePartAsset.bytecode)
-	state.palette = state.assets.loadEntryFromBank(gamePartAsset.palette)
-	state.cinematic = state.assets.loadEntryFromBank(gamePartAsset.cinematic)
-	state.video2 = state.assets.loadEntryFromBank(gamePartAsset.video2)
+	gamePartAsset := state.assets.GameParts[gamePart]
+	state.bytecode = state.assets.LoadEntryFromBank(gamePartAsset.Bytecode)
+	state.palette = state.assets.LoadEntryFromBank(gamePartAsset.Palette)
+	state.cinematic = state.assets.LoadEntryFromBank(gamePartAsset.Cinematic)
+	state.video2 = state.assets.LoadEntryFromBank(gamePartAsset.Video2)
 }
 
 // Run the Virtual Machine for every active threads
@@ -185,19 +185,19 @@ func (state *VMState) handleKeypress(keypresses uint32) {
 	leftRight := int16(0)
 	upDown := int16(0)
 	mask := int16(0)
-	if keypresses&KeyRight > 0 {
+	if keypresses&anotherworld.KeyRight > 0 {
 		leftRight = 1
 		mask |= 1
 	}
-	if keypresses&KeyLeft > 0 {
+	if keypresses&anotherworld.KeyLeft > 0 {
 		leftRight = -1
 		mask |= 2
 	}
-	if keypresses&KeyDown > 0 {
+	if keypresses&anotherworld.KeyDown > 0 {
 		upDown = 1
 		mask |= 4
 	}
-	if keypresses&KeyUp > 0 {
+	if keypresses&anotherworld.KeyUp > 0 {
 		upDown = -1
 		mask |= 8
 	}
@@ -207,7 +207,7 @@ func (state *VMState) handleKeypress(keypresses uint32) {
 	state.variables[VM_VARIABLE_HERO_POS_MASK] = mask
 
 	fireButton := int16(0)
-	if keypresses&KeyFire > 0 {
+	if keypresses&anotherworld.KeyFire > 0 {
 		fireButton = 1
 		mask |= 0x80
 	}

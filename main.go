@@ -8,6 +8,7 @@ import (
 
 	"os"
 
+	"github.com/neophob/ganother-world/anotherworld"
 	"github.com/neophob/ganother-world/logger"
 )
 
@@ -34,7 +35,7 @@ func main() {
 	app := initGotherWorld(data, bankFilesMap, *noVideoOutput)
 
 	logger.Info("- setup game")
-	app.loadGamePart(GAME_PART_ID_1 + *startPart)
+	app.loadGamePart(anotherworld.GAME_PART_ID_1 + *startPart)
 
 	//start main loop
 	for i := 0; app.exitRequested() == false; i++ {

@@ -1,8 +1,4 @@
-package main
-
-import (
-	"github.com/neophob/ganother-world/anotherworld"
-)
+package anotherworld
 
 //UnpackCtx encapsulate a decompress operation
 type UnpackCtx struct {
@@ -16,7 +12,7 @@ type UnpackCtx struct {
 }
 
 func (unpackCtx *UnpackCtx) readUInt32BE() uint32 {
-	ret := anotherworld.ToUint32BE(
+	ret := ToUint32BE(
 		unpackCtx.source[unpackCtx.sourceOffset-3],
 		unpackCtx.source[unpackCtx.sourceOffset-2],
 		unpackCtx.source[unpackCtx.sourceOffset-1],

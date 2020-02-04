@@ -1,4 +1,4 @@
-package main
+package anotherworld
 
 //Virtual Key mapping
 const (
@@ -15,10 +15,10 @@ const (
 
 //HAL is the implementation abstraction (audio, video, io)
 type HAL interface {
-	blitPage(buffer [WIDTH * HEIGHT]Color, posX, posY int)
-	eventLoop(frameCount int) uint32
-	shutdown()
+	BlitPage(buffer [WIDTH * HEIGHT]Color, posX, posY int)
+	EventLoop(frameCount int) uint32
+	Shutdown()
 
-	playSound(resNum, freq, vol, channel int)
-	playMusic(resNum, delay, pos int)
+	PlaySound(resNum, freq, vol, channel int)
+	PlayMusic(resNum, delay, pos int)
 }
