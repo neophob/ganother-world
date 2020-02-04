@@ -18,10 +18,13 @@ SRC := main.go resource.go vm.go parts.go decrunch.go lib.go \
 SRCDIR := ./
 DISTDIR := ./dist
 
-## build: build go binary in dev mode
-build:
+## build: build all the things
+build: build-native build-wasm
+
+## build-native: build go binary in dev mode
+build-native:
 	@echo "  >  BUILD"
-	@go build $(SRC)
+	@go build -o "$(DISTDIR)/main" $(SRC)
 
 ## build-wasm: builds the wasm app
 build-wasm:
@@ -38,7 +41,7 @@ format:
 ## build-release: build release build, could be compressed with UPX
 build-release:
 	#@env GOOS=js GOARCH=wasm go build -o gaw.js $(RELEASE) $(SRC)
-	@env go build -o main.release $(RELEASE) $(SRC)
+	@env go build -o "$(DISTDIR)/main.release" $(RELEASE) $(SRC)
 
 ## test: run unit tests
 test:
@@ -50,8 +53,6 @@ doc:
 
 ## clean: removes build files
 clean:
-	@rm -f ./main
-	@rm -f ./main.release
 	@rm -r ./dist/*
 
 .PHONY: help
