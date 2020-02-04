@@ -1,5 +1,9 @@
 package main
 
+import (
+	"github.com/neophob/ganother-world/logger"
+)
+
 const (
 	//TODO rename me to channel
 	VM_NUM_THREADS    int = 64
@@ -137,7 +141,7 @@ func (state *VMState) setupGamePart(newGamePart int) {
 
 // gamePart is the int between 0 and 10
 func (state *VMState) loadGameParts(gamePart int) {
-	Debug("LOAD GAME PART %d", gamePart)
+	logger.Debug("LOAD GAME PART %d", gamePart)
 	state.gamePart = gamePart
 
 	gamePartAsset := state.assets.gameParts[gamePart]
@@ -166,14 +170,14 @@ func (state *VMState) mainLoop(keypresses uint32, video *Video) {
 			for state.paused == false {
 				state.executeOp(video)
 			}
-			Debug("> step: PAUSED, pc[%5d], channel[%2d] >>> ", state.pc-1, channelID)
+			logger.Debug("> step: PAUSED, pc[%5d], channel[%2d] >>> ", state.pc-1, channelID)
 			if state.sp > 0 {
 				state.countSPNotZero++
 			}
 			state.channelPC[channelID] = state.pc
 		}
 	}
-	Debug("> --- MAINLOOP DONE")
+	logger.Debug("> --- MAINLOOP DONE")
 }
 
 func (state *VMState) handleKeypress(keypresses uint32) {
@@ -222,7 +226,7 @@ func (state *VMState) setupChannels() {
 
 func (state *VMState) executeOp(video *Video) {
 	opcode := state.fetchByte()
-	Debug("> step: opcode[%2d], pc[%5d], channel[%2d] >>> ", opcode, state.pc-1, state.channelID)
+	logger.Debug("> step: opcode[%2d], pc[%5d], channel[%2d] >>> ", opcode, state.pc-1, state.channelID)
 
 	state.countOps++
 
@@ -299,6 +303,6 @@ func (state *VMState) executeOp(video *Video) {
 		state.opPlayMusic()
 	default:
 		state.countNoOps++
-		Warn("NO_OP: %d", opcode)
+		logger.Warn("NO_OP: %d", opcode)
 	}
 }

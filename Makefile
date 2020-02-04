@@ -12,10 +12,10 @@ GOROOT := $(shell go env GOROOT)
 
 # -X add string value definition of the form importpath.name=value
 RELEASE := -ldflags "-s -w -X project.name=anotherworld"
-SRC := src/main.go src/resource.go src/vm.go src/parts.go src/decrunch.go src/lib.go \
-	src/vm-ops.go src/assets.go src/video.go src/hal-dummy.go src/hal.go src/hal-sdl.go src/text.go \
-	src/font.go src/log.go src/videoassets.go src/polygon.go src/video-data-fetcher.go
-SRCDIR := ./src
+SRC := main.go resource.go vm.go parts.go decrunch.go lib.go \
+	vm-ops.go assets.go video.go hal-dummy.go hal.go hal-sdl.go text.go \
+	font.go videoassets.go polygon.go video-data-fetcher.go
+SRCDIR := ./
 DISTDIR := ./dist
 
 ## build: build go binary in dev mode
