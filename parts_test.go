@@ -14,7 +14,7 @@ func TestPartsAllDefined(t *testing.T) {
 
 func TestPartsIntegrationValidateGamePartTypes(t *testing.T) {
 	gamePartsIndex := getGameParts()
-	gameData := readFile("../assets/memlist.bin")
+	gameData := readFile("./assets/memlist.bin")
 	resourceMap, _ := unmarshallingMemlistBin(gameData)
 
 	if len(resourceMap) == 0 {
