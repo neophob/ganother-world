@@ -1,5 +1,5 @@
 //See https://github.com/aszxqw/simplelog/blob/master/README.md
-package main
+package logger
 
 import (
 	"fmt"

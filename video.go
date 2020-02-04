@@ -1,5 +1,7 @@
 package main
 
+import "github.com/neophob/ganother-world/logger"
+
 const (
 	WIDTH         int32 = 320
 	HEIGHT        int32 = 200
@@ -43,7 +45,7 @@ func (video *Video) getColor(colorIndex, page, ofs int) uint8 {
 		i := video.rawBuffer[0][ofs]
 		return i & 0x0F
 	}
-	Warn(">VID: UNKNOWN PIXEL COLOR %d", colorIndex)
+	logger.Warn(">VID: UNKNOWN PIXEL COLOR %d", colorIndex)
 	return uint8(colorIndex & 0x0F)
 }
 
@@ -90,7 +92,7 @@ func (video *Video) copyPage(src, dst, vscroll int) {
 }
 
 func (video *Video) setWorkPagePtr(page int) {
-	Debug(">VID: SETWORKPAGEPTR %d", page)
+	logger.Debug(">VID: SETWORKPAGEPTR %d", page)
 	video.workerPage = getWorkerPage(page)
 }
 
@@ -108,7 +110,7 @@ func (video *Video) updateDisplay(page int) {
 			workerPage = getWorkerPage(page)
 		}
 	}
-	Debug(">VID: UPDATEDISPLAY %d(%d)", page, workerPage)
+	logger.Debug(">VID: UPDATEDISPLAY %d(%d)", page, workerPage)
 
 	var outputBuffer [WIDTH * HEIGHT]Color
 	for i := range video.rawBuffer[workerPage] {
@@ -144,14 +146,14 @@ func getWorkerPage(page int) int {
 	case 0xFE:
 		return 1
 	default:
-		Warn("updateWorkerPage != [0,1,2,3,0xFF,0xFE] == %d", page)
+		logger.Warn("updateWorkerPage != [0,1,2,3,0xFF,0xFE] == %d", page)
 		return 0
 	}
 }
 
 func (video *Video) drawString(color, posX, posY, stringID int) {
 	text := getText(stringID)
-	Debug(">VID: DRAWSTRING color:%d, x:%d, y:%d, text:%s", color, posX, posY, text)
+	logger.Debug(">VID: DRAWSTRING color:%d, x:%d, y:%d, text:%s", color, posX, posY, text)
 	//setWorkPagePtr(buffer);?
 
 	video.setColor(color)
@@ -169,7 +171,7 @@ func (video *Video) drawString(color, posX, posY, stringID int) {
 }
 
 func (video *Video) drawChar(posX, posY int32, char byte) {
-	Debug(">VID: DRAWCHAR char:%c, x:%d, y:%d", char, posX, posY)
+	logger.Debug(">VID: DRAWCHAR char:%c, x:%d, y:%d", char, posX, posY)
 
 	fontOffset := 8 * (int32(char) - 0x20)
 	for j := int32(0); j < 8; j++ {
@@ -185,7 +187,7 @@ func (video *Video) drawChar(posX, posY int32, char byte) {
 
 func (video *Video) drawShape(videoDataFetcher VideoDataFetcher, color, zoom, posX, posY int) {
 	i := videoDataFetcher.fetchByte()
-	Debug(">VID: DRAWSHAPE i:%d, color:%d, fetcher:%v, x:%d, y:%d, zoom:%d",
+	logger.Debug(">VID: DRAWSHAPE i:%d, color:%d, fetcher:%v, x:%d, y:%d, zoom:%d",
 		i, color, videoDataFetcher, posX, posY, zoom)
 
 	if i >= 0xC0 {
@@ -198,7 +200,7 @@ func (video *Video) drawShape(videoDataFetcher VideoDataFetcher, color, zoom, po
 		if i == 2 {
 			video.drawShapeParts(videoDataFetcher, zoom, posX, posY)
 		} else {
-			Warn("drawShape INVALID! (%d != 2)\n", i)
+			logger.Warn("drawShape INVALID! (%d != 2)\n", i)
 		}
 	}
 }
@@ -207,14 +209,14 @@ func (video *Video) drawShapeParts(videoDataFetcher VideoDataFetcher, zoom, posX
 	x := posX - int(videoDataFetcher.fetchByte())*zoom/64
 	y := posY - int(videoDataFetcher.fetchByte())*zoom/64
 	n := int16(videoDataFetcher.fetchByte())
-	Debug(">VID: DRAWSHAPEPARTS x:%d, y:%d, n:%d", x, y, n)
+	logger.Debug(">VID: DRAWSHAPEPARTS x:%d, y:%d, n:%d", x, y, n)
 
 	for ; n >= 0; n-- {
 		off := videoDataFetcher.fetchWord()
 		_x := x + int(videoDataFetcher.fetchByte())*zoom/64
 		_y := y + int(videoDataFetcher.fetchByte())*zoom/64
 
-		Debug(">VID: DRAWSHAPEPARTS off:%d at %d/%d", off, _x, _y)
+		logger.Debug(">VID: DRAWSHAPEPARTS off:%d at %d/%d", off, _x, _y)
 
 		var color uint16 = 0xFF
 		if off&0x8000 > 0 {
@@ -230,7 +232,7 @@ func (video *Video) drawShapeParts(videoDataFetcher VideoDataFetcher, zoom, posX
 }
 
 func (video *Video) drawFilledPolygon(videoDataFetcher VideoDataFetcher, col, zoom, posX, posY int) {
-	Debug(">VID: FILLPOLYGON color:%d, x:%d, y:%d, zoom:%d", col, posX, posY, zoom)
+	logger.Debug(">VID: FILLPOLYGON color:%d, x:%d, y:%d, zoom:%d", col, posX, posY, zoom)
 
 	bbw := int(videoDataFetcher.fetchByte()) * zoom / 64
 	bbh := int(videoDataFetcher.fetchByte()) * zoom / 64
@@ -248,7 +250,7 @@ func (video *Video) drawFilledPolygon(videoDataFetcher VideoDataFetcher, col, zo
 	numVertices := int(videoDataFetcher.fetchByte())
 
 	if numVertices > 70 {
-		Warn(">VID: TOOMANY %d", numVertices)
+		logger.Warn(">VID: TOOMANY %d", numVertices)
 		panic("UNEXPECTED_AMOUNT_OF_VERTICES")
 	}
 
@@ -258,7 +260,7 @@ func (video *Video) drawFilledPolygon(videoDataFetcher VideoDataFetcher, col, zo
 		vy[i] = int16(y1 + int(videoDataFetcher.fetchByte())*zoom/64)
 	}
 
-	Debug(">VID: FILLPOLYGON WorkerPage: %d, numVert: %d, col: %d, %v/%v", video.workerPage, numVertices, col, vx, vy)
+	logger.Debug(">VID: FILLPOLYGON WorkerPage: %d, numVert: %d, col: %d, %v/%v", video.workerPage, numVertices, col, vx, vy)
 	video.drawFilledPolygons(video.workerPage, vx, vy, col)
 }
 
@@ -266,7 +268,7 @@ func (video *Video) setPalette(index int) {
 	video.colors = video.videoAssets.getPalette(index >> 8)
 	//TODO fixup palette
 	//part 16004 and palette 0x47 -> ret 8, part 16006 and palette 0x4a -> ret 1
-	Debug(">VID: SETPALETTE %d", index>>8)
+	logger.Debug(">VID: SETPALETTE %d", index>>8)
 }
 
 func (video *Video) eventLoop(frameCount int) uint32 {
