@@ -12,10 +12,11 @@ GOROOT := $(shell go env GOROOT)
 
 # -X add string value definition of the form importpath.name=value
 RELEASE := -ldflags "-s -w -X project.name=anotherworld"
-SRC := main.go resource.go vm.go parts.go decrunch.go lib.go \
+SRC := main.go vm.go parts.go decrunch.go lib.go \
 	vm-ops.go assets.go video.go hal-dummy.go hal.go hal-sdl.go text.go \
 	font.go videoassets.go polygon.go video-data-fetcher.go
 SRCDIR := ./
+PACKAGES := $(SRCDIR) anotherworld logger
 DISTDIR := ./dist
 
 ## build: build all the things
@@ -45,6 +46,7 @@ build-release:
 
 ## test: run unit tests
 test:
+  # TODO test anotherworld lib too
 	@go test -cover -v $(SRCDIR)
 
 ## doc: create project documentation

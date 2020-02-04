@@ -1,5 +1,9 @@
 package main
 
+import (
+	"github.com/neophob/ganother-world/anotherworld"
+)
+
 //VideoAssets holds the assets for the currently active game part
 type VideoAssets struct {
 	palette   []uint8
@@ -23,7 +27,7 @@ func (asset VideoAssets) getPalette(index int) [16]Color {
 
 	ofs := index * 32
 	for i := 0; i < 16; i++ {
-		color := toUint16BE(asset.palette[ofs], asset.palette[ofs+1])
+		color := anotherworld.ToUint16BE(asset.palette[ofs], asset.palette[ofs+1])
 		ofs += 2
 		r := uint8(((color >> 8) & 0xF) << 4)
 		g := uint8(((color >> 4) & 0xF) << 4)

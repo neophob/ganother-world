@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/neophob/ganother-world/anotherworld"
 	"github.com/neophob/ganother-world/logger"
 )
 
@@ -110,7 +111,7 @@ func (state *VMState) fetchWord() uint16 {
 	b1 := state.bytecode[state.pc]
 	b2 := state.bytecode[state.pc+1]
 	state.pc += 2
-	return toUint16BE(b1, b2)
+	return anotherworld.ToUint16BE(b1, b2)
 }
 
 func (state *VMState) setupGamePart(newGamePart int) {

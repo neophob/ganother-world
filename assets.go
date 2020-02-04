@@ -1,12 +1,13 @@
 package main
 
 import (
+	"github.com/neophob/ganother-world/anotherworld"
 	"github.com/neophob/ganother-world/logger"
 )
 
 //TODO rename to staticGameAssets
 type Assets struct {
-	memList         map[int]MemlistEntry
+	memList         map[int]anotherworld.MemlistEntry
 	gameParts       map[int]GamePartContent
 	bank            map[int][]uint8
 	loadedResources map[int][]uint8
@@ -15,10 +16,10 @@ type Assets struct {
 // this is a function for the Assets struct
 func (assets Assets) loadEntryFromBank(index int) []uint8 {
 	memlistEntry := assets.memList[index]
-	bank := assets.bank[int(memlistEntry.bankID)]
-	ofs := int(memlistEntry.bankOffset)
-	result := bank[ofs : ofs+int(memlistEntry.packedSize)]
-	if memlistEntry.packedSize == memlistEntry.unpackedSize {
+	bank := assets.bank[int(memlistEntry.BankID)]
+	ofs := int(memlistEntry.BankOffset)
+	result := bank[ofs : ofs+int(memlistEntry.PackedSize)]
+	if memlistEntry.PackedSize == memlistEntry.UnpackedSize {
 		logger.Info("loadResource on bank %d size %d, offset %v", index, len(bank), memlistEntry)
 		return result
 	}

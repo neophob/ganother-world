@@ -5,6 +5,7 @@ import (
 	"math"
 	"sort"
 
+	"github.com/neophob/ganother-world/anotherworld"
 	"github.com/neophob/ganother-world/logger"
 )
 
@@ -23,7 +24,7 @@ type GameState struct {
 }
 
 func initGotherWorld(memlistData []byte, bankFilesMap map[int][]byte, noVideoOutput bool) GotherWorld {
-	resourceMap, resourceStatistics := unmarshallingMemlistBin(memlistData)
+	resourceMap, resourceStatistics := anotherworld.UnmarshallingMemlistBin(memlistData)
 	printResourceStats(resourceStatistics)
 
 	gameParts := getGameParts()
@@ -85,25 +86,25 @@ func (app *GotherWorld) shutdown() {
 	app.video.shutdown()
 }
 
-func printResourceStats(memlistStatistic MemlistStatistic) {
-	logger.Debug("Total # resources: %d", memlistStatistic.entryCount)
-	logger.Debug("Compressed       : %d", memlistStatistic.compressedEntries)
-	logger.Debug("Uncompressed     : %d", memlistStatistic.entryCount-memlistStatistic.compressedEntries)
-	compressionRatio := 100 / float64(memlistStatistic.entryCount) * float64(memlistStatistic.compressedEntries)
+func printResourceStats(memlistStatistic anotherworld.MemlistStatistic) {
+	logger.Debug("Total # resources: %d", memlistStatistic.EntryCount)
+	logger.Debug("Compressed       : %d", memlistStatistic.CompressedEntries)
+	logger.Debug("Uncompressed     : %d", memlistStatistic.EntryCount-memlistStatistic.CompressedEntries)
+	compressionRatio := 100 / float64(memlistStatistic.EntryCount) * float64(memlistStatistic.CompressedEntries)
 	logger.Debug("Note: %.0f%% of resources are compressed.", math.Round(compressionRatio))
-	logger.Debug("Total size (uncompressed) : %d bytes.", memlistStatistic.sizeUncompressed)
-	logger.Debug("Total size (compressed)   : %d bytes.", memlistStatistic.sizeCompressed)
-	compressionGain := 100 * (1 - float64(memlistStatistic.sizeCompressed)/float64(memlistStatistic.sizeUncompressed))
+	logger.Debug("Total size (uncompressed) : %d bytes.", memlistStatistic.SizeUncompressed)
+	logger.Debug("Total size (compressed)   : %d bytes.", memlistStatistic.SizeCompressed)
+	compressionGain := 100 * (1 - float64(memlistStatistic.SizeCompressed)/float64(memlistStatistic.SizeUncompressed))
 	logger.Debug("Note: Overall compression gain is : %.0f%%.", math.Round(compressionGain))
 
-	sortedKeys := sortedKeys(memlistStatistic.resourceTypeMap)
+	sortedKeys := sortedKeys(memlistStatistic.ResourceTypeMap)
 	for i := 0; i < len(sortedKeys); i++ {
 		k := sortedKeys[i]
-		resourceName := getResourceTypeName(k)
+		resourceName := anotherworld.GetResourceTypeName(k)
 		if len(resourceName) < 1 {
 			resourceName = fmt.Sprintf("RT_UNKOWNN_%d", k)
 		}
-		logger.Debug("Total %20s, files: %d", resourceName, memlistStatistic.resourceTypeMap[k])
+		logger.Debug("Total %20s, files: %d", resourceName, memlistStatistic.ResourceTypeMap[k])
 	}
 }
 

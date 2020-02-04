@@ -1,5 +1,9 @@
 package main
 
+import (
+	"github.com/neophob/ganother-world/anotherworld"
+)
+
 //VideoDataFetcher is the DTO for polygon drawing
 type VideoDataFetcher struct {
 	asset      *[]uint8
@@ -16,7 +20,7 @@ func (reader *VideoDataFetcher) fetchWord() uint16 {
 	b1 := (*reader.asset)[reader.readOffset]
 	b2 := (*reader.asset)[reader.readOffset+1]
 	reader.readOffset += 2
-	return toUint16BE(b1, b2)
+	return anotherworld.ToUint16BE(b1, b2)
 }
 
 func (reader *VideoDataFetcher) cloneWithUpdatedOffset(readOffset int) VideoDataFetcher {
