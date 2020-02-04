@@ -215,35 +215,35 @@ func (state *VMState) opCondJmp() {
 }
 
 // Fade "palette number" - Changes of colour palette
-func (state *VMState) opVidSetPalette(video *Video) {
+func (state *VMState) opVidSetPalette(video *anotherworld.Video) {
 	index := state.fetchWord()
-	video.setPalette(int(index))
+	video.SetPalette(int(index))
 }
 
 //Text "text number", x, y, color - Displays in the work screen the specified text for the coordinates x,y.
-func (state *VMState) opVidDrawString(video *Video) {
+func (state *VMState) opVidDrawString(video *anotherworld.Video) {
 	stringID := int(state.fetchWord())
 	x := int(state.fetchByte())
 	y := int(state.fetchByte())
 	col := int(state.fetchByte())
-	video.drawString(col, x, y, stringID)
+	video.DrawString(col, x, y, stringID)
 }
 
 //SetWS "Screen number" - Sets the work screen, which is where the polygons will be drawn by default.
-func (state *VMState) opVidSelectPage(video *Video) {
+func (state *VMState) opVidSelectPage(video *anotherworld.Video) {
 	page := int(state.fetchByte())
-	video.setWorkPagePtr(page)
+	video.SetWorkPagePtr(page)
 }
 
 //Clr "Screen number", Color - Deletes a screen with one colour. Ingame, there are 4 screen buffers
-func (state *VMState) opVidFillPage(video *Video) {
+func (state *VMState) opVidFillPage(video *anotherworld.Video) {
 	page := int(state.fetchByte())
 	color := int(state.fetchByte())
-	video.fillPage(page, color)
+	video.FillPage(page, color)
 }
 
 //Copy "Screen number A", "Screen number B" - Copies screen buffer A to screen buffer B.
-func (state *VMState) opVidCopyPage(video *Video) {
+func (state *VMState) opVidCopyPage(video *anotherworld.Video) {
 	source := state.fetchByte()
 	dest := state.fetchByte()
 
@@ -251,13 +251,13 @@ func (state *VMState) opVidCopyPage(video *Video) {
 	isVscrollEnabled := (source & uint8(not0x40)) & 0x80
 	if source >= 0xFE || isVscrollEnabled == 0 {
 		// no vscroll
-		video.copyPage(int(source), int(dest), 0)
+		video.CopyPage(int(source), int(dest), 0)
 		//app.video.copyPage(int(source&uint8(not0x40)), int(dest), 0)
 	} else {
 		sourceTranslated := int(source & 3)
 		vscroll := int(state.variables[VM_VARIABLE_SCROLL_Y])
 		if vscroll >= -199 && vscroll <= 199 {
-			video.copyPage(sourceTranslated, int(dest), vscroll)
+			video.CopyPage(sourceTranslated, int(dest), vscroll)
 		} else {
 			logger.Warn("Invalid VSCROLL %d", vscroll)
 		}
@@ -265,7 +265,7 @@ func (state *VMState) opVidCopyPage(video *Video) {
 }
 
 //Show "Screen number" - Displays the screen buffer specified in the next video frame.
-func (state *VMState) opVidUpdatePage(video *Video) {
+func (state *VMState) opVidUpdatePage(video *anotherworld.Video) {
 	page := int(state.fetchByte())
 	//TODO inp_handleSpecialKeys();
 	if state.gamePart == 0 && state.variables[0x67] == 1 {
@@ -273,10 +273,10 @@ func (state *VMState) opVidUpdatePage(video *Video) {
 		state.variables[0xDC] = 33
 	}
 
-	video.updateDisplay(page)
+	video.UpdateDisplay(page)
 }
 
-func (state *VMState) opVidDrawPolyBackground(opcode uint8, video *Video) {
+func (state *VMState) opVidDrawPolyBackground(opcode uint8, video *anotherworld.Video) {
 	offset := ((uint16(opcode) << 8) | uint16(state.fetchByte())) << 1
 	posX := int16(state.fetchByte())
 	posY := int16(state.fetchByte())
@@ -286,12 +286,12 @@ func (state *VMState) opVidDrawPolyBackground(opcode uint8, video *Video) {
 		posX += height
 	}
 	logger.Debug("opVidDrawPolyBackground %d %d", opcode, offset)
-	videoDataFetcher := video.buildReader(false, int(offset))
-	video.drawShape(videoDataFetcher, 0xFF, 0x40, int(posX), int(posY))
+	videoDataFetcher := video.BuildReader(false, int(offset))
+	video.DrawShape(videoDataFetcher, 0xFF, 0x40, int(posX), int(posY))
 }
 
 //Spr "'object name" , x, y, z - In the work screen, draws the graphics tool at the coordinates x,y and the zoom factor z. A polygon, a group of polygons...
-func (state *VMState) opVidDrawPolySprite(opcode uint8, video *Video) {
+func (state *VMState) opVidDrawPolySprite(opcode uint8, video *anotherworld.Video) {
 	useSecondVideoResource := false
 	offsetHi := state.fetchByte()
 	offset := ((uint16(offsetHi) << 8) | uint16(state.fetchByte())) << 1
@@ -333,29 +333,29 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8, video *Video) {
 		}
 	}
 	logger.Debug("opVidDrawPolySprite %d", offset)
-	videoDataFetcher := video.buildReader(useSecondVideoResource, int(offset))
-	video.drawShape(videoDataFetcher, 0xFF, int(zoom), int(posX), int(posY))
+	videoDataFetcher := video.BuildReader(useSecondVideoResource, int(offset))
+	video.DrawShape(videoDataFetcher, 0xFF, int(zoom), int(posX), int(posY))
 }
 
 //Initialises a song.
-func (state *VMState) opPlayMusic(video *Video) {
+func (state *VMState) opPlayMusic(video *anotherworld.Video) {
 	resNum := int(state.fetchWord())
 	delay := int(state.fetchWord())
 	pos := int(state.fetchByte())
-    //TODO naming is hard!
+	//TODO naming is hard!
 	logger.Debug("op_playMusic(0x%X, %d, %d)", resNum, delay, pos)
-    video.playMusic(resNum, delay, pos)
+	video.PlayMusic(resNum, delay, pos)
 }
 
 //Plays the sound file on one of the four game audio channels with specific height and volume.
-func (state *VMState) opPlaySound(video *Video) {
+func (state *VMState) opPlaySound(video *anotherworld.Video) {
 	resNum := int(state.fetchWord())
 	freq := int(state.fetchByte())
 	vol := int(state.fetchByte())
 	channel := int(state.fetchByte())
-    //TODO naming is hard!
-    state.assets.LoadResource(resNum)
-    video.playSound(resNum, freq, vol, channel)
+	//TODO naming is hard!
+	state.assets.LoadResource(resNum)
+	video.PlaySound(resNum, freq, vol, channel)
 }
 
 func (state *VMState) opUpdateResource() {

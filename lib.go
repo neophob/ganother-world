@@ -11,7 +11,7 @@ import (
 
 //GotherWorld is the root object, it holds the whole world
 type GotherWorld struct {
-	video      Video
+	video      anotherworld.Video
 	vm         VMState
 	gameState  GameState
 	keyPresses uint32
@@ -20,10 +20,10 @@ type GotherWorld struct {
 //GameState used to save and load a game state
 type GameState struct {
 	vm    VMState
-	video Video
+	video anotherworld.Video
 }
 
-func initGotherWorld(memlistData []byte, bankFilesMap map[int][]byte, videoDriver Video) GotherWorld {
+func initGotherWorld(memlistData []byte, bankFilesMap map[int][]byte, videoDriver anotherworld.Video) GotherWorld {
 	resourceMap, resourceStatistics := anotherworld.UnmarshallingMemlistBin(memlistData)
 	printResourceStats(resourceStatistics)
 
@@ -77,11 +77,11 @@ func (app *GotherWorld) loadGamePart(partID int) {
 	//TODO rename video struct to game??
 	//TODO add audio stuff
 	videoAssets := app.vm.buildVideoAssets()
-	app.video.updateGamePart(videoAssets)
+	app.video.UpdateGamePart(videoAssets)
 }
 
-func (app *GotherWorld) shutdown() {
-	app.video.shutdown()
+func (app *GotherWorld) Shutdown() {
+	app.video.Shutdown()
 }
 
 func printResourceStats(memlistStatistic anotherworld.MemlistStatistic) {

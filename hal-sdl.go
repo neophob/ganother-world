@@ -38,7 +38,7 @@ func buildSDLHAL() *SDLHAL {
 		logger.Error("SDL CREATE RENDERER FAILED")
 		panic(err)
 	}
-	renderer.SetLogicalSize(WIDTH, HEIGHT)
+	renderer.SetLogicalSize(anotherworld.WIDTH, anotherworld.HEIGHT)
 	//renderer.SetLogicalSize(WIDTH*2, HEIGHT*2)
 	renderer.Clear()
 	renderer.Present()
@@ -58,12 +58,12 @@ func buildSDLHAL() *SDLHAL {
 }
 
 // blit image
-func (render *SDLHAL) BlitPage(buffer [WIDTH * HEIGHT]anotherworld.Color, posX, posY int) {
+func (render *SDLHAL) BlitPage(buffer [anotherworld.WIDTH * anotherworld.HEIGHT]anotherworld.Color, posX, posY int) {
 	lastSetColor := buffer[0]
 	render.renderer.SetDrawColor(buffer[0].R, buffer[0].G, buffer[0].B, 255)
 	offset := 0
-	for y := 0; y < int(HEIGHT); y++ {
-		for x := 0; x < int(WIDTH); x++ {
+	for y := 0; y < int(anotherworld.HEIGHT); y++ {
+		for x := 0; x < int(anotherworld.WIDTH); x++ {
 			if i := buffer[offset]; i != lastSetColor {
 				render.renderer.SetDrawColor(i.R, i.G, i.B, 255)
 				lastSetColor = i

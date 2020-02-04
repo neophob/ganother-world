@@ -153,7 +153,7 @@ func (state *VMState) loadGameParts(gamePart int) {
 }
 
 // Run the Virtual Machine for every active threads
-func (state *VMState) mainLoop(keypresses uint32, video *Video) {
+func (state *VMState) mainLoop(keypresses uint32, video *anotherworld.Video) {
 	state.handleKeypress(keypresses)
 
 	//TODO check if next part needs to be loaded!
@@ -225,7 +225,7 @@ func (state *VMState) setupChannels() {
 	}
 }
 
-func (state *VMState) executeOp(video *Video) {
+func (state *VMState) executeOp(video *anotherworld.Video) {
 	opcode := state.fetchByte()
 	logger.Debug("> step: opcode[%2d], pc[%5d], channel[%2d] >>> ", opcode, state.pc-1, state.channelID)
 

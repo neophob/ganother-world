@@ -1,4 +1,4 @@
-package main
+package anotherworld
 
 func calcStep(x1, y1, x2, y2 int) (int, int) {
 	dy := y2 - y1
@@ -56,8 +56,8 @@ func (video *Video) drawFilledPolygons(page int, vx, vy []int16, col int) {
 
 						outputOffset := yPosition * int(WIDTH)
 						for x := xPositionStart; x <= xPositionEnd; x++ {
-							color := video.getColor(col, video.workerPage, outputOffset+x)
-							video.rawBuffer[video.workerPage][outputOffset+x] = color
+							color := video.getColor(col, video.WorkerPage, outputOffset+x)
+							video.rawBuffer[video.WorkerPage][outputOffset+x] = color
 						}
 					}
 				}

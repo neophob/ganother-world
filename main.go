@@ -32,11 +32,11 @@ func main() {
 	data := readFile("./assets/memlist.bin")
 	bankFilesMap := createBankMap("./assets/")
 
-	var videoDriver Video
+	var videoDriver anotherworld.Video
 	if *noVideoOutput == true {
-		videoDriver = Video{hal: anotherworld.DummyHAL{}}
+		videoDriver = anotherworld.Video{Hal: anotherworld.DummyHAL{}}
 	} else {
-		videoDriver = Video{hal: buildSDLHAL(), workerPage: 0xFE}
+		videoDriver = anotherworld.Video{Hal: buildSDLHAL(), WorkerPage: 0xFE}
 	}
 
 	app := initGotherWorld(data, bankFilesMap, videoDriver)
@@ -55,7 +55,7 @@ func main() {
 		time.Sleep(20 * time.Millisecond)
 	}
 
-	app.shutdown()
+	app.Shutdown()
 }
 
 func readFile(filename string) []byte {
