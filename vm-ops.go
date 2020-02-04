@@ -1,19 +1,21 @@
 package main
 
+import "github.com/neophob/ganother-world/logger"
+
 //Implementation of all VM ops
 
 //Continues the code execution at the indicated address.
 func (state *VMState) opJmp() {
 	offset := state.fetchWord()
 	state.pc = uint16(offset)
-	Debug("#op_jmp() jump to %d", state.pc)
+	logger.Debug("#op_jmp() jump to %d", state.pc)
 }
 
 //Set.i variable, value - Initialises the variable with an integer value from -32768 to 32767.
 func (state *VMState) opMovConst() {
 	index := state.fetchByte()
 	value := int16(state.fetchWord())
-	Debug("#op_movConst %d %d", index, value)
+	logger.Debug("#op_movConst %d %d", index, value)
 	state.variables[index] = value
 }
 
@@ -21,14 +23,14 @@ func (state *VMState) opMovConst() {
 func (state *VMState) opMov() {
 	dest := state.fetchByte()
 	source := state.fetchByte()
-	Debug("#op_mov %d %d %d", source, dest, state.variables[source])
+	logger.Debug("#op_mov %d %d %d", source, dest, state.variables[source])
 	state.variables[dest] = state.variables[source]
 }
 
 //Variable = Variable + Integer value
 func (state *VMState) opAddConst() {
 	if state.gamePart == 5 && state.pc == 0x6D48 {
-		Warn("TODO Script::op_addConst() workaround for infinite looping gun sound")
+		logger.Warn("TODO Script::op_addConst() workaround for infinite looping gun sound")
 		// The script 0x27 slot 0x17 doesn't stop the gun sound from looping.
 		// This is a bug in the original game code, confirmed by Eric Chahi and
 		// addressed with the anniversary editions.
@@ -38,7 +40,7 @@ func (state *VMState) opAddConst() {
 	}
 	index := state.fetchByte()
 	value := int16(state.fetchWord())
-	Debug("#op_addConst() index=%d, value=%d, add=%d", index, state.variables[index], value)
+	logger.Debug("#op_addConst() index=%d, value=%d, add=%d", index, state.variables[index], value)
 	state.variables[index] += value
 }
 
@@ -46,7 +48,7 @@ func (state *VMState) opAddConst() {
 func (state *VMState) opAdd() {
 	dest := state.fetchByte()
 	source := state.fetchByte()
-	Debug("#op_add() index=%d, var1=%d, var2=%d", dest, state.variables[dest], state.variables[source])
+	logger.Debug("#op_add() index=%d, var1=%d, var2=%d", dest, state.variables[dest], state.variables[source])
 	state.variables[dest] += state.variables[source]
 }
 
@@ -54,7 +56,7 @@ func (state *VMState) opAdd() {
 func (state *VMState) opSub() {
 	dest := state.fetchByte()
 	source := state.fetchByte()
-	Debug("#op_sub() %d %d", dest, state.variables[source])
+	logger.Debug("#op_sub() %d %d", dest, state.variables[source])
 	state.variables[dest] -= state.variables[source]
 }
 
@@ -62,7 +64,7 @@ func (state *VMState) opSub() {
 func (state *VMState) opAnd() {
 	index := state.fetchByte()
 	value := state.fetchWord()
-	Debug("#op_and() %d %d", index, value)
+	logger.Debug("#op_and() %d %d", index, value)
 	state.variables[index] &= int16(value)
 }
 
@@ -70,7 +72,7 @@ func (state *VMState) opAnd() {
 func (state *VMState) opOr() {
 	index := state.fetchByte()
 	value := state.fetchWord()
-	Debug("#op_or() %d %d", index, value)
+	logger.Debug("#op_or() %d %d", index, value)
 	state.variables[index] |= int16(value)
 }
 
@@ -79,7 +81,7 @@ func (state *VMState) opShl() {
 	index := state.fetchByte()
 	value := state.fetchWord()
 	state.variables[index] <<= uint(value)
-	Debug("#op_shl() %d %d %d", index, value, state.variables[index])
+	logger.Debug("#op_shl() %d %d %d", index, value, state.variables[index])
 }
 
 //Makes a N bit rotation to the right on the variable.
@@ -87,7 +89,7 @@ func (state *VMState) opShr() {
 	index := state.fetchByte()
 	value := state.fetchWord()
 	state.variables[index] >>= uint(value)
-	Debug("#op_shr() %d %d %d", index, value, state.variables[index])
+	logger.Debug("#op_shr() %d %d %d", index, value, state.variables[index])
 }
 
 //Jsr Adress - Executes the subroutine located at the indicated address.
@@ -95,13 +97,13 @@ func (state *VMState) opCall() {
 	newPC := state.fetchWord()
 	state.saveSP()
 	state.pc = newPC
-	Debug("#op_call(), jump to pc: %d", state.pc)
+	logger.Debug("#op_call(), jump to pc: %d", state.pc)
 }
 
 //End of a subroutine.
 func (state *VMState) opRet() {
 	state.restoreSP()
-	Debug("#op_ret(), pc: %d", state.pc)
+	logger.Debug("#op_ret(), pc: %d", state.pc)
 }
 
 //Setvec "numéro de canal", address - Initialises a channel with a code address to execute
@@ -109,19 +111,19 @@ func (state *VMState) opRet() {
 func (state *VMState) opInstallTask() {
 	channelID := state.fetchByte()
 	address := state.fetchWord()
-	Debug("#opInstallTask %d %d", channelID, address)
+	logger.Debug("#opInstallTask %d %d", channelID, address)
 	state.nextLoopChannelPC[channelID] = address
 }
 
 //Break - Temporarily stops the executing channel and goes to the next.
 func (state *VMState) opYieldTask() {
-	Debug("#opYieldTask")
+	logger.Debug("#opYieldTask")
 	state.paused = true
 }
 
 //Bigend - Permanently stops the executing channel and goes to the next.
 func (state *VMState) opRemoveTask() {
-	Debug("#opRemoveTask %d", state.channelID)
+	logger.Debug("#opRemoveTask %d", state.channelID)
 	state.pc = VM_INACTIVE_THREAD
 	state.paused = true
 }
@@ -131,7 +133,7 @@ func (state *VMState) opChangeTaskState() {
 	channelIDStart := state.fetchByte()
 	channelIDEnd := state.fetchByte()
 	changeType := state.fetchByte()
-	Debug("#opChangeTaskState %d %d %d", channelIDStart, channelIDEnd, changeType)
+	logger.Debug("#opChangeTaskState %d %d %d", channelIDStart, channelIDEnd, changeType)
 	for i := channelIDStart; i <= channelIDEnd; i++ {
 		switch changeType {
 		case 0:
@@ -148,7 +150,7 @@ func (state *VMState) opChangeTaskState() {
 func (state *VMState) opJmpIfVar() {
 	index := state.fetchByte()
 	state.variables[index]--
-	Debug("#opJmpIfVar %d", state.variables[index])
+	logger.Debug("#opJmpIfVar %d", state.variables[index])
 	if state.variables[index] != 0 {
 		state.opJmp()
 	} else {
@@ -169,13 +171,13 @@ func (state *VMState) opCondJmp() {
 	} else {
 		newVariable = int16(state.fetchByte())
 	}
-	Debug("> step #op_condJmp (%d, 0x%02X, 0x%02X) var=0x%02X", op, currentVariable, newVariable, variableID)
+	logger.Debug("> step #op_condJmp (%d, 0x%02X, 0x%02X) var=0x%02X", op, currentVariable, newVariable, variableID)
 	expr := false
 	switch op & 7 {
 	case 0:
 		expr = (currentVariable == newVariable)
 		if variableID == 0x29 && op&0x80 != 0 {
-			Warn("TODO BYPASS PROTECTION!")
+			logger.Warn("TODO BYPASS PROTECTION!")
 			/*				// 4 symbols
 							_scriptVars[0x29] = _scriptVars[0x1E];
 							_scriptVars[0x2A] = _scriptVars[0x1F];
@@ -198,10 +200,10 @@ func (state *VMState) opCondJmp() {
 	case 5:
 		expr = (currentVariable <= newVariable)
 	default:
-		Debug("#op_condJmp: Invalid condition!")
+		logger.Debug("#op_condJmp: Invalid condition!")
 	}
 	if expr {
-		Debug("> step: TRUE!ILLJUMP")
+		logger.Debug("> step: TRUE!ILLJUMP")
 		state.opJmp()
 		//fixUpPalette_changeScreen(_res->_currentPart, _scriptVars[VAR_SCREEN_NUM]);
 	} else {
@@ -254,7 +256,7 @@ func (state *VMState) opVidCopyPage(video *Video) {
 		if vscroll >= -199 && vscroll <= 199 {
 			video.copyPage(sourceTranslated, int(dest), vscroll)
 		} else {
-			Warn("Invalid VSCROLL %d", vscroll)
+			logger.Warn("Invalid VSCROLL %d", vscroll)
 		}
 	}
 }
@@ -264,7 +266,7 @@ func (state *VMState) opVidUpdatePage(video *Video) {
 	page := int(state.fetchByte())
 	//TODO inp_handleSpecialKeys();
 	if state.gamePart == 0 && state.variables[0x67] == 1 {
-		Debug("opVidUpdatePage: BYPASS PROTECTION %d", page)
+		logger.Debug("opVidUpdatePage: BYPASS PROTECTION %d", page)
 		state.variables[0xDC] = 33
 	}
 
@@ -280,7 +282,7 @@ func (state *VMState) opVidDrawPolyBackground(opcode uint8, video *Video) {
 		posY = 199
 		posX += height
 	}
-	Debug("opVidDrawPolyBackground %d %d", opcode, offset)
+	logger.Debug("opVidDrawPolyBackground %d %d", opcode, offset)
 	videoDataFetcher := video.buildReader(false, int(offset))
 	video.drawShape(videoDataFetcher, 0xFF, 0x40, int(posX), int(posY))
 }
@@ -314,7 +316,7 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8, video *Video) {
 	if opcode&2 == 0 {
 		if opcode&1 == 0 {
 			state.pc--
-			Debug("zoom decreased PC %d", state.pc)
+			logger.Debug("zoom decreased PC %d", state.pc)
 			zoom = 0x40
 		} else {
 			zoom = uint16(state.variables[zoom])
@@ -323,11 +325,11 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8, video *Video) {
 		if opcode&1 > 0 {
 			useSecondVideoResource = true
 			state.pc--
-			Debug("useSecondVideoResource! zoom decreased PC: %d", state.pc)
+			logger.Debug("useSecondVideoResource! zoom decreased PC: %d", state.pc)
 			zoom = 0x40
 		}
 	}
-	Debug("opVidDrawPolySprite %d", offset)
+	logger.Debug("opVidDrawPolySprite %d", offset)
 	videoDataFetcher := video.buildReader(useSecondVideoResource, int(offset))
 	video.drawShape(videoDataFetcher, 0xFF, int(zoom), int(posX), int(posY))
 }
@@ -337,9 +339,9 @@ func (state *VMState) opPlayMusic(video *Video) {
 	resNum := int(state.fetchWord())
 	delay := int(state.fetchWord())
 	pos := int(state.fetchByte())
-	//TODO naming is hard!
-	state.assets.loadResource(resNum)
-	video.playMusic(resNum, delay, pos)
+    //TODO naming is hard!
+	logger.Debug("op_playMusic(0x%X, %d, %d)", resNum, delay, pos)
+    video.playMusic(resNum, delay, pos)
 }
 
 //Plays the sound file on one of the four game audio channels with specific height and volume.
@@ -348,21 +350,21 @@ func (state *VMState) opPlaySound(video *Video) {
 	freq := int(state.fetchByte())
 	vol := int(state.fetchByte())
 	channel := int(state.fetchByte())
-	//TODO naming is hard!
-	state.assets.loadResource(resNum)
-	video.playSound(resNum, freq, vol, channel)
+    //TODO naming is hard!
+    state.assets.loadResource(resNum)
+    video.playSound(resNum, freq, vol, channel)
 }
 
 func (state *VMState) opUpdateResource() {
 	id := int(state.fetchWord())
-	Debug("opUpdateResource %d", id)
+	logger.Debug("opUpdateResource %d", id)
 	if id >= GAME_PART_ID_1 {
-		Debug("should load next part %d", id)
+		logger.Debug("should load next part %d", id)
 		state.loadNextPart = id
 		return
 	}
 	if id == 0 {
-		Warn("opUpdateResource TODO! INVALIDATE DATA %d", id)
+		logger.Warn("opUpdateResource TODO! INVALIDATE DATA %d", id)
 		//_ply->stop();
 		//_mix->stopAll();
 		//_res->invalidateRes();

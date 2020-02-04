@@ -2,6 +2,7 @@
 package main
 
 import (
+	"github.com/neophob/ganother-world/logger"
 	"github.com/veandco/go-sdl2/sdl"
 )
 
@@ -20,20 +21,20 @@ type SDLHAL struct {
 
 func buildSDLHAL() *SDLHAL {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
-		Error("SDL INIT FAILED")
+		logger.Error("SDL INIT FAILED")
 		panic(err)
 	}
 
 	window, err := sdl.CreateWindow("ganother world", sdl.WINDOWPOS_CENTERED, sdl.WINDOWPOS_CENTERED,
 		windowWidth, windowHeight, sdl.WINDOW_ALLOW_HIGHDPI)
 	if err != nil {
-		Error("SDL CREATE WINDOW FAILED")
+		logger.Error("SDL CREATE WINDOW FAILED")
 		panic(err)
 	}
 
 	renderer, err := sdl.CreateRenderer(window, -1, sdl.RENDERER_SOFTWARE)
 	if err != nil {
-		Error("SDL CREATE RENDERER FAILED")
+		logger.Error("SDL CREATE RENDERER FAILED")
 		panic(err)
 	}
 	renderer.SetLogicalSize(WIDTH, HEIGHT)
@@ -43,7 +44,7 @@ func buildSDLHAL() *SDLHAL {
 
 	surface, err := window.GetSurface()
 	if err != nil {
-		Error("SDL GET SURFACE FAILED")
+		logger.Error("SDL GET SURFACE FAILED")
 		panic(err)
 	}
 
@@ -80,9 +81,9 @@ func (render *SDLHAL) eventLoop(frameCount int) uint32 {
 		switch t := event.(type) {
 		case *sdl.QuitEvent:
 			keyPress |= KeyEsc
-			Debug(">ESC")
+			logger.Debug(">ESC")
 		case *sdl.KeyboardEvent:
-			Debug(">KeyboardEvent %v %v", t.State, t.Keysym.Scancode)
+			logger.Debug(">KeyboardEvent %v %v", t.State, t.Keysym.Scancode)
 			isKeyPressed := t.State == sdl.PRESSED
 			if t.Keysym.Sym == sdl.K_ESCAPE {
 				keyPress |= KeyEsc
@@ -143,11 +144,11 @@ func (render *SDLHAL) eventLoop(frameCount int) uint32 {
 }
 
 func (render *SDLHAL) playMusic(resNum, delay, pos int) {
-	Info(">SND: playMusic res:%d del:%d pos:%d", resNum, delay, pos)
+	logger.Info(">SND: playMusic res:%d del:%d pos:%d", resNum, delay, pos)
 }
 
 func (render *SDLHAL) playSound(resNum, freq, vol, channel int) {
-	Info(">SND: playSound res:%d frq:%d vol:%d c:%d", resNum, freq, vol, channel)
+	logger.Info(">SND: playSound res:%d frq:%d vol:%d c:%d", resNum, freq, vol, channel)
 }
 
 // exit application, lets cleanup...

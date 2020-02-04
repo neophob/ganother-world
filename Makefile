@@ -8,18 +8,31 @@ PROJECTNAME := $(shell basename "$(PWD)")
 # Go related variables.
 GOBASE := $(shell pwd)
 GOFILES := $(wildcard *.go)
+GOROOT := $(shell go env GOROOT)
 
 # -X add string value definition of the form importpath.name=value
 RELEASE := -ldflags "-s -w -X project.name=anotherworld"
-SRC := src/main.go src/resource.go src/vm.go src/parts.go src/decrunch.go src/lib.go \
-	src/vm-ops.go src/assets.go src/video.go src/hal-dummy.go src/hal.go src/hal-sdl.go src/text.go \
-	src/font.go src/log.go src/videoassets.go src/polygon.go src/video-data-fetcher.go
-SRCDIR := ./src
+SRC := main.go resource.go vm.go parts.go decrunch.go lib.go \
+	vm-ops.go assets.go video.go hal-dummy.go hal.go hal-sdl.go text.go \
+	font.go videoassets.go polygon.go video-data-fetcher.go
+SRCDIR := ./
+DISTDIR := ./dist
 
-## build: build go binary in dev mode
-build:
+## build: build all the things
+build: build-native build-wasm
+
+## build-native: build go binary in dev mode
+build-native:
 	@echo "  >  BUILD"
-	@go build $(SRC)
+	@go build -o "$(DISTDIR)/main" $(SRC)
+
+## build-wasm: builds the wasm app
+build-wasm:
+	@echo "  >  BUILD-WASM"
+	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" wasm/main.go
+	@cp wasm/index.html $(DISTDIR)
+	@go build -o "$(DISTDIR)/devserver" cmd/devserver/main.go
+	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
 
 ## format: format code using go fmt
 format:
@@ -28,7 +41,7 @@ format:
 ## build-release: build release build, could be compressed with UPX
 build-release:
 	#@env GOOS=js GOARCH=wasm go build -o gaw.js $(RELEASE) $(SRC)
-	@env go build -o main.release $(RELEASE) $(SRC)
+	@env go build -o "$(DISTDIR)/main.release" $(RELEASE) $(SRC)
 
 ## test: run unit tests
 test:
@@ -40,8 +53,7 @@ doc:
 
 ## clean: removes build files
 clean:
-	@rm -f ./main
-	@rm -f ./main.release
+	@rm -r ./dist/*
 
 .PHONY: help
 all: help

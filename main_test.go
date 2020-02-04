@@ -7,8 +7,8 @@ import (
 
 const stepsToRun int = 1
 
-var memlist = readFile("../assets/memlist.bin")
-var bankFilesMap = createBankMap("../assets/")
+var memlist = readFile("./assets/memlist.bin")
+var bankFilesMap = createBankMap("./assets/")
 
 func run(gamepart int) GotherWorld {
 	app := initGotherWorld(memlist, bankFilesMap, true)

@@ -3,6 +3,8 @@ Resource handling: load files needed for game, unpack data
 */
 package main
 
+import "github.com/neophob/ganother-world/logger"
+
 const (
 	memlistEntrySize int = 20
 )
@@ -43,7 +45,7 @@ func unmarshallingMemlistBin(data []uint8) (map[int]MemlistEntry, MemlistStatist
 		if entry.resourceType == 0xFF {
 			break
 		}
-		Debug("R:%#02x, %-17s size=%5d (%5d)  bank=%2d  offset=%6d", memlistStatistic.entryCount,
+		logger.Debug("R:%#02x, %-17s size=%5d (%5d)  bank=%2d  offset=%6d", memlistStatistic.entryCount,
 			getResourceTypeName(int(entry.resourceType)), entry.unpackedSize, entry.packedSize, entry.bankID, entry.bankOffset)
 		resourceMap[memlistStatistic.entryCount] = entry
 		memlistStatistic.entryCount++

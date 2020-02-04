@@ -7,31 +7,33 @@ import (
 	"time"
 
 	"os"
+
+	"github.com/neophob/ganother-world/logger"
 )
 
 func main() {
-	Info("# GOTHER WORLD vDEV")
+	logger.Info("# GOTHER WORLD vDEV")
 
 	noVideoOutput := flag.Bool("t", false, "Use Text only output (no SDL needed)")
 	debug := flag.Bool("d", false, "Enable Debug Mode")
 	startPart := flag.Int("p", 1, "Game part to start from (0-9)")
 	flag.Parse()
 
-	Info("# KEYBOARD MAPPING:")
-	Info("- L: Load State")
-	Info("- S: Save State")
+	logger.Info("# KEYBOARD MAPPING:")
+	logger.Info("- L: Load State")
+	logger.Info("- S: Save State")
 
 	if *debug == false {
-		SetLogLevel(LEVEL_INFO)
+		logger.SetLogLevel(logger.LEVEL_INFO)
 	}
 
-	Info("- load memlist.bin")
+	logger.Info("- load memlist.bin")
 	data := readFile("./assets/memlist.bin")
 	bankFilesMap := createBankMap("./assets/")
 
 	app := initGotherWorld(data, bankFilesMap, *noVideoOutput)
 
-	Info("- setup game")
+	logger.Info("- setup game")
 	app.loadGamePart(GAME_PART_ID_1 + *startPart)
 
 	//start main loop
@@ -51,7 +53,7 @@ func main() {
 func readFile(filename string) []byte {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		Error("File reading error %v", err)
+		logger.Error("File reading error %v", err)
 		os.Exit(1)
 	}
 	return data
@@ -61,7 +63,7 @@ func createBankMap(assetPath string) map[int][]byte {
 	bankFilesMap := make(map[int][]byte)
 	for i := 0x01; i < 0x0e; i++ {
 		name := fmt.Sprintf("%sbank%02x", assetPath, i)
-		Debug("- load file %s", name)
+		logger.Debug("- load file %s", name)
 		entry := readFile(name)
 		bankFilesMap[i] = entry
 	}
