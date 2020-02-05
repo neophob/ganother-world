@@ -17,7 +17,7 @@ func run(gamepart int) GotherWorld {
 	app := initGotherWorld(memlist, bankFilesMap, videoDriver)
 	app.loadGamePart(anotherworld.GAME_PART_ID_1 + gamepart)
 	for i := 0; i < stepsToRun; i++ {
-		app.mainLoop(i)
+		app.MainLoop(i)
 	}
 	return app
 }
@@ -27,11 +27,11 @@ func TestRunGameparts(t *testing.T) {
 		fmt.Println("### RUN PART", part)
 		app := run(part)
 		//TODO should be 0, there is one case!
-		if app.vm.countNoOps > 1 {
-			t.Errorf("countNoOps > 0: part %d %d", part, app.vm.countNoOps)
+		if app.vm.CountNoOps > 1 {
+			t.Errorf("CountNoOps > 0: part %d %d", part, app.vm.CountNoOps)
 		}
-		if app.vm.countSPNotZero > 1 {
-			t.Errorf("countSPNotZero > 1: part %d %d", part, app.vm.countSPNotZero)
+		if app.vm.CountSPNotZero > 1 {
+			t.Errorf("CountSPNotZero > 1: part %d %d", part, app.vm.CountSPNotZero)
 		}
 	}
 }

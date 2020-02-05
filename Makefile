@@ -12,7 +12,7 @@ GOROOT := $(shell go env GOROOT)
 
 # -X add string value definition of the form importpath.name=value
 RELEASE := -ldflags "-s -w -X project.name=anotherworld"
-SRC := main.go lib.go hal-sdl.go vm.go vm-ops.go
+SRC := main.go lib.go hal-sdl.go
 SRCDIR := ./
 PACKAGES := $(SRCDIR) anotherworld logger
 DISTDIR := ./dist

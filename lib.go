@@ -12,14 +12,14 @@ import (
 //GotherWorld is the root object, it holds the whole world
 type GotherWorld struct {
 	video      anotherworld.Video
-	vm         VMState
+	vm         anotherworld.VMState
 	gameState  GameState
 	keyPresses uint32
 }
 
 //GameState used to save and load a game state
 type GameState struct {
-	vm    VMState
+	vm    anotherworld.VMState
 	video anotherworld.Video
 }
 
@@ -36,7 +36,7 @@ func initGotherWorld(memlistData []byte, bankFilesMap map[int][]byte, videoDrive
 	}
 
 	logger.Info("- create state")
-	vmState := createNewState(assets)
+	vmState := anotherworld.CreateNewState(assets)
 	app := GotherWorld{video: videoDriver, vm: vmState}
 	app.loadGamePart(anotherworld.GAME_PART_FIRST)
 	return app
@@ -46,37 +46,37 @@ func (app *GotherWorld) exitRequested() bool {
 	return app.keyPresses&anotherworld.KeyEsc > 0
 }
 
-func (app *GotherWorld) mainLoop(i int) {
+func (app *GotherWorld) MainLoop(i int) {
 	app.keyPresses = app.video.EventLoop(i)
-	app.vm.mainLoop(app.keyPresses, &app.video)
+	app.vm.MainLoop(app.keyPresses, &app.video)
 
 	if app.keyPresses&anotherworld.KeySave > 0 {
 		logger.Info("SAVE STATE")
 		app.gameState = GameState{app.vm, app.video}
 	}
-	if app.gameState.vm.gamePart > 0 && app.keyPresses&anotherworld.KeyLoad > 0 {
+	if app.gameState.vm.GamePart > 0 && app.keyPresses&anotherworld.KeyLoad > 0 {
 		logger.Info("LOAD STATE")
-		app.vm.loadGameParts(app.gameState.vm.gamePart)
-		app.vm.variables = app.gameState.vm.variables
-		app.vm.channelPC = app.gameState.vm.channelPC
-		app.vm.nextLoopChannelPC = app.gameState.vm.nextLoopChannelPC
-		app.vm.channelPaused = app.gameState.vm.channelPaused
-		app.vm.stackCalls = app.gameState.vm.stackCalls
+		app.vm.LoadGameParts(app.gameState.vm.GamePart)
+		app.vm.Variables = app.gameState.vm.Variables
+		app.vm.ChannelPC = app.gameState.vm.ChannelPC
+		app.vm.NextLoopChannelPC = app.gameState.vm.NextLoopChannelPC
+		app.vm.ChannelPaused = app.gameState.vm.ChannelPaused
+		app.vm.StackCalls = app.gameState.vm.StackCalls
 		app.video = app.gameState.video
 	}
 
-	if app.vm.loadNextPart > 0 {
-		logger.Info("- load next part %d", app.vm.loadNextPart)
-		app.loadGamePart(app.vm.loadNextPart)
+	if app.vm.LoadNextPart > 0 {
+		logger.Info("- load next part %d", app.vm.LoadNextPart)
+		app.loadGamePart(app.vm.LoadNextPart)
 	}
 }
 
 func (app *GotherWorld) loadGamePart(partID int) {
-	app.vm.setupGamePart(partID)
+	app.vm.SetupGamePart(partID)
 	//TODO rename videoAssets to game part assets
 	//TODO rename video struct to game??
 	//TODO add audio stuff
-	videoAssets := app.vm.buildVideoAssets()
+	videoAssets := app.vm.BuildVideoAssets()
 	app.video.UpdateGamePart(videoAssets)
 }
 

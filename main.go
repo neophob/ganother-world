@@ -49,7 +49,7 @@ func main() {
 		/*if i%30 == rand.Intn(30) {
 			app.loadGamePart(GAME_PART_ID_1+rand.Intn(9))
 		}*/
-		app.mainLoop(i)
+		app.MainLoop(i)
 
 		//game run at approx 25 fps
 		time.Sleep(20 * time.Millisecond)
