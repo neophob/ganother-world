@@ -39,15 +39,15 @@ func main() {
 		videoDriver = anotherworld.Video{Hal: buildSDLHAL(), WorkerPage: 0xFE}
 	}
 
-	app := initGotherWorld(data, bankFilesMap, videoDriver)
+	app := anotherworld.InitGotherWorld(data, bankFilesMap, videoDriver)
 
 	logger.Info("- setup game")
-	app.loadGamePart(anotherworld.GAME_PART_ID_1 + *startPart)
+	app.LoadGamePart(anotherworld.GAME_PART_ID_1 + *startPart)
 
 	//start main loop
-	for i := 0; app.exitRequested() == false; i++ {
+	for i := 0; app.ExitRequested() == false; i++ {
 		/*if i%30 == rand.Intn(30) {
-			app.loadGamePart(GAME_PART_ID_1+rand.Intn(9))
+			app.LoadGamePart(GAME_PART_ID_1+rand.Intn(9))
 		}*/
 		app.MainLoop(i)
 

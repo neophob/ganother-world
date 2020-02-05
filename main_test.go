@@ -12,10 +12,10 @@ const stepsToRun int = 1
 var memlist = readFile("./assets/memlist.bin")
 var bankFilesMap = createBankMap("./assets/")
 
-func run(gamepart int) GotherWorld {
+func run(gamepart int) anotherworld.GotherWorld {
 	videoDriver := anotherworld.Video{Hal: anotherworld.DummyHAL{}}
-	app := initGotherWorld(memlist, bankFilesMap, videoDriver)
-	app.loadGamePart(anotherworld.GAME_PART_ID_1 + gamepart)
+	app := anotherworld.InitGotherWorld(memlist, bankFilesMap, videoDriver)
+	app.LoadGamePart(anotherworld.GAME_PART_ID_1 + gamepart)
 	for i := 0; i < stepsToRun; i++ {
 		app.MainLoop(i)
 	}
@@ -27,11 +27,11 @@ func TestRunGameparts(t *testing.T) {
 		fmt.Println("### RUN PART", part)
 		app := run(part)
 		//TODO should be 0, there is one case!
-		if app.vm.CountNoOps > 1 {
-			t.Errorf("CountNoOps > 0: part %d %d", part, app.vm.CountNoOps)
+		if app.Vm.CountNoOps > 1 {
+			t.Errorf("CountNoOps > 0: part %d %d", part, app.Vm.CountNoOps)
 		}
-		if app.vm.CountSPNotZero > 1 {
-			t.Errorf("CountSPNotZero > 1: part %d %d", part, app.vm.CountSPNotZero)
+		if app.Vm.CountSPNotZero > 1 {
+			t.Errorf("CountSPNotZero > 1: part %d %d", part, app.Vm.CountSPNotZero)
 		}
 	}
 }
