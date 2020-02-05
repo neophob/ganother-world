@@ -9,8 +9,8 @@ import (
 
 const stepsToRun int = 1
 
-var memlist = readFile("./assets/memlist.bin")
-var bankFilesMap = createBankMap("./assets/")
+var memlist = readFile("../assets/memlist.bin")
+var bankFilesMap = createBankMap("../assets/")
 
 func run(gamepart int) anotherworld.GotherWorld {
 	videoDriver := anotherworld.Video{Hal: anotherworld.DummyHAL{}}
