@@ -12,7 +12,6 @@ GOROOT := $(shell go env GOROOT)
 
 # -X add string value definition of the form importpath.name=value
 RELEASE := -ldflags "-s -w -X project.name=anotherworld"
-SRC := main.go hal-sdl.go
 WASMDIR := ./wasm
 SLDDIR := ./sdl
 PACKAGES := $(SLDDIR) ./logger ./anotherworld
@@ -45,7 +44,6 @@ build-release:
 
 ## test: run unit tests
 test:
-  # TODO test anotherworld lib too
 	@go test -cover -v $(PACKAGES)
 
 ## doc: create project documentation
