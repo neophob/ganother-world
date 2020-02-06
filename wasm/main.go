@@ -1,26 +1,30 @@
 package main
 
 import (
+	"github.com/neophob/ganother-world/anotherworld"
+	"github.com/neophob/ganother-world/logger"
 	"syscall/js"
-	"github.com/neophob/ganother-world/gamelib"
 )
 
-func addTitle() {
-	gameTitle := gamelib.GetTitle()
-
-	document := js.Global().Get("document")
-	h1 := document.Call("createElement", "h1")
-	h1.Set("innerHTML", gameTitle)
-	document.Get("body").Call("appendChild", h1)
+func init() {
+	logger.SetLogLevel(logger.LEVEL_INFO)
+	addTitle()
 }
 
 func main() {
-	gameTitle := gamelib.GetTitle()
+	// TODO make logger wasm/browser console friendly
+	logger.Info("WASM " + anotherworld.GetTitle())
 
-	println("Hello " + gameTitle)
-
-	addTitle()
+	app := InitGame()
+	defer app.Shutdown()
 
 	channel := make(chan bool)
 	<-channel
+}
+
+func addTitle() {
+	document := js.Global().Get("document")
+	h1 := document.Call("createElement", "h1")
+	h1.Set("innerHTML", anotherworld.GetTitle())
+	document.Get("body").Call("appendChild", h1)
 }

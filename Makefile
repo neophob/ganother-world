@@ -28,7 +28,7 @@ build-native:
 ## build-wasm: builds the wasm app
 build-wasm:
 	@echo "  >  BUILD-WASM"
-	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" $(WASMDIR)/main.go
+	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" $(WASMDIR)
 	@cp wasm/index.html $(DISTDIR)
 	@go build -o "$(DISTDIR)/devserver" cmd/devserver/main.go
 	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
