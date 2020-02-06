@@ -34,6 +34,7 @@ build-wasm:
 	@go build -o "$(DISTDIR)/devserver" cmd/devserver/main.go
 	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
 	@cp -r ./assets $(DISTDIR)
+	@cp -r ./logo.png $(DISTDIR)
 
 ## format: format code using go fmt
 format:
