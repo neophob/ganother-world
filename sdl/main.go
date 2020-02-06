@@ -8,6 +8,7 @@ import (
 
 	"os"
 
+	"github.com/neophob/ganother-world/anotherworld"
 	"github.com/neophob/ganother-world/logger"
 )
 
@@ -31,23 +32,30 @@ func main() {
 	data := readFile("./assets/memlist.bin")
 	bankFilesMap := createBankMap("./assets/")
 
-	app := initGotherWorld(data, bankFilesMap, *noVideoOutput)
+	var videoDriver anotherworld.Video
+	if *noVideoOutput == true {
+		videoDriver = anotherworld.Video{Hal: anotherworld.DummyHAL{}}
+	} else {
+		videoDriver = anotherworld.Video{Hal: buildSDLHAL(), WorkerPage: 0xFE}
+	}
+
+	app := anotherworld.InitGotherWorld(data, bankFilesMap, videoDriver)
 
 	logger.Info("- setup game")
-	app.loadGamePart(GAME_PART_ID_1 + *startPart)
+	app.LoadGamePart(anotherworld.GAME_PART_ID_1 + *startPart)
 
 	//start main loop
-	for i := 0; app.exitRequested() == false; i++ {
+	for i := 0; app.ExitRequested() == false; i++ {
 		/*if i%30 == rand.Intn(30) {
-			app.loadGamePart(GAME_PART_ID_1+rand.Intn(9))
+			app.LoadGamePart(GAME_PART_ID_1+rand.Intn(9))
 		}*/
-		app.mainLoop(i)
+		app.MainLoop(i)
 
 		//game run at approx 25 fps
 		time.Sleep(20 * time.Millisecond)
 	}
 
-	app.shutdown()
+	app.Shutdown()
 }
 
 func readFile(filename string) []byte {

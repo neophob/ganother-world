@@ -1,6 +1,8 @@
-package main
+package anotherworld
 
-import "github.com/neophob/ganother-world/logger"
+import (
+	"github.com/neophob/ganother-world/logger"
+)
 
 //Implementation of all VM ops
 
@@ -16,20 +18,20 @@ func (state *VMState) opMovConst() {
 	index := state.fetchByte()
 	value := int16(state.fetchWord())
 	logger.Debug("#op_movConst %d %d", index, value)
-	state.variables[index] = value
+	state.Variables[index] = value
 }
 
 //Initialises variable 1 with variable 2.
 func (state *VMState) opMov() {
 	dest := state.fetchByte()
 	source := state.fetchByte()
-	logger.Debug("#op_mov %d %d %d", source, dest, state.variables[source])
-	state.variables[dest] = state.variables[source]
+	logger.Debug("#op_mov %d %d %d", source, dest, state.Variables[source])
+	state.Variables[dest] = state.Variables[source]
 }
 
 //Variable = Variable + Integer value
 func (state *VMState) opAddConst() {
-	if state.gamePart == 5 && state.pc == 0x6D48 {
+	if state.GamePart == 5 && state.pc == 0x6D48 {
 		logger.Warn("TODO Script::op_addConst() workaround for infinite looping gun sound")
 		// The script 0x27 slot 0x17 doesn't stop the gun sound from looping.
 		// This is a bug in the original game code, confirmed by Eric Chahi and
@@ -40,24 +42,24 @@ func (state *VMState) opAddConst() {
 	}
 	index := state.fetchByte()
 	value := int16(state.fetchWord())
-	logger.Debug("#op_addConst() index=%d, value=%d, add=%d", index, state.variables[index], value)
-	state.variables[index] += value
+	logger.Debug("#op_addConst() index=%d, value=%d, add=%d", index, state.Variables[index], value)
+	state.Variables[index] += value
 }
 
 //Add Variable1, Variable2. Variable1 = Variable 1 + Variable2
 func (state *VMState) opAdd() {
 	dest := state.fetchByte()
 	source := state.fetchByte()
-	logger.Debug("#op_add() index=%d, var1=%d, var2=%d", dest, state.variables[dest], state.variables[source])
-	state.variables[dest] += state.variables[source]
+	logger.Debug("#op_add() index=%d, var1=%d, var2=%d", dest, state.Variables[dest], state.Variables[source])
+	state.Variables[dest] += state.Variables[source]
 }
 
 //Sub Variable1, Variable2, Variable1 = Variable1 - Variable2
 func (state *VMState) opSub() {
 	dest := state.fetchByte()
 	source := state.fetchByte()
-	logger.Debug("#op_sub() %d %d", dest, state.variables[source])
-	state.variables[dest] -= state.variables[source]
+	logger.Debug("#op_sub() %d %d", dest, state.Variables[source])
+	state.Variables[dest] -= state.Variables[source]
 }
 
 //Variable = Variable AND value
@@ -65,7 +67,7 @@ func (state *VMState) opAnd() {
 	index := state.fetchByte()
 	value := state.fetchWord()
 	logger.Debug("#op_and() %d %d", index, value)
-	state.variables[index] &= int16(value)
+	state.Variables[index] &= int16(value)
 }
 
 //Variable = Variable OR value
@@ -73,23 +75,23 @@ func (state *VMState) opOr() {
 	index := state.fetchByte()
 	value := state.fetchWord()
 	logger.Debug("#op_or() %d %d", index, value)
-	state.variables[index] |= int16(value)
+	state.Variables[index] |= int16(value)
 }
 
 //Makes a N bit rotation to the left on the variable. Zeros on the right.
 func (state *VMState) opShl() {
 	index := state.fetchByte()
 	value := state.fetchWord()
-	state.variables[index] <<= uint(value)
-	logger.Debug("#op_shl() %d %d %d", index, value, state.variables[index])
+	state.Variables[index] <<= uint(value)
+	logger.Debug("#op_shl() %d %d %d", index, value, state.Variables[index])
 }
 
 //Makes a N bit rotation to the right on the variable.
 func (state *VMState) opShr() {
 	index := state.fetchByte()
 	value := state.fetchWord()
-	state.variables[index] >>= uint(value)
-	logger.Debug("#op_shr() %d %d %d", index, value, state.variables[index])
+	state.Variables[index] >>= uint(value)
+	logger.Debug("#op_shr() %d %d %d", index, value, state.Variables[index])
 }
 
 //Jsr Adress - Executes the subroutine located at the indicated address.
@@ -112,7 +114,7 @@ func (state *VMState) opInstallTask() {
 	channelID := state.fetchByte()
 	address := state.fetchWord()
 	logger.Debug("#opInstallTask %d %d", channelID, address)
-	state.nextLoopChannelPC[channelID] = address
+	state.NextLoopChannelPC[channelID] = address
 }
 
 //Break - Temporarily stops the executing channel and goes to the next.
@@ -137,11 +139,11 @@ func (state *VMState) opChangeTaskState() {
 	for i := channelIDStart; i <= channelIDEnd; i++ {
 		switch changeType {
 		case 0:
-			state.channelPaused[i] = false
+			state.ChannelPaused[i] = false
 		case 1:
-			state.channelPaused[i] = true
+			state.ChannelPaused[i] = true
 		case 2:
-			state.nextLoopChannelPC[i] = VM_INACTIVE_THREAD
+			state.NextLoopChannelPC[i] = VM_INACTIVE_THREAD
 		}
 	}
 }
@@ -149,9 +151,9 @@ func (state *VMState) opChangeTaskState() {
 //Dbra Variable, Adress - Decrements the variable, if the result is different from zero the execution continues at the indicated address.
 func (state *VMState) opJmpIfVar() {
 	index := state.fetchByte()
-	state.variables[index]--
-	logger.Debug("#opJmpIfVar %d", state.variables[index])
-	if state.variables[index] != 0 {
+	state.Variables[index]--
+	logger.Debug("#opJmpIfVar %d", state.Variables[index])
+	if state.Variables[index] != 0 {
 		state.opJmp()
 	} else {
 		state.fetchWord()
@@ -162,10 +164,10 @@ func (state *VMState) opJmpIfVar() {
 func (state *VMState) opCondJmp() {
 	op := state.fetchByte()
 	variableID := uint16(state.fetchByte())
-	currentVariable := state.variables[variableID]
+	currentVariable := state.Variables[variableID]
 	var newVariable int16
 	if op&0x80 > 0 {
-		newVariable = int16(state.variables[state.fetchByte()])
+		newVariable = int16(state.Variables[state.fetchByte()])
 	} else if op&0x40 > 0 {
 		newVariable = int16(state.fetchWord())
 	} else {
@@ -214,7 +216,7 @@ func (state *VMState) opCondJmp() {
 // Fade "palette number" - Changes of colour palette
 func (state *VMState) opVidSetPalette(video *Video) {
 	index := state.fetchWord()
-	video.setPalette(int(index))
+	video.SetPalette(int(index))
 }
 
 //Text "text number", x, y, color - Displays in the work screen the specified text for the coordinates x,y.
@@ -223,20 +225,20 @@ func (state *VMState) opVidDrawString(video *Video) {
 	x := int(state.fetchByte())
 	y := int(state.fetchByte())
 	col := int(state.fetchByte())
-	video.drawString(col, x, y, stringID)
+	video.DrawString(col, x, y, stringID)
 }
 
 //SetWS "Screen number" - Sets the work screen, which is where the polygons will be drawn by default.
 func (state *VMState) opVidSelectPage(video *Video) {
 	page := int(state.fetchByte())
-	video.setWorkPagePtr(page)
+	video.SetWorkPagePtr(page)
 }
 
 //Clr "Screen number", Color - Deletes a screen with one colour. Ingame, there are 4 screen buffers
 func (state *VMState) opVidFillPage(video *Video) {
 	page := int(state.fetchByte())
 	color := int(state.fetchByte())
-	video.fillPage(page, color)
+	video.FillPage(page, color)
 }
 
 //Copy "Screen number A", "Screen number B" - Copies screen buffer A to screen buffer B.
@@ -248,13 +250,13 @@ func (state *VMState) opVidCopyPage(video *Video) {
 	isVscrollEnabled := (source & uint8(not0x40)) & 0x80
 	if source >= 0xFE || isVscrollEnabled == 0 {
 		// no vscroll
-		video.copyPage(int(source), int(dest), 0)
+		video.CopyPage(int(source), int(dest), 0)
 		//app.video.copyPage(int(source&uint8(not0x40)), int(dest), 0)
 	} else {
 		sourceTranslated := int(source & 3)
-		vscroll := int(state.variables[VM_VARIABLE_SCROLL_Y])
+		vscroll := int(state.Variables[VM_VARIABLE_SCROLL_Y])
 		if vscroll >= -199 && vscroll <= 199 {
-			video.copyPage(sourceTranslated, int(dest), vscroll)
+			video.CopyPage(sourceTranslated, int(dest), vscroll)
 		} else {
 			logger.Warn("Invalid VSCROLL %d", vscroll)
 		}
@@ -265,12 +267,12 @@ func (state *VMState) opVidCopyPage(video *Video) {
 func (state *VMState) opVidUpdatePage(video *Video) {
 	page := int(state.fetchByte())
 	//TODO inp_handleSpecialKeys();
-	if state.gamePart == 0 && state.variables[0x67] == 1 {
+	if state.GamePart == 0 && state.Variables[0x67] == 1 {
 		logger.Debug("opVidUpdatePage: BYPASS PROTECTION %d", page)
-		state.variables[0xDC] = 33
+		state.Variables[0xDC] = 33
 	}
 
-	video.updateDisplay(page)
+	video.UpdateDisplay(page)
 }
 
 func (state *VMState) opVidDrawPolyBackground(opcode uint8, video *Video) {
@@ -283,8 +285,8 @@ func (state *VMState) opVidDrawPolyBackground(opcode uint8, video *Video) {
 		posX += height
 	}
 	logger.Debug("opVidDrawPolyBackground %d %d", opcode, offset)
-	videoDataFetcher := video.buildReader(false, int(offset))
-	video.drawShape(videoDataFetcher, 0xFF, 0x40, int(posX), int(posY))
+	videoDataFetcher := video.BuildReader(false, int(offset))
+	video.DrawShape(videoDataFetcher, 0xFF, 0x40, int(posX), int(posY))
 }
 
 //Spr "'object name" , x, y, z - In the work screen, draws the graphics tool at the coordinates x,y and the zoom factor z. A polygon, a group of polygons...
@@ -297,7 +299,7 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8, video *Video) {
 		if opcode&0x10 == 0 {
 			posX = (posX << 8) | int16(state.fetchByte())
 		} else {
-			posX = state.variables[posX]
+			posX = state.Variables[posX]
 		}
 	} else {
 		if opcode&0x10 > 0 {
@@ -309,7 +311,7 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8, video *Video) {
 		if opcode&4 == 0 {
 			posY = (posY << 8) | int16(state.fetchByte())
 		} else {
-			posY = state.variables[posY]
+			posY = state.Variables[posY]
 		}
 	}
 	zoom := uint16(state.fetchByte())
@@ -319,7 +321,7 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8, video *Video) {
 			logger.Debug("zoom decreased PC %d", state.pc)
 			zoom = 0x40
 		} else {
-			zoom = uint16(state.variables[zoom])
+			zoom = uint16(state.Variables[zoom])
 		}
 	} else {
 		if opcode&1 > 0 {
@@ -330,8 +332,8 @@ func (state *VMState) opVidDrawPolySprite(opcode uint8, video *Video) {
 		}
 	}
 	logger.Debug("opVidDrawPolySprite %d", offset)
-	videoDataFetcher := video.buildReader(useSecondVideoResource, int(offset))
-	video.drawShape(videoDataFetcher, 0xFF, int(zoom), int(posX), int(posY))
+	videoDataFetcher := video.BuildReader(useSecondVideoResource, int(offset))
+	video.DrawShape(videoDataFetcher, 0xFF, int(zoom), int(posX), int(posY))
 }
 
 //Initialises a song.
@@ -339,9 +341,9 @@ func (state *VMState) opPlayMusic(video *Video) {
 	resNum := int(state.fetchWord())
 	delay := int(state.fetchWord())
 	pos := int(state.fetchByte())
-    //TODO naming is hard!
+	//TODO naming is hard!
 	logger.Debug("op_playMusic(0x%X, %d, %d)", resNum, delay, pos)
-    video.playMusic(resNum, delay, pos)
+	video.PlayMusic(resNum, delay, pos)
 }
 
 //Plays the sound file on one of the four game audio channels with specific height and volume.
@@ -350,9 +352,9 @@ func (state *VMState) opPlaySound(video *Video) {
 	freq := int(state.fetchByte())
 	vol := int(state.fetchByte())
 	channel := int(state.fetchByte())
-    //TODO naming is hard!
-    state.assets.loadResource(resNum)
-    video.playSound(resNum, freq, vol, channel)
+	//TODO naming is hard!
+	state.assets.LoadResource(resNum)
+	video.PlaySound(resNum, freq, vol, channel)
 }
 
 func (state *VMState) opUpdateResource() {
@@ -360,7 +362,7 @@ func (state *VMState) opUpdateResource() {
 	logger.Debug("opUpdateResource %d", id)
 	if id >= GAME_PART_ID_1 {
 		logger.Debug("should load next part %d", id)
-		state.loadNextPart = id
+		state.LoadNextPart = id
 		return
 	}
 	if id == 0 {
@@ -370,5 +372,5 @@ func (state *VMState) opUpdateResource() {
 		//_res->invalidateRes();
 		return
 	}
-	state.assets.loadResource(id)
+	state.assets.LoadResource(id)
 }

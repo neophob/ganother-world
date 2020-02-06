@@ -1,6 +1,8 @@
-package main
+package anotherworld
 
-import "github.com/neophob/ganother-world/logger"
+import (
+	"github.com/neophob/ganother-world/logger"
+)
 
 const (
 	WIDTH         int32 = 320
@@ -11,24 +13,17 @@ const (
 
 //Video implements buffer handling (4 buffers) and game specific alpha/buffer0 handling
 type Video struct {
-	hal         HAL
+	Hal         HAL
 	videoAssets VideoAssets
-	workerPage  int
+	WorkerPage  int
 	colors      [16]Color
 	rawBuffer   [4][WIDTH * HEIGHT]uint8
 	drawColor   uint8
 }
 
-func initVideo(noVideoOutput bool) Video {
-	if noVideoOutput == false {
-		return Video{hal: buildSDLHAL(), workerPage: 0xFE}
-	}
-	return Video{hal: DummyHAL{}}
-}
-
-func (video *Video) updateGamePart(videoAssets VideoAssets) {
+func (video *Video) UpdateGamePart(videoAssets VideoAssets) {
 	video.videoAssets = videoAssets
-	video.colors = videoAssets.getPalette(0)
+	video.colors = videoAssets.GetPalette(0)
 }
 
 func (video *Video) getColor(colorIndex, page, ofs int) uint8 {
@@ -53,14 +48,14 @@ func (video *Video) setColor(colorIndex int) {
 	video.drawColor = uint8(colorIndex)
 }
 
-func (video *Video) fillPage(page, colorIndex int) {
+func (video *Video) FillPage(page, colorIndex int) {
 	workerPage := getWorkerPage(page)
 	for i := range video.rawBuffer[workerPage] {
 		video.rawBuffer[workerPage][i] = uint8(colorIndex)
 	}
 }
 
-func (video *Video) copyPage(src, dst, vscroll int) {
+func (video *Video) CopyPage(src, dst, vscroll int) {
 	workerPageSrc := getWorkerPage(src)
 	workerPageDst := getWorkerPage(dst)
 
@@ -91,15 +86,15 @@ func (video *Video) copyPage(src, dst, vscroll int) {
 	}
 }
 
-func (video *Video) setWorkPagePtr(page int) {
+func (video *Video) SetWorkPagePtr(page int) {
 	logger.Debug(">VID: SETWORKPAGEPTR %d", page)
-	video.workerPage = getWorkerPage(page)
+	video.WorkerPage = getWorkerPage(page)
 }
 
 // blit
 // step 1 is to convert the indexed color (0..15 for "normal" colors, 16 for translucent and 17 for buffer0 value) to an rgb value
 // step 2 is updating the sdl buffers
-func (video *Video) updateDisplay(page int) {
+func (video *Video) UpdateDisplay(page int) {
 	var workerPage int
 	if page != 0xFE {
 		if page == 0xFF {
@@ -116,21 +111,21 @@ func (video *Video) updateDisplay(page int) {
 	for i := range video.rawBuffer[workerPage] {
 		outputBuffer[i] = video.colors[video.rawBuffer[workerPage][i]]
 	}
-	video.hal.blitPage(outputBuffer, 0, 0)
+	video.Hal.BlitPage(outputBuffer, 0, 0)
 
 	//DEBUG OUTPUT
 	/*	for i := range video.rawBuffer[0] {
 			outputBuffer[i] = video.colors[video.rawBuffer[0][i]]
 		}
-		video.hal.blitPage(outputBuffer, 320, 0)
+		video.Hal.BlitPage(outputBuffer, 320, 0)
 		for i := range video.rawBuffer[1] {
 			outputBuffer[i] = video.colors[video.rawBuffer[1][i]]
 		}
-		video.hal.blitPage(outputBuffer, 0, 200)
+		video.Hal.BlitPage(outputBuffer, 0, 200)
 		for i := range video.rawBuffer[2] {
 			outputBuffer[i] = video.colors[video.rawBuffer[2][i]]
 		}
-		video.hal.blitPage(outputBuffer, 320, 200)*/
+		video.Hal.BlitPage(outputBuffer, 320, 200)*/
 }
 
 func getWorkerPage(page int) int {
@@ -151,8 +146,8 @@ func getWorkerPage(page int) int {
 	}
 }
 
-func (video *Video) drawString(color, posX, posY, stringID int) {
-	text := getText(stringID)
+func (video *Video) DrawString(color, posX, posY, stringID int) {
+	text := GetText(stringID)
 	logger.Debug(">VID: DRAWSTRING color:%d, x:%d, y:%d, text:%s", color, posX, posY, text)
 	//setWorkPagePtr(buffer);?
 
@@ -179,13 +174,14 @@ func (video *Video) drawChar(posX, posY int32, char byte) {
 		outputOffset := posX + (posY+j)*WIDTH
 		for i := int32(0); i < 8; i++ {
 			if ch&(1<<(7-i)) > 0 {
-				video.rawBuffer[video.workerPage][outputOffset+i] = video.drawColor
+				video.rawBuffer[video.WorkerPage][outputOffset+i] = video.drawColor
 			}
 		}
 	}
 }
 
-func (video *Video) drawShape(videoDataFetcher VideoDataFetcher, color, zoom, posX, posY int) {
+// TODO VideoDataFetcher is used in video and VideoDataFetcher defines a function of video... it's a bit cyclic
+func (video *Video) DrawShape(videoDataFetcher VideoDataFetcher, color, zoom, posX, posY int) {
 	i := videoDataFetcher.fetchByte()
 	logger.Debug(">VID: DRAWSHAPE i:%d, color:%d, fetcher:%v, x:%d, y:%d, zoom:%d",
 		i, color, videoDataFetcher, posX, posY, zoom)
@@ -227,7 +223,7 @@ func (video *Video) drawShapeParts(videoDataFetcher VideoDataFetcher, zoom, posX
 		off &= 0x7FFF
 
 		clonedVideoDataFetcher := videoDataFetcher.cloneWithUpdatedOffset(int(off * 2))
-		video.drawShape(clonedVideoDataFetcher, int(color), zoom, _x, _y)
+		video.DrawShape(clonedVideoDataFetcher, int(color), zoom, _x, _y)
 	}
 }
 
@@ -260,35 +256,35 @@ func (video *Video) drawFilledPolygon(videoDataFetcher VideoDataFetcher, col, zo
 		vy[i] = int16(y1 + int(videoDataFetcher.fetchByte())*zoom/64)
 	}
 
-	logger.Debug(">VID: FILLPOLYGON WorkerPage: %d, numVert: %d, col: %d, %v/%v", video.workerPage, numVertices, col, vx, vy)
-	video.drawFilledPolygons(video.workerPage, vx, vy, col)
+	logger.Debug(">VID: FILLPOLYGON WorkerPage: %d, numVert: %d, col: %d, %v/%v", video.WorkerPage, numVertices, col, vx, vy)
+	video.drawFilledPolygons(video.WorkerPage, vx, vy, col)
 }
 
-func (video *Video) setPalette(index int) {
-	video.colors = video.videoAssets.getPalette(index >> 8)
+func (video *Video) SetPalette(index int) {
+	video.colors = video.videoAssets.GetPalette(index >> 8)
 	//TODO fixup palette
 	//part 16004 and palette 0x47 -> ret 8, part 16006 and palette 0x4a -> ret 1
 	logger.Debug(">VID: SETPALETTE %d", index>>8)
 }
 
-func (video *Video) playSound(resNum, freq, vol, channel int) {
+func (video *Video) PlaySound(resNum, freq, vol, channel int) {
 	if vol == 0 || resNum == 0 || resNum == 5000 {
 		//TODO STOP music
 		return
 	}
 
 	logger.Info("playSound resNum %d", resNum)
-	video.hal.playSound(resNum, freq, vol, channel)
+	video.Hal.PlaySound(resNum, freq, vol, channel)
 }
 
-func (video *Video) playMusic(resNum, delay, pos int) {
-	video.hal.playMusic(resNum, delay, pos)
+func (video *Video) PlayMusic(resNum, delay, pos int) {
+	video.Hal.PlayMusic(resNum, delay, pos)
 }
 
-func (video *Video) eventLoop(frameCount int) uint32 {
-	return video.hal.eventLoop(frameCount)
+func (video *Video) EventLoop(frameCount int) uint32 {
+	return video.Hal.EventLoop(frameCount)
 }
 
-func (video *Video) shutdown() {
-	video.hal.shutdown()
+func (video *Video) Shutdown() {
+	video.Hal.Shutdown()
 }

@@ -1,6 +1,6 @@
-package main
+package anotherworld
 
-func getText(id int) string {
+func GetText(id int) string {
 	return keys[id]
 }
 

@@ -1,4 +1,4 @@
-package main
+package anotherworld
 
 const (
 	FONT_HEIGHT int = 8

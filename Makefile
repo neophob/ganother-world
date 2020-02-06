@@ -12,10 +12,9 @@ GOROOT := $(shell go env GOROOT)
 
 # -X add string value definition of the form importpath.name=value
 RELEASE := -ldflags "-s -w -X project.name=anotherworld"
-SRC := main.go resource.go vm.go parts.go decrunch.go lib.go \
-	vm-ops.go assets.go video.go hal-dummy.go hal.go hal-sdl.go text.go \
-	font.go videoassets.go polygon.go video-data-fetcher.go
-SRCDIR := ./
+WASMDIR := ./wasm
+SDLDIR := ./sdl
+PACKAGES := $(SDLDIR) ./logger ./anotherworld
 DISTDIR := ./dist
 
 ## build: build all the things
@@ -24,32 +23,34 @@ build: build-native build-wasm
 ## build-native: build go binary in dev mode
 build-native:
 	@echo "  >  BUILD"
-	@go build -o "$(DISTDIR)/main" $(SRC)
+	@go build -o "$(DISTDIR)/main" $(SDLDIR)
 
 ## build-wasm: builds the wasm app
 build-wasm:
 	@echo "  >  BUILD-WASM"
-	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" wasm/main.go
+	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" $(WASMDIR)/main.go
 	@cp wasm/index.html $(DISTDIR)
 	@go build -o "$(DISTDIR)/devserver" cmd/devserver/main.go
 	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
 
 ## format: format code using go fmt
 format:
-	@go fmt $(SRC)
+	@go fmt $(PACKAGES)
 
 ## build-release: build release build, could be compressed with UPX
 build-release:
-	#@env GOOS=js GOARCH=wasm go build -o gaw.js $(RELEASE) $(SRC)
-	@env go build -o "$(DISTDIR)/main.release" $(RELEASE) $(SRC)
+	@env go build -o "$(DISTDIR)/main.release" $(RELEASE) $(SDLDIR)
 
 ## test: run unit tests
 test:
-	@go test -cover -v $(SRCDIR)
+	@go test -cover -v $(PACKAGES)
 
 ## doc: create project documentation
 doc:
-	@go doc -all $(SRCDIR)
+	@go doc -all $(SDLDIR)
+	@go doc -all $(WASMDIR)
+	@go doc -all ./logger
+	@go doc -all ./anotherworld
 
 ## clean: removes build files
 clean:

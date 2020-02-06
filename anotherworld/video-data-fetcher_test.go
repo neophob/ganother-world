@@ -1,4 +1,4 @@
-package main
+package anotherworld
 
 import (
 	"testing"

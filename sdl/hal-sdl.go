@@ -2,6 +2,7 @@
 package main
 
 import (
+	"github.com/neophob/ganother-world/anotherworld"
 	"github.com/neophob/ganother-world/logger"
 	"github.com/veandco/go-sdl2/sdl"
 )
@@ -37,7 +38,7 @@ func buildSDLHAL() *SDLHAL {
 		logger.Error("SDL CREATE RENDERER FAILED")
 		panic(err)
 	}
-	renderer.SetLogicalSize(WIDTH, HEIGHT)
+	renderer.SetLogicalSize(anotherworld.WIDTH, anotherworld.HEIGHT)
 	//renderer.SetLogicalSize(WIDTH*2, HEIGHT*2)
 	renderer.Clear()
 	renderer.Present()
@@ -57,14 +58,14 @@ func buildSDLHAL() *SDLHAL {
 }
 
 // blit image
-func (render *SDLHAL) blitPage(buffer [WIDTH * HEIGHT]Color, posX, posY int) {
+func (render *SDLHAL) BlitPage(buffer [anotherworld.WIDTH * anotherworld.HEIGHT]anotherworld.Color, posX, posY int) {
 	lastSetColor := buffer[0]
-	render.renderer.SetDrawColor(buffer[0].r, buffer[0].g, buffer[0].b, 255)
+	render.renderer.SetDrawColor(buffer[0].R, buffer[0].G, buffer[0].B, 255)
 	offset := 0
-	for y := 0; y < int(HEIGHT); y++ {
-		for x := 0; x < int(WIDTH); x++ {
+	for y := 0; y < int(anotherworld.HEIGHT); y++ {
+		for x := 0; x < int(anotherworld.WIDTH); x++ {
 			if i := buffer[offset]; i != lastSetColor {
-				render.renderer.SetDrawColor(i.r, i.g, i.b, 255)
+				render.renderer.SetDrawColor(i.R, i.G, i.B, 255)
 				lastSetColor = i
 			}
 			render.renderer.DrawPoint(int32(x+posX), int32(y+posY))
@@ -75,84 +76,84 @@ func (render *SDLHAL) blitPage(buffer [WIDTH * HEIGHT]Color, posX, posY int) {
 }
 
 // check keyboard input
-func (render *SDLHAL) eventLoop(frameCount int) uint32 {
+func (render *SDLHAL) EventLoop(frameCount int) uint32 {
 	keyPress := uint32(0x0)
 	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 		switch t := event.(type) {
 		case *sdl.QuitEvent:
-			keyPress |= KeyEsc
+			keyPress |= anotherworld.KeyEsc
 			logger.Debug(">ESC")
 		case *sdl.KeyboardEvent:
 			logger.Debug(">KeyboardEvent %v %v", t.State, t.Keysym.Scancode)
 			isKeyPressed := t.State == sdl.PRESSED
 			if t.Keysym.Sym == sdl.K_ESCAPE {
-				keyPress |= KeyEsc
-				render.holdKeys[KeyEsc] = isKeyPressed
+				keyPress |= anotherworld.KeyEsc
+				render.holdKeys[anotherworld.KeyEsc] = isKeyPressed
 			}
 			if t.Keysym.Sym == sdl.K_LEFT {
-				keyPress |= KeyLeft
-				render.holdKeys[KeyLeft] = isKeyPressed
+				keyPress |= anotherworld.KeyLeft
+				render.holdKeys[anotherworld.KeyLeft] = isKeyPressed
 			}
 			if t.Keysym.Sym == sdl.K_RIGHT {
-				keyPress |= KeyRight
-				render.holdKeys[KeyRight] = isKeyPressed
+				keyPress |= anotherworld.KeyRight
+				render.holdKeys[anotherworld.KeyRight] = isKeyPressed
 			}
 			if t.Keysym.Sym == sdl.K_UP {
-				keyPress |= KeyUp
-				render.holdKeys[KeyUp] = isKeyPressed
+				keyPress |= anotherworld.KeyUp
+				render.holdKeys[anotherworld.KeyUp] = isKeyPressed
 			}
 			if t.Keysym.Sym == sdl.K_DOWN {
-				keyPress |= KeyDown
-				render.holdKeys[KeyDown] = isKeyPressed
+				keyPress |= anotherworld.KeyDown
+				render.holdKeys[anotherworld.KeyDown] = isKeyPressed
 			}
 			if t.Keysym.Sym == sdl.K_SPACE {
-				keyPress |= KeyFire
-				render.holdKeys[KeyFire] = isKeyPressed
+				keyPress |= anotherworld.KeyFire
+				render.holdKeys[anotherworld.KeyFire] = isKeyPressed
 			}
 			if isKeyPressed && t.Keysym.Sym == sdl.K_p {
-				keyPress |= KeyPause
+				keyPress |= anotherworld.KeyPause
 			}
 			if isKeyPressed && t.Keysym.Sym == sdl.K_s {
-				keyPress |= KeySave
+				keyPress |= anotherworld.KeySave
 			}
 			if isKeyPressed && t.Keysym.Sym == sdl.K_l {
-				keyPress |= KeyLoad
+				keyPress |= anotherworld.KeyLoad
 			}
 		}
 	}
 
-	if render.holdKeys[KeyEsc] {
-		keyPress |= KeyEsc
+	if render.holdKeys[anotherworld.KeyEsc] {
+		keyPress |= anotherworld.KeyEsc
 	}
-	if render.holdKeys[KeyLeft] {
-		keyPress |= KeyLeft
+	if render.holdKeys[anotherworld.KeyLeft] {
+		keyPress |= anotherworld.KeyLeft
 	}
-	if render.holdKeys[KeyRight] {
-		keyPress |= KeyRight
+	if render.holdKeys[anotherworld.KeyRight] {
+		keyPress |= anotherworld.KeyRight
 	}
-	if render.holdKeys[KeyUp] {
-		keyPress |= KeyUp
+	if render.holdKeys[anotherworld.KeyUp] {
+		keyPress |= anotherworld.KeyUp
 	}
-	if render.holdKeys[KeyDown] {
-		keyPress |= KeyDown
+	if render.holdKeys[anotherworld.KeyDown] {
+		keyPress |= anotherworld.KeyDown
 	}
-	if render.holdKeys[KeyFire] {
-		keyPress |= KeyFire
+	if render.holdKeys[anotherworld.KeyFire] {
+		keyPress |= anotherworld.KeyFire
 	}
 
 	return keyPress
 }
 
-func (render *SDLHAL) playMusic(resNum, delay, pos int) {
+func (render *SDLHAL) PlayMusic(resNum, delay, pos int) {
 	logger.Info(">SND: playMusic res:%d del:%d pos:%d", resNum, delay, pos)
 }
 
-func (render *SDLHAL) playSound(resNum, freq, vol, channel int) {
+func (render *SDLHAL) PlaySound(resNum, freq, vol, channel int) {
 	logger.Info(">SND: playSound res:%d frq:%d vol:%d c:%d", resNum, freq, vol, channel)
 }
 
 // exit application, lets cleanup...
-func (render *SDLHAL) shutdown() {
+func (render *SDLHAL) Shutdown() {
 	render.window.Destroy()
 	sdl.Quit()
 }

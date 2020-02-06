@@ -1,21 +1,22 @@
-package main
+package anotherworld
 
 import (
 	"fmt"
+	"io/ioutil"
 	"testing"
 )
 
 func TestPartsAllDefined(t *testing.T) {
-	result := getGameParts()
+	result := GetGameParts()
 	if len(result) != GAME_PARTS_COUNT {
 		t.Errorf("The world will end: %d", result)
 	}
 }
 
 func TestPartsIntegrationValidateGamePartTypes(t *testing.T) {
-	gamePartsIndex := getGameParts()
-	gameData := readFile("./assets/memlist.bin")
-	resourceMap, _ := unmarshallingMemlistBin(gameData)
+	gamePartsIndex := GetGameParts()
+	gameData := readFile("../assets/memlist.bin")
+	resourceMap, _ := UnmarshallingMemlistBin(gameData)
 
 	if len(resourceMap) == 0 {
 		t.Errorf("Unexpected empty resourceMap: %d", resourceMap)
@@ -27,42 +28,50 @@ func TestPartsIntegrationValidateGamePartTypes(t *testing.T) {
 
 		gamePart := gamePartsIndex[partIndex]
 
-		resource = resourceMap[gamePart.palette]
-		partType = getResourceTypeName(int(resource.resourceType))
+		resource = resourceMap[gamePart.Palette]
+		partType = GetResourceTypeName(int(resource.ResourceType))
 		if partType != "RT_PALETTE" {
 			t.Errorf("Expected GamePartContent:%d palette (%#02x) to have type RT_PALETTE got: %s",
-				partIndex, gamePart.palette, partType)
+				partIndex, gamePart.Palette, partType)
 		}
 
-		resource = resourceMap[gamePart.bytecode]
-		partType = getResourceTypeName(int(resource.resourceType))
+		resource = resourceMap[gamePart.Bytecode]
+		partType = GetResourceTypeName(int(resource.ResourceType))
 		if partType != "RT_BYTECODE" {
 			t.Errorf("Expected GamePartContent %d bytecode (%#02x) to have type RT_BYTECODE got: %s",
-				partIndex, gamePart.bytecode, partType)
+				partIndex, gamePart.Bytecode, partType)
 		}
 
-		resource = resourceMap[gamePart.cinematic]
-		partType = getResourceTypeName(int(resource.resourceType))
+		resource = resourceMap[gamePart.Cinematic]
+		partType = GetResourceTypeName(int(resource.ResourceType))
 		if partType != "RT_POLY_CINEMATIC" {
-			if resource.unpackedSize == 0 {
+			if resource.UnpackedSize == 0 {
 				fmt.Printf("Warning empty GamePartContent[%d].cinematic:%#02x, %-17s\n",
-					partIndex, gamePart.cinematic, partType)
+					partIndex, gamePart.Cinematic, partType)
 			} else {
 				t.Errorf("Expected GamePartContent %d cinematic (%#02x) to have type RT_COMMON_SHAPES got: %s",
-					partIndex, gamePart.cinematic, partType)
+					partIndex, gamePart.Cinematic, partType)
 			}
 		}
 
-		resource = resourceMap[gamePart.video2]
-		partType = getResourceTypeName(int(resource.resourceType))
+		resource = resourceMap[gamePart.Video2]
+		partType = GetResourceTypeName(int(resource.ResourceType))
 		if partType != "RT_COMMON_SHAPES" {
-			if resource.unpackedSize == 0 {
+			if resource.UnpackedSize == 0 {
 				fmt.Printf("Warning empty GamePartContent[%d].video2:%#02x, %-17s\n",
-					partIndex, gamePart.video2, partType)
+					partIndex, gamePart.Video2, partType)
 			} else {
 				t.Errorf("Expected GamePartContent %d video2 (%#02x) to have type RT_COMMON_SHAPES got: %s",
-					partIndex, gamePart.video2, partType)
+					partIndex, gamePart.Video2, partType)
 			}
 		}
 	}
+}
+
+func readFile(filename string) []byte {
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Printf("Failed to read file: %v", err)
+	}
+	return data
 }

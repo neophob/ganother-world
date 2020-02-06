@@ -1,4 +1,4 @@
-package main
+package anotherworld
 
 import (
 	"github.com/neophob/ganother-world/logger"
@@ -33,13 +33,13 @@ const (
 //VMState implements the state of the the VM
 type VMState struct {
 	assets            Assets
-	variables         [VM_NUM_VARIABLES]int16
-	channelPC         [VM_NUM_THREADS]uint16
-	nextLoopChannelPC [VM_NUM_THREADS]uint16
-	channelPaused     [VM_NUM_THREADS]bool
-	stackCalls        [VM_MAX_STACK_SIZE]uint16
-	gamePart          int
-	loadNextPart      int
+	Variables         [VM_NUM_VARIABLES]int16
+	ChannelPC         [VM_NUM_THREADS]uint16
+	NextLoopChannelPC [VM_NUM_THREADS]uint16
+	ChannelPaused     [VM_NUM_THREADS]bool
+	StackCalls        [VM_MAX_STACK_SIZE]uint16
+	GamePart          int
+	LoadNextPart      int
 
 	palette   []uint8
 	bytecode  []uint8
@@ -53,34 +53,34 @@ type VMState struct {
 	paused    bool
 
 	//statistics
-	countNoOps     int
+	CountNoOps     int
 	countOps       int
-	countSPNotZero int
+	CountSPNotZero int
 }
 
-func createNewState(assets Assets) VMState {
-	state := VMState{gamePart: -1, assets: assets}
-	state.variables[VM_VARIABLE_RANDOM_SEED] = 42
+func CreateNewState(assets Assets) VMState {
+	state := VMState{GamePart: -1, assets: assets}
+	state.Variables[VM_VARIABLE_RANDOM_SEED] = 42
 	//WTF? whats this? -> create const
-	state.variables[0xE4] = 0x14
+	state.Variables[0xE4] = 0x14
 
 	//BYPASS PROTECTION START
-	state.variables[0xBC] = 0x10
-	state.variables[0xC6] = 0x80
-	state.variables[0xDC] = 0x21
+	state.Variables[0xBC] = 0x10
+	state.Variables[0xC6] = 0x80
+	state.Variables[0xDC] = 0x21
 	// this variable explicit checked when level 2 starts - if content != 0xFA0 then a cond jump will be made to nowhere
-	state.variables[VM_VARIABLE_PROTECTION_CHECK] = 0xFA0
+	state.Variables[VM_VARIABLE_PROTECTION_CHECK] = 0xFA0
 	//BYPASS END
 
 	return state
 }
 
-//TODO integrate with setupGamePart
-func (state VMState) buildVideoAssets() VideoAssets {
+//TODO integrate with SetupGamePart
+func (state VMState) BuildVideoAssets() VideoAssets {
 	return VideoAssets{
-		palette:   state.palette,
-		cinematic: state.cinematic,
-		video2:    state.video2,
+		Palette:   state.palette,
+		Cinematic: state.cinematic,
+		Video2:    state.video2,
 	}
 }
 
@@ -88,7 +88,7 @@ func (state *VMState) saveSP() {
 	if state.sp >= VM_MAX_STACK_SIZE {
 		panic("SaveSP, stack overflow")
 	}
-	state.stackCalls[state.sp] = state.pc
+	state.StackCalls[state.sp] = state.pc
 	state.sp++
 }
 
@@ -97,7 +97,7 @@ func (state *VMState) restoreSP() {
 		panic("restoreSP, stack underflow")
 	}
 	state.sp--
-	state.pc = state.stackCalls[state.sp]
+	state.pc = state.StackCalls[state.sp]
 }
 
 func (state *VMState) fetchByte() uint8 {
@@ -110,56 +110,56 @@ func (state *VMState) fetchWord() uint16 {
 	b1 := state.bytecode[state.pc]
 	b2 := state.bytecode[state.pc+1]
 	state.pc += 2
-	return toUint16BE(b1, b2)
+	return ToUint16BE(b1, b2)
 }
 
-func (state *VMState) setupGamePart(newGamePart int) {
+func (state *VMState) SetupGamePart(newGamePart int) {
 	if newGamePart < GAME_PART_FIRST || newGamePart > GAME_PART_LAST {
 		panic("INVALID_GAME_PART")
 	}
 	if newGamePart == GAME_PART_FIRST {
 		// VAR(0x54) indicates if the "Out of this World" title screen should be presented
 		// language setting?
-		state.variables[VM_VARIABLE_TITLESCREEN] = 0x81
+		state.Variables[VM_VARIABLE_TITLESCREEN] = 0x81
 	}
 
-	state.loadGameParts(newGamePart - GAME_PART_FIRST)
+	state.LoadGameParts(newGamePart - GAME_PART_FIRST)
 
 	//Set all thread to inactive (pc at 0xFFFF or 0xFFFE )
-	for i := range state.channelPC {
-		state.channelPC[i] = VM_INACTIVE_THREAD
-		state.nextLoopChannelPC[i] = VM_NO_TASK_OP
-		state.channelPaused[i] = false
+	for i := range state.ChannelPC {
+		state.ChannelPC[i] = VM_INACTIVE_THREAD
+		state.NextLoopChannelPC[i] = VM_NO_TASK_OP
+		state.ChannelPaused[i] = false
 	}
 
 	//activate first channel, set initial PC to 0
 	state.pc = 0
-	state.channelPC[0] = state.pc
+	state.ChannelPC[0] = state.pc
 
-	state.loadNextPart = 0
+	state.LoadNextPart = 0
 }
 
 // gamePart is the int between 0 and 10
-func (state *VMState) loadGameParts(gamePart int) {
+func (state *VMState) LoadGameParts(gamePart int) {
 	logger.Debug("LOAD GAME PART %d", gamePart)
-	state.gamePart = gamePart
+	state.GamePart = gamePart
 
-	gamePartAsset := state.assets.gameParts[gamePart]
-	state.bytecode = state.assets.loadEntryFromBank(gamePartAsset.bytecode)
-	state.palette = state.assets.loadEntryFromBank(gamePartAsset.palette)
-	state.cinematic = state.assets.loadEntryFromBank(gamePartAsset.cinematic)
-	state.video2 = state.assets.loadEntryFromBank(gamePartAsset.video2)
+	gamePartAsset := state.assets.GameParts[gamePart]
+	state.bytecode = state.assets.LoadEntryFromBank(gamePartAsset.Bytecode)
+	state.palette = state.assets.LoadEntryFromBank(gamePartAsset.Palette)
+	state.cinematic = state.assets.LoadEntryFromBank(gamePartAsset.Cinematic)
+	state.video2 = state.assets.LoadEntryFromBank(gamePartAsset.Video2)
 }
 
 // Run the Virtual Machine for every active threads
-func (state *VMState) mainLoop(keypresses uint32, video *Video) {
+func (state *VMState) MainLoop(keypresses uint32, video *Video) {
 	state.handleKeypress(keypresses)
 
 	//TODO check if next part needs to be loaded!
 	state.setupChannels()
 	for channelID := 0; channelID < VM_NUM_THREADS; channelID++ {
-		channelPC := state.channelPC[channelID]
-		channelPaused := state.channelPaused[channelID]
+		channelPC := state.ChannelPC[channelID]
+		channelPaused := state.ChannelPaused[channelID]
 		// Inactive threads are marked with a thread instruction pointer set to 0xFFFF (VM_INACTIVE_THREAD).
 		if channelPC != VM_INACTIVE_THREAD && !channelPaused {
 			state.channelID = channelID
@@ -172,9 +172,9 @@ func (state *VMState) mainLoop(keypresses uint32, video *Video) {
 			}
 			logger.Debug("> step: PAUSED, pc[%5d], channel[%2d] >>> ", state.pc-1, channelID)
 			if state.sp > 0 {
-				state.countSPNotZero++
+				state.CountSPNotZero++
 			}
-			state.channelPC[channelID] = state.pc
+			state.ChannelPC[channelID] = state.pc
 		}
 	}
 	logger.Debug("> --- MAINLOOP DONE")
@@ -200,26 +200,26 @@ func (state *VMState) handleKeypress(keypresses uint32) {
 		upDown = -1
 		mask |= 8
 	}
-	state.variables[VM_VARIABLE_HERO_POS_UP_DOWN] = upDown
-	state.variables[VM_VARIABLE_HERO_POS_JUMP_DOWN] = upDown
-	state.variables[VM_VARIABLE_HERO_POS_LEFT_RIGHT] = leftRight
-	state.variables[VM_VARIABLE_HERO_POS_MASK] = mask
+	state.Variables[VM_VARIABLE_HERO_POS_UP_DOWN] = upDown
+	state.Variables[VM_VARIABLE_HERO_POS_JUMP_DOWN] = upDown
+	state.Variables[VM_VARIABLE_HERO_POS_LEFT_RIGHT] = leftRight
+	state.Variables[VM_VARIABLE_HERO_POS_MASK] = mask
 
 	fireButton := int16(0)
 	if keypresses&KeyFire > 0 {
 		fireButton = 1
 		mask |= 0x80
 	}
-	state.variables[VM_VARIABLE_HERO_ACTION] = fireButton
-	state.variables[VM_VARIABLE_HERO_ACTION_POS_MASK] = mask
+	state.Variables[VM_VARIABLE_HERO_ACTION] = fireButton
+	state.Variables[VM_VARIABLE_HERO_ACTION_POS_MASK] = mask
 }
 
 //no pending tasks when starting a loop
 func (state *VMState) setupChannels() {
 	for channelID := 0; channelID < VM_NUM_THREADS; channelID++ {
-		if state.nextLoopChannelPC[channelID] != VM_NO_TASK_OP {
-			state.channelPC[channelID] = state.nextLoopChannelPC[channelID]
-			state.nextLoopChannelPC[channelID] = VM_NO_TASK_OP
+		if state.NextLoopChannelPC[channelID] != VM_NO_TASK_OP {
+			state.ChannelPC[channelID] = state.NextLoopChannelPC[channelID]
+			state.NextLoopChannelPC[channelID] = VM_NO_TASK_OP
 		}
 	}
 }
@@ -302,7 +302,7 @@ func (state *VMState) executeOp(video *Video) {
 	case 0x1A:
 		state.opPlayMusic(video)
 	default:
-		state.countNoOps++
+		state.CountNoOps++
 		logger.Warn("NO_OP: %d", opcode)
 	}
 }

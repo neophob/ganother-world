@@ -1,11 +1,11 @@
-package main
+package anotherworld
 
 //GamePartContent -AW has 10 different game parts. here we map which assets (code, video, palettes) belong to which level
 type GamePartContent struct {
-	palette   int
-	bytecode  int
-	cinematic int
-	video2    int
+	Palette   int
+	Bytecode  int
+	Cinematic int
+	Video2    int
 }
 
 const GAME_PARTS_COUNT = 10
@@ -35,7 +35,7 @@ const (
 // kPartLuxe
 // kPartFinal
 // kPartPassword
-func getGameParts() map[int]GamePartContent {
+func GetGameParts() map[int]GamePartContent {
 	GP_PALETTE := [GAME_PARTS_COUNT]int{0x14, 0x17, 0x1A, 0x1D, 0x20, 0x23, 0x26, 0x29, 0x7D, 0x7D}
 	GP_BYTECODE := [GAME_PARTS_COUNT]int{0x15, 0x18, 0x1B, 0x1E, 0x21, 0x24, 0x27, 0x2A, 0x7E, 0x7E}
 	GP_CINEMATIC := [GAME_PARTS_COUNT]int{0x16, 0x19, 0x1C, 0x1F, 0x22, 0x25, 0x28, 0x2B, 0x7f}
@@ -45,10 +45,10 @@ func getGameParts() map[int]GamePartContent {
 
 	for gamePart := 0; gamePart < GAME_PARTS_COUNT; gamePart++ {
 		entry := GamePartContent{
-			palette:   GP_PALETTE[gamePart],
-			bytecode:  GP_BYTECODE[gamePart],
-			cinematic: GP_CINEMATIC[gamePart],
-			video2:    GP_VIDEO2[gamePart],
+			Palette:   GP_PALETTE[gamePart],
+			Bytecode:  GP_BYTECODE[gamePart],
+			Cinematic: GP_CINEMATIC[gamePart],
+			Video2:    GP_VIDEO2[gamePart],
 		}
 		gamePartsMap[gamePart] = entry
 	}
