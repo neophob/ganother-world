@@ -13,8 +13,8 @@ GOROOT := $(shell go env GOROOT)
 # -X add string value definition of the form importpath.name=value
 RELEASE := -ldflags "-s -w -X project.name=anotherworld"
 WASMDIR := ./wasm
-SLDDIR := ./sdl
-PACKAGES := $(SLDDIR) ./logger ./anotherworld
+SDLDIR := ./sdl
+PACKAGES := $(SDLDIR) ./logger ./anotherworld
 DISTDIR := ./dist
 
 ## build: build all the things
@@ -23,7 +23,7 @@ build: build-native build-wasm
 ## build-native: build go binary in dev mode
 build-native:
 	@echo "  >  BUILD"
-	@go build -o "$(DISTDIR)/main" $(SLDDIR)
+	@go build -o "$(DISTDIR)/main" $(SDLDIR)
 
 ## build-wasm: builds the wasm app
 build-wasm:
@@ -39,8 +39,7 @@ format:
 
 ## build-release: build release build, could be compressed with UPX
 build-release:
-	#@env GOOS=js GOARCH=wasm go build -o gaw.js $(RELEASE) $(SLDDIR)
-	@env go build -o "$(DISTDIR)/main.release" $(RELEASE) $(SLDDIR)
+	@env go build -o "$(DISTDIR)/main.release" $(RELEASE) $(SDLDIR)
 
 ## test: run unit tests
 test:
@@ -48,7 +47,7 @@ test:
 
 ## doc: create project documentation
 doc:
-	@go doc -all $(SLDDIR)
+	@go doc -all $(SDLDIR)
 	@go doc -all $(WASMDIR)
 	@go doc -all ./logger
 	@go doc -all ./anotherworld
