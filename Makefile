@@ -30,8 +30,10 @@ build-wasm:
 	@echo "  >  BUILD-WASM"
 	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" $(WASMDIR)
 	@cp wasm/index.html $(DISTDIR)
+	@cp wasm/main.js $(DISTDIR)
 	@go build -o "$(DISTDIR)/devserver" cmd/devserver/main.go
 	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
+	@cp -r ./assets $(DISTDIR)
 
 ## format: format code using go fmt
 format:
