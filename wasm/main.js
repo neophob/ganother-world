@@ -3,24 +3,23 @@
 
   const go = new Go();
 
-  // TODO consider loading all assets (wasm, memlist, banks)
-  // and only then initializing the webassembly code.
+  console.info('Loading assets...');
+  const assetsPromise = Promise.all([
+    fetch('lib.wasm'),
+    loadFileAsBytes('assets/memlist.bin'),
+    // TODO load all bank assets
+  ]);
 
-  const memlist = loadFileAsBytes("assets/memlist.bin");
-  memlist
-    .then((bytes) => {
-      console.log('Success:', bytes);
+  assetsPromise
+    .then(([wasmLib, memList, ...banks]) => {
+      console.log('Assets loaded:', {memList});
+
+      return WebAssembly.instantiateStreaming(wasmLib, go.importObject)
     })
-    .catch((error) => {
-      console.error('Failed to load assets:', error);
-    });
-
-  WebAssembly
-    .instantiateStreaming(fetch("lib.wasm"), go.importObject)
     .then((gotherworld) => {
       go.run(gotherworld.instance);
-      // TODO load memlist and use CopyBytesToGo to pass it in
-      // TODO then load all bank assets and pass them in to build bankFilesMap
+      // TODO copy memlist to go
+      // TODO copy banks to go
     });
 
   async function loadFileAsBytes(filename) {

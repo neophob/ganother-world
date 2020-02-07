@@ -8,7 +8,7 @@ import (
 func init() {
 	// TODO make logger wasm/browser console friendly
 	logger.SetLogLevel(logger.LEVEL_INFO)
-	logger.Info("WASM " + anotherworld.GetTitle() + "loading...")
+	logger.Info("WASM " + anotherworld.GetTitle() + " loading...")
 }
 
 func main() {
