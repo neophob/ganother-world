@@ -10,9 +10,9 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - run: |
-      if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
-        apk add --libsdl2
-      fi
+        if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+          apk add --libsdl2
+        fi
       - name: Install Go
         uses: actions/setup-go@v1
         with:
