@@ -21,7 +21,7 @@ DISTDIR := ./dist
 ## build: build all the things
 build: build-native build-wasm
 
-## build-native: build go binary in dev mode
+## build-native: build go SDL binary
 build-native:
 	@echo "  >  BUILD"
 	@go build -o "$(DISTDIR)/main" $(SDLDIR)

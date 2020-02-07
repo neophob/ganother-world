@@ -16,4 +16,4 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v1
       - run: make test
-      - run: make build
+      - run: make build-wasm
