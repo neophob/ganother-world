@@ -13,6 +13,7 @@ jobs:
         if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
           apk add --libsdl2
         fi
+        shell: bash
       - name: Install Go
         uses: actions/setup-go@v1
         with:
