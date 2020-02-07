@@ -34,13 +34,13 @@ build-wasm:
 	@go build -o "$(DISTDIR)/devserver" cmd/devserver/main.go
 	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
 
-## format: format code using go fmt
-format:
-	@go fmt $(PACKAGES)
-
 ## build-release: build release build, could be compressed with UPX
 build-release:
 	@env go build -o "$(DISTDIR)/main.release" $(RELEASE) $(SDLDIR)
+
+## format: format code using go fmt
+format:
+	@go fmt $(PACKAGES)
 
 ## test: run unit tests
 test:
