@@ -14,12 +14,12 @@ func InitGame() anotherworld.GotherWorld {
 }
 
 func fetchAssets(filename string) []byte {
-	// TODO implement loading
+	// TODO implement loading through CopyBytesToGo
 	return make([]byte, 0)
 }
 
 func createBankMap(assetPath string) map[int][]byte {
 	bankFilesMap := make(map[int][]byte)
-	// TODO implement loading
+	// TODO implement loading through CopyBytesToGo
 	return bankFilesMap
 }

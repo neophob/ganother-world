@@ -12,11 +12,12 @@
 
   assetsPromise
     .then(([wasmLib, memList, ...banks]) => {
-      console.log('Assets loaded:', {memList});
+      console.info('Assets loaded:', {memList});
 
       return WebAssembly.instantiateStreaming(wasmLib, go.importObject)
     })
     .then((gotherworld) => {
+      console.info('Running gotherworld...');
       go.run(gotherworld.instance);
       // TODO copy memlist to go
       // TODO copy banks to go
