@@ -27,7 +27,7 @@ func InitGotherWorld(memlistData []byte, bankFilesMap map[int][]byte, videoDrive
 	printResourceStats(resourceStatistics)
 
 	gameParts := GetGameParts()
-	assets := Assets{
+	assets := StaticGameAssets{
 		MemList:         resourceMap,
 		GameParts:       gameParts,
 		Bank:            bankFilesMap,

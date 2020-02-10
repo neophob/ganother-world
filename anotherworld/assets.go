@@ -8,16 +8,15 @@ import (
 	"github.com/neophob/ganother-world/logger"
 )
 
-//TODO rename to staticGameAssets
-type Assets struct {
+type StaticGameAssets struct {
 	MemList         map[int]MemlistEntry
 	GameParts       map[int]GamePartContent
 	Bank            map[int][]uint8
 	LoadedResources map[int][]uint8
 }
 
-//LoadEntryFromBank extract a resource from a serialized bank file
-func (assets Assets) LoadEntryFromBank(index int) []uint8 {
+//LoadEntryFromBank extract a resource from a serialized bank
+func (assets StaticGameAssets) LoadEntryFromBank(index int) []uint8 {
 	memlistEntry := assets.MemList[index]
 	bank := assets.Bank[int(memlistEntry.BankID)]
 	ofs := int(memlistEntry.BankOffset)
@@ -32,7 +31,7 @@ func (assets Assets) LoadEntryFromBank(index int) []uint8 {
 }
 
 //LoadResource return a resource
-func (assets *Assets) LoadResource(id int) {
+func (assets *StaticGameAssets) LoadResource(id int) {
 	if len(assets.LoadedResources[id]) > 0 {
 		logger.Info("resource [%d] already loaded", id)
 		return
