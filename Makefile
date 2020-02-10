@@ -15,7 +15,6 @@ RELEASE := -ldflags "-s -w -X project.name=anotherworld"
 WASMDIR := ./wasm
 SDLDIR := ./sdl
 PACKAGES := $(SDLDIR) ./logger ./anotherworld
-PACKAGES_TO_TEST := ./logger ./anotherworld
 DISTDIR := ./dist
 
 ## build: build all the things
@@ -44,7 +43,7 @@ format:
 
 ## test: run unit tests
 test:
-	@go test -cover -v $(PACKAGES_TO_TEST)
+	@go test -cover -v $(PACKAGES)
 
 ## doc: create project documentation
 doc:
