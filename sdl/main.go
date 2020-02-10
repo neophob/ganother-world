@@ -2,11 +2,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"io/ioutil"
 	"time"
-
-	"os"
 
 	"github.com/neophob/ganother-world/anotherworld"
 	"github.com/neophob/ganother-world/logger"
@@ -29,8 +25,8 @@ func main() {
 	}
 
 	logger.Info("- load memlist.bin")
-	data := readFile("./assets/memlist.bin")
-	bankFilesMap := createBankMap("./assets/")
+	data := anotherworld.ReadFile("./assets/memlist.bin")
+	bankFilesMap := anotherworld.CreateBankMap("./assets/")
 
 	var videoDriver anotherworld.Video
 	if *noVideoOutput == true {
@@ -56,24 +52,4 @@ func main() {
 	}
 
 	app.Shutdown()
-}
-
-func readFile(filename string) []byte {
-	data, err := ioutil.ReadFile(filename)
-	if err != nil {
-		logger.Error("File reading error %v", err)
-		os.Exit(1)
-	}
-	return data
-}
-
-func createBankMap(assetPath string) map[int][]byte {
-	bankFilesMap := make(map[int][]byte)
-	for i := 0x01; i < 0x0e; i++ {
-		name := fmt.Sprintf("%sbank%02x", assetPath, i)
-		logger.Debug("- load file %s", name)
-		entry := readFile(name)
-		bankFilesMap[i] = entry
-	}
-	return bankFilesMap
 }

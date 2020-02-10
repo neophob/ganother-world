@@ -15,12 +15,13 @@ RELEASE := -ldflags "-s -w -X project.name=anotherworld"
 WASMDIR := ./wasm
 SDLDIR := ./sdl
 PACKAGES := $(SDLDIR) ./logger ./anotherworld
+PACKAGES_TO_TEST := ./anotherworld
 DISTDIR := ./dist
 
 ## build: build all the things
 build: build-native build-wasm
 
-## build-native: build go binary in dev mode
+## build-native: build go SDL binary
 build-native:
 	@echo "  >  BUILD"
 	@go build -o "$(DISTDIR)/main" $(SDLDIR)
@@ -33,17 +34,17 @@ build-wasm:
 	@go build -o "$(DISTDIR)/devserver" cmd/devserver/main.go
 	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
 
-## format: format code using go fmt
-format:
-	@go fmt $(PACKAGES)
-
 ## build-release: build release build, could be compressed with UPX
 build-release:
 	@env go build -o "$(DISTDIR)/main.release" $(RELEASE) $(SDLDIR)
 
+## format: format code using go fmt
+format:
+	@go fmt $(PACKAGES)
+
 ## test: run unit tests
 test:
-	@go test -cover -v $(PACKAGES)
+	@go test -cover -v $(PACKAGES_TO_TEST)
 
 ## doc: create project documentation
 doc:
@@ -54,7 +55,8 @@ doc:
 
 ## clean: removes build files
 clean:
-	@rm -r ./dist/*
+	@go clean
+	@rm -fr ./dist/*
 
 .PHONY: help
 all: help

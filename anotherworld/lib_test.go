@@ -1,21 +1,19 @@
-package main
+package anotherworld
 
 import (
 	"fmt"
 	"testing"
-
-	"github.com/neophob/ganother-world/anotherworld"
 )
 
 const stepsToRun int = 1
 
-var memlist = readFile("../assets/memlist.bin")
-var bankFilesMap = createBankMap("../assets/")
+var memlist = ReadFile("../assets/memlist.bin")
+var bankFilesMap = CreateBankMap("../assets/")
 
-func run(gamepart int) anotherworld.GotherWorld {
-	videoDriver := anotherworld.Video{Hal: anotherworld.DummyHAL{}}
-	app := anotherworld.InitGotherWorld(memlist, bankFilesMap, videoDriver)
-	app.LoadGamePart(anotherworld.GAME_PART_ID_1 + gamepart)
+func run(gamepart int) GotherWorld {
+	videoDriver := Video{Hal: DummyHAL{}}
+	app := InitGotherWorld(memlist, bankFilesMap, videoDriver)
+	app.LoadGamePart(GAME_PART_ID_1 + gamepart)
 	for i := 0; i < stepsToRun; i++ {
 		app.MainLoop(i)
 	}
