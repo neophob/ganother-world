@@ -54,7 +54,8 @@ doc:
 
 ## clean: removes build files
 clean:
-	@rm -r ./dist/*
+	@go clean
+	@rm -fr ./dist/*
 
 .PHONY: help
 all: help
