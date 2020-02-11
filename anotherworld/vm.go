@@ -32,7 +32,7 @@ const (
 
 //VMState implements the state of the the VM
 type VMState struct {
-	assets            Assets
+	assets            StaticGameAssets
 	Variables         [VM_NUM_VARIABLES]int16
 	ChannelPC         [VM_NUM_THREADS]uint16
 	NextLoopChannelPC [VM_NUM_THREADS]uint16
@@ -58,7 +58,7 @@ type VMState struct {
 	CountSPNotZero int
 }
 
-func CreateNewState(assets Assets) VMState {
+func CreateNewState(assets StaticGameAssets) VMState {
 	state := VMState{GamePart: -1, assets: assets}
 	state.Variables[VM_VARIABLE_RANDOM_SEED] = 42
 	//WTF? whats this? -> create const
