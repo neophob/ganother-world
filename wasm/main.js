@@ -17,10 +17,13 @@
       return WebAssembly.instantiateStreaming(wasmLib, go.importObject)
     })
     .then((gotherworld) => {
-      console.info('Running gotherworld...');
       go.run(gotherworld.instance);
+      console.info('Loading gotherworld...');
       // TODO copy memlist to go
       // TODO copy banks to go
+      LoadAssets();
+      console.info('Running gotherworld...');
+      InitGame();
     });
 
   async function loadFileAsBytes(filename) {
