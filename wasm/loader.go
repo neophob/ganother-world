@@ -2,9 +2,13 @@ package main
 
 import (
 	"github.com/neophob/ganother-world/anotherworld"
+	"github.com/neophob/ganother-world/logger"
 )
 
-func InitGame() anotherworld.GotherWorld {
+func InitGame(assetsURI string) anotherworld.GotherWorld {
+	logger.Info("Loading assets over http from %s", assetsURI)
+	// TODO update fetching to use HTTP:
+	// https://github.com/golang/go/wiki/WebAssembly#configuring-fetch-options-while-using-nethttp
 	data := fetchAssets("./assets/memlist.bin")
 	bankFilesMap := createBankMap("./assets/")
 	videoDriver := anotherworld.Video{Hal: anotherworld.DummyHAL{}}

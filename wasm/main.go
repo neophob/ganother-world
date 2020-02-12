@@ -29,26 +29,24 @@ func main() {
 }
 
 func RegisterCallbacks() {
-	js.Global().Set("InitGame", js.FuncOf(InitGameWrapper))
-	js.Global().Set("Shutdown", js.FuncOf(Shutdown))
-	js.Global().Set("LoadAssets", js.FuncOf(LoadAssets))
+	js.Global().Set("initGameFromURI", js.FuncOf(InitGameJSWrapper))
+	js.Global().Set("shutdown", js.FuncOf(ShutdownJSWrapper))
 }
 
-func InitGameWrapper(this js.Value, inputs []js.Value) interface{} {
-	logger.Info("Initializing game...")
-	// TODO Since init game needs the assets it should also be a callback triggered from JS once assets are loaded.
-	app = InitGame()
+func InitGameJSWrapper(this js.Value, inputs []js.Value) interface{} {
+	if len(inputs) < 1 || inputs[0].Type() != js.TypeString {
+		logger.Error("Argument one for InitGameWrapper(assetsURI) must be a string")
+		return nil
+	}
+	assetsURI := inputs[0].String()
+	logger.Info("Initializing game from %s", assetsURI)
+	app = InitGame(assetsURI)
 	return nil
 }
 
-func Shutdown(this js.Value, inputs []js.Value) interface{} {
+func ShutdownJSWrapper(this js.Value, inputs []js.Value) interface{} {
 	logger.Info("Shutting down")
 	app.Shutdown()
 	channel <- true
-	return nil
-}
-
-func LoadAssets(this js.Value, inputs []js.Value) interface{} {
-	logger.Info("Loading assets")
 	return nil
 }

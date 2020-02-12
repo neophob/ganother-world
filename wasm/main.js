@@ -1,6 +1,7 @@
 (function() {
   'use strict';
 
+  const ASSETS_URI = window.location.href + 'assets/';
   const go = new Go();
 
   console.info('Loading assets...');
@@ -18,12 +19,7 @@
     })
     .then((gotherworld) => {
       go.run(gotherworld.instance);
-      console.info('Loading gotherworld...');
-      // TODO copy memlist to go
-      // TODO copy banks to go
-      LoadAssets();
-      console.info('Running gotherworld...');
-      InitGame();
+      initGameFromURI(ASSETS_URI);
     });
 
   async function loadFileAsBytes(filename) {
