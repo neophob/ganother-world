@@ -34,14 +34,26 @@ func RegisterCallbacks() {
 }
 
 func InitGameJSWrapper(this js.Value, inputs []js.Value) interface{} {
-	if len(inputs) < 1 || inputs[0].Type() != js.TypeString {
-		logger.Error("Argument one for InitGameWrapper(assetsURI) must be a string")
+	if len(inputs) < 1 {
+		logger.Error("One argument required: memlist []byte")
 		return nil
 	}
-	assetsURI := inputs[0].String()
-	logger.Info("Initializing game from %s", assetsURI)
-	app = InitGame(assetsURI)
+	if inputs[0].Type() != js.TypeObject {
+		logger.Error("Argument one for InitGameWrapper(assetsURI) must be a %s not %s", js.TypeObject, inputs[0].Type())
+		return nil
+	}
+
+	memlist := copyBytesFromJS(inputs[0])
+	// TODO load bank assets too
+	app = InitGame(memlist)
+
 	return nil
+}
+
+func copyBytesFromJS(input js.Value) []byte {
+	data := make([]uint8, input.Get("byteLength").Int())
+	js.CopyBytesToGo(data, input)
+	return data
 }
 
 func ShutdownJSWrapper(this js.Value, inputs []js.Value) interface{} {

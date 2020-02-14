@@ -1,26 +1,28 @@
 (function() {
   'use strict';
 
-  const ASSETS_URI = window.location.href + 'assets/';
   const go = new Go();
 
   console.info('Loading assets...');
   const assetsPromise = Promise.all([
-    fetch('lib.wasm'),
+    loadGoWasm('lib.wasm'),
     loadFileAsBytes('assets/memlist.bin'),
     // TODO load all bank assets
   ]);
 
   assetsPromise
-    .then(([wasmLib, memList, ...banks]) => {
+    .then(([gotherworld, memList, ...banks]) => {
       console.info('Assets loaded:', {memList});
-
-      return WebAssembly.instantiateStreaming(wasmLib, go.importObject)
-    })
-    .then((gotherworld) => {
       go.run(gotherworld.instance);
-      initGameFromURI(ASSETS_URI);
+      initGameFromURI(memList);
     });
+
+  function loadGoWasm(filename) {
+    return fetch(filename)
+      .then((wasmLib) => {
+        return WebAssembly.instantiateStreaming(wasmLib, go.importObject)
+      });
+  }
 
   async function loadFileAsBytes(filename) {
     const response = await fetch(filename);
