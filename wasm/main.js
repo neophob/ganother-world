@@ -15,7 +15,7 @@
     .then(([gotherworld, memList, banks]) => {
       console.info('Assets loaded:', {memList, banks});
       go.run(gotherworld.instance);
-      initGameFromURI(memList, banks);
+      initGameFromURI(memList, ...banks);
     });
 
   function loadGoWasm(filename) {
@@ -60,7 +60,7 @@
     }
 
     let index = 0;
-    return chucks.reduce((bytes, chunk) => {
+    return chunks.reduce((bytes, chunk) => {
       bytes.set(chunk, index);
       index += chunk;
       return bytes;

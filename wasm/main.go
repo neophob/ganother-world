@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"syscall/js"
 
 	"github.com/neophob/ganother-world/anotherworld"
 	"github.com/neophob/ganother-world/logger"
 )
+
+const expectedBankAssets = 13
 
 var app anotherworld.GotherWorld
 var channel chan bool
@@ -34,20 +37,36 @@ func RegisterCallbacks() {
 }
 
 func InitGameJSWrapper(this js.Value, inputs []js.Value) interface{} {
-	if len(inputs) < 1 {
-		logger.Error("One argument required: memlist []byte")
+	expectedInputs := expectedBankAssets + 1
+	if len(inputs) != expectedInputs {
+		logger.Error("Expecting %v arguments, 1 for memlist the rest for banks got: %v", expectedInputs, len(inputs))
 		return nil
 	}
 	if inputs[0].Type() != js.TypeObject {
-		logger.Error("Argument one for InitGameWrapper(assetsURI) must be a %s not %s", js.TypeObject, inputs[0].Type())
+		logger.Error("Argument 1 for InitGameWrapper(memlist, ...banks) must be a %v not %v", js.TypeObject, inputs[0].Type())
 		return nil
 	}
 
-	memlist := copyBytesFromJS(inputs[0])
-	// TODO load bank assets too
-	app = InitGame(memlist)
+	jsMemlist := inputs[0]
+	jsBankFiles := inputs[1:]
+
+	memlist := copyBytesFromJS(jsMemlist)
+	bankFilesMap := copyBankMap(jsBankFiles)
+
+	app = InitGame(memlist, bankFilesMap)
 
 	return nil
+}
+
+func copyBankMap(bankInputs []js.Value) map[int][]byte {
+	bankFilesMap := make(map[int][]byte)
+	for i := 0x01; i < 0x0e; i++ {
+		name := fmt.Sprintf("bank%02x", i)
+		logger.Info("- coping %s from JS", name)
+		entry := copyBytesFromJS(bankInputs[i-1])
+		bankFilesMap[i] = entry
+	}
+	return bankFilesMap
 }
 
 func copyBytesFromJS(input js.Value) []byte {
