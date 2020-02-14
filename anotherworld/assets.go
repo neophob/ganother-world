@@ -39,6 +39,7 @@ func (assets *StaticGameAssets) LoadResource(id int) {
 	assets.LoadedResources[id] = assets.LoadEntryFromBank(id)
 }
 
+// TODO this should be moved out of anotherworld package, since for wasm it doesn't work.
 //ReadFile reads a file from disc
 func ReadFile(filename string) []byte {
 	data, err := ioutil.ReadFile(filename)
@@ -49,6 +50,7 @@ func ReadFile(filename string) []byte {
 	return data
 }
 
+// TODO this should be moved out of anotherworld package, since for wasm it doesn't work.
 //CreateBankMap loads the bank asset files from disk and returns a map with its content
 func CreateBankMap(assetPath string) map[int][]byte {
 	bankFilesMap := make(map[int][]byte)
