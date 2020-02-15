@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const LOG_FORMAT = "%5s %v %12s:%d\t\t%s\n"
+const LOG_FORMAT = "%5s %8dms %12s:%-4d\t%s\n"
 
 // Log Level: DEBUG INFO WARN ERROR FATAL
 const (
@@ -59,7 +59,7 @@ func logByLevel(level int, message string) {
 	if level < log_level {
 		return
 	}
-	timeDiff := time.Since(startTime)
+	timeDiff := time.Since(startTime).Milliseconds()
 	_, filename, line, _ := runtime.Caller(2)
 	_, filename = path.Split(filename)
 	fmt.Printf(LOG_FORMAT, LEVEL_STRINGS[level], timeDiff, filename, line, message)
