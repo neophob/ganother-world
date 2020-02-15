@@ -19,7 +19,7 @@ const (
 	LEVEL_FATAL
 )
 
-var LEVEL_STRINGS = [...]string{
+var LEVEL_STRINGS_COLOR = [...]string{
 	"DEBUG",
 	"\033[1;36mINFO\033[0m",
 	"\033[1;33mWARN\033[0m",
@@ -27,12 +27,26 @@ var LEVEL_STRINGS = [...]string{
 	"FATAL",
 }
 
+var LEVEL_STRINGS = [...]string{
+	"DEBUG",
+	"INFO",
+	"WARN",
+	"ERROR",
+	"FATAL",
+}
+
 var startTime time.Time = time.Now()
 var log_level = LEVEL_DEBUG
+var color_enabled = true
 
 // If SetLevel is not called , log_level is the default value : LEVEL_DEBUG (the lowest level)
 func SetLogLevel(level int) {
 	log_level = level
+}
+
+// DisableColors make sure no ASCII sequence is used, useful for browser console logs
+func DisableColors() {
+	color_enabled = false
 }
 
 func Debug(format string, v ...interface{}) {
@@ -62,5 +76,9 @@ func logByLevel(level int, message string) {
 	timeDiff := time.Since(startTime).Milliseconds()
 	_, filename, line, _ := runtime.Caller(2)
 	_, filename = path.Split(filename)
-	fmt.Printf(LOG_FORMAT, LEVEL_STRINGS[level], timeDiff, filename, line, message)
+	if color_enabled {
+		fmt.Printf(LOG_FORMAT, LEVEL_STRINGS_COLOR[level], timeDiff, filename, line, message)
+	} else {
+		fmt.Printf(LOG_FORMAT, LEVEL_STRINGS[level], timeDiff, filename, line, message)
+	}
 }
