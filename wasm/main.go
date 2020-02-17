@@ -16,7 +16,7 @@ var channel chan bool
 func init() {
 	// TODO make logger wasm/browser console friendly
 	logger.SetLogLevel(logger.LEVEL_INFO)
-	logger.Info("WASM " + anotherworld.GetTitle() + " initializing...")
+	logger.Info("WASM Gother-World initializing...")
 }
 
 func main() {
