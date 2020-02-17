@@ -57,7 +57,7 @@ func copyBankMap(bankInputs []js.Value) map[int][]byte {
 	bankFilesMap := make(map[int][]byte)
 	for i := 0x01; i < 0x0e; i++ {
 		name := fmt.Sprintf("bank%02x", i)
-		logger.Info("- coping %s from JS", name)
+		logger.Debug("- coping %s from JS", name)
 		entry := copyBytesFromJS(bankInputs[i-1])
 		bankFilesMap[i] = entry
 	}

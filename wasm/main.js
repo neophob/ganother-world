@@ -47,38 +47,8 @@
   }
 
   async function loadFileAsBytes(filename) {
-    const response = await fetch(filename);
-    const chunks = [];
-    let responseSize = 0;
-    for await (const chunk of streamAsyncIterator(response.body)) {
-      chunks.push(chunk);
-      responseSize += chunk.length;
-    }
-
-    if (chunks.length === 1) {
-      return chunks[0];
-    }
-
-    let index = 0;
-    return chunks.reduce((bytes, chunk) => {
-      bytes.set(chunk, index);
-      index += chunk;
-      return bytes;
-    }, new Uint8Array(responseSize));
-  }
-
-  async function* streamAsyncIterator(stream) {
-    const reader = stream.getReader();
-    try {
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) {
-          return;
-        }
-        yield value;
-      }
-    } finally {
-      reader.releaseLock();
-    }
+    return fetch(filename)
+      .then((response) => response.arrayBuffer())
+      .then((buffer) => new Uint8Array(buffer));
   }
 })();
