@@ -3,16 +3,18 @@ package main
 import (
 	"fmt"
 	"syscall/js"
+	"time"
 
 	"github.com/neophob/ganother-world/anotherworld"
 	"github.com/neophob/ganother-world/logger"
 )
 
 const (
-	expectedBankAssets = 13
-	defaultStartPart   = anotherworld.GAME_PART_ID_1
-	maxStartPartOffset = 9
-	minStartPartOffset = 0
+	expectedBankAssets     = 13
+	defaultStartPart       = anotherworld.GAME_PART_ID_1
+	maxStartPartOffset     = 9
+	minStartPartOffset     = 0
+	fixedLoopDelayFor25FPS = 20 * time.Millisecond
 )
 
 var app anotherworld.GotherWorld
@@ -66,19 +68,23 @@ func startGameFromPart(this js.Value, inputs []js.Value) interface{} {
 		startPartId += parseGamePartOffset(inputs[0])
 	}
 
-	logger.Info("Starting game from %v", startPartId)
-	// TODO is part 0 loaded by default can we skip if default?
-	app.LoadGamePart(startPartId)
+	nonDefaultPartLoadingIsNeeded := startPartId != defaultStartPart
+	if nonDefaultPartLoadingIsNeeded {
+		logger.Info("Loading game from %v", startPartId)
+		app.LoadGamePart(startPartId)
+	}
 
-	// TODO sync this with request animation frame
-	// start main loop
-	// for i := 0; app.ExitRequested() == false; i++ {
-	// 	app.MainLoop(i)
-	// 	// game run at approx 25 fps
-	// 	time.Sleep(20 * time.Millisecond)
-	// }
+	startMainLoop()
 
 	return nil
+}
+
+func startMainLoop() {
+	// TODO sync this with request animation frame
+	for i := 0; app.ExitRequested() == false; i++ {
+		app.MainLoop(i)
+		time.Sleep(fixedLoopDelayFor25FPS)
+	}
 }
 
 func parseGamePartOffset(gamePartOffset js.Value) int {
