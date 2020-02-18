@@ -16,6 +16,8 @@
       console.info('Assets loaded:', {memList, banks});
       go.run(gotherworld.instance);
       initGameFromURI(memList, ...banks);
+      // TODO read offset from get parameters
+      startGameFromPart();
     });
 
   function loadGoWasm(filename) {
