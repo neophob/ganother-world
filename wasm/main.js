@@ -3,8 +3,9 @@
 
   const ASSETS_PATH = 'assets';
   const go = new Go();
+  const params = parseParameters();
 
-  console.info('Loading assets...');
+  console.info('Loading assets and...');
   const assetsPromise = Promise.all([
     loadGoWasm('lib.wasm'),
     loadFileAsBytes(`${ASSETS_PATH}/memlist.bin`),
@@ -15,9 +16,14 @@
     .then(([gotherworld, memList, banks]) => {
       console.info('Assets loaded:', {memList, banks});
       go.run(gotherworld.instance);
+      console.info('Initializing with:', params);
+      if (isFinite(params.logLevel)) {
+        console.info('Updating log level to:', params.logLevel)
+        setLogLevel(params.logLevel);
+      }
+
       initGameFromURI(memList, ...banks);
-      // TODO read offset from get parameters
-      startGameFromPart();
+      startGameFromPart(params.gamePart);
     });
 
   function loadGoWasm(filename) {
@@ -52,5 +58,18 @@
     return fetch(filename)
       .then((response) => response.arrayBuffer())
       .then((buffer) => new Uint8Array(buffer));
+  }
+
+  function parseParameters() {
+    const rawQuery = location.search.substr(1);
+    return rawQuery.split("&")
+      .filter((pair) => Boolean(pair))
+      .reduce((map, pair) => {
+        console.log("parsing pair", pair)
+        const [key, value] = pair.split("=");
+        const intValue = parseInt(value, 10);
+        map[key] = isFinite(intValue) ? intValue :value;
+        return map;
+      }, {});
   }
 })();

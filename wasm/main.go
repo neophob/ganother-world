@@ -38,6 +38,7 @@ func RegisterCallbacks() {
 	js.Global().Set("initGameFromURI", js.FuncOf(InitGameJSWrapper))
 	js.Global().Set("startGameFromPart", js.FuncOf(startGameFromPart))
 	js.Global().Set("shutdown", js.FuncOf(ShutdownJSWrapper))
+	js.Global().Set("setLogLevel", js.FuncOf(SetLogLevelWrapper))
 }
 
 func InitGameJSWrapper(this js.Value, inputs []js.Value) interface{} {
@@ -116,6 +117,14 @@ func copyBytesFromJS(input js.Value) []byte {
 	data := make([]uint8, input.Get("byteLength").Int())
 	js.CopyBytesToGo(data, input)
 	return data
+}
+
+func SetLogLevelWrapper(this js.Value, inputs []js.Value) interface{} {
+	if len(inputs) != 1 || inputs[0].Type() != js.TypeNumber {
+		logger.Error("Invalid log level requested %v, number required", inputs[0])
+	}
+	logger.SetLogLevel(inputs[0].Int())
+	return nil
 }
 
 func ShutdownJSWrapper(this js.Value, inputs []js.Value) interface{} {
