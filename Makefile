@@ -29,10 +29,13 @@ build-native:
 ## build-wasm: builds the wasm app
 build-wasm:
 	@echo "  >  BUILD-WASM"
-	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" $(WASMDIR)/main.go
+	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" $(WASMDIR)
 	@cp wasm/index.html $(DISTDIR)
+	@cp wasm/main.js $(DISTDIR)
 	@go build -o "$(DISTDIR)/devserver" cmd/devserver/main.go
 	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
+	@cp -r ./assets $(DISTDIR)
+	@cp -r ./logo.png $(DISTDIR)
 
 ## build-release: build release build, could be compressed with UPX
 build-release:
