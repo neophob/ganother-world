@@ -74,7 +74,7 @@ func startGameFromPart(this js.Value, inputs []js.Value) interface{} {
 		app.LoadGamePart(startPartId)
 	}
 
-	startMainLoop()
+	go startMainLoop()
 
 	return nil
 }
