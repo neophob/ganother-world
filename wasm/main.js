@@ -5,14 +5,7 @@
   const go = new Go();
   const params = parseParameters();
 
-  console.info('Loading assets and...');
-  const assetsPromise = Promise.all([
-    loadGoWasm('lib.wasm'),
-    loadFileAsBytes(`${ASSETS_PATH}/memlist.bin`),
-    loadBankAssets()
-  ]);
-
-  assetsPromise
+  loadAllAssets()
     .then(([gotherworld, memList, banks]) => {
       console.info('Assets loaded:', {memList, banks});
       go.run(gotherworld.instance);
@@ -25,6 +18,14 @@
       initGameFromURI(memList, ...banks);
       startGameFromPart(params.gamePart);
     });
+
+  function loadAllAssets() {
+    return Promise.all([
+      loadGoWasm('lib.wasm'),
+      loadFileAsBytes(`${ASSETS_PATH}/memlist.bin`),
+      loadBankAssets()
+    ]);
+  }
 
   function loadGoWasm(filename) {
     return fetch(filename)

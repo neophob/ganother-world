@@ -65,7 +65,7 @@ func InitGameJSWrapper(this js.Value, inputs []js.Value) interface{} {
 
 func startGameFromPart(this js.Value, inputs []js.Value) interface{} {
 	startPartId := defaultStartPart
-	if len(inputs) == 1 {
+	if len(inputs) == 1 && inputs[0].Type() != js.TypeUndefined {
 		startPartId += parseGamePartOffset(inputs[0])
 	}
 
