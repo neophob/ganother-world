@@ -15,6 +15,7 @@
         setLogLevel(params.logLevel);
       }
 
+      initializeKeyEventListner();
       initGameFromURI(memList, ...banks);
       startGameFromPart(params.gamePart);
     });
@@ -59,6 +60,19 @@
     return fetch(filename)
       .then((response) => response.arrayBuffer())
       .then((buffer) => new Uint8Array(buffer));
+  }
+
+  function initializeKeyEventListner() {
+    document.addEventListener('keydown', handleKeyEvent);
+    document.addEventListener('keyup', handleKeyEvent);
+  }
+
+  function handleKeyEvent(event) {
+    if (event.repeat) {
+      return; //Ignore repeat, only up and down is important.
+    }
+    console.info('key event', event);
+    // TODO send to go
   }
 
   function parseParameters() {
