@@ -5,7 +5,7 @@ import (
 )
 
 func InitGame(memlist []byte, bankFilesMap map[int][]byte) anotherworld.GotherWorld {
-	videoDriver := anotherworld.Video{Hal: WASMHAL{}}
+	videoDriver := anotherworld.Video{Hal: buildWASMHAL()}
 	app := anotherworld.InitGotherWorld(memlist, bankFilesMap, videoDriver)
 	return app
 }

@@ -8,7 +8,24 @@ import (
 const MAX_FRAME_COUNT = 32
 
 type WASMHAL struct {
-	// TODO
+	holdKeys map[uint32]bool
+}
+
+type KeyEvent struct {
+	key     string
+	keyCode int
+	pressed bool
+}
+
+func buildWASMHAL() *WASMHAL {
+	return &WASMHAL{
+		holdKeys: make(map[uint32]bool),
+	}
+}
+
+func (render WASMHAL) setKeyState(key *KeyEvent) {
+	// TODO switch based on keyCode
+	// then set render.holdKeys based on type
 }
 
 func (render WASMHAL) BlitPage(buffer [anotherworld.WIDTH * anotherworld.HEIGHT]anotherworld.Color, posX, posY int) {
@@ -17,28 +34,14 @@ func (render WASMHAL) BlitPage(buffer [anotherworld.WIDTH * anotherworld.HEIGHT]
 
 //Outputs framecount, sends escape after MAX_FRAME_COUNT frames and ends the game
 func (render WASMHAL) EventLoop(frameCount int) uint32 {
-	/*
-		TODO Implement Key handling from JS, should js pass in a map
-		can we fetch a map via callback's callback. Maybe update from js
-		on event then use updated version here?
-		Where would the state be stored and how does the HAL access it?
-			K_ESCAPE - KeyEsc
-			K_LEFT - KeyLeft
-			K_RIGHT - KeyRight
-			K_UP - KeyUp
-			K_DOWN - KeyDown
-			K_SPACE - KeyFire
-			K_p - KeyPause
-			K_s - KeySave
-			K_l - KeyLoad
-		See hal-sdl for multiple key holds handling.
-	*/
+	keyPress := anotherworld.KeyNone
 	logger.Info(">EVNT: EVENTLOOP %d", frameCount)
-	if frameCount < MAX_FRAME_COUNT {
-		return anotherworld.KeyNone
+	if frameCount >= MAX_FRAME_COUNT {
+		logger.Info(">EVNT: Max frameCount reached (%d) triggering KeyEsc", frameCount)
+		return anotherworld.KeyEsc
 	}
-	logger.Info(">EVNT: Max frameCount reached (%d) triggering KeyEsc", frameCount)
-	return anotherworld.KeyEsc
+	// TODO get details from setKeyState and flatten onto 1 var.
+	return keyPress
 }
 
 func (render WASMHAL) Shutdown() {

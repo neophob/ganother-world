@@ -21,7 +21,6 @@ var app anotherworld.GotherWorld
 var channel chan bool
 
 func init() {
-	// TODO ideally parse debug level from get parameter: ?logLevel=debug
 	logger.SetLogLevel(logger.LEVEL_INFO)
 	logger.DisableColors()
 	logger.Info("WASM Gother-World initializing...")
@@ -37,6 +36,7 @@ func main() {
 func RegisterCallbacks() {
 	js.Global().Set("initGameFromURI", js.FuncOf(InitGameJSWrapper))
 	js.Global().Set("startGameFromPart", js.FuncOf(startGameFromPart))
+	js.Global().Set("handleKeyEvent", js.FuncOf(handleKeyEvent))
 	js.Global().Set("shutdown", js.FuncOf(ShutdownJSWrapper))
 	js.Global().Set("setLogLevel", js.FuncOf(SetLogLevelWrapper))
 }
@@ -85,6 +85,62 @@ func startMainLoop() {
 	for i := 0; app.ExitRequested() == false; i++ {
 		app.MainLoop(i)
 		time.Sleep(fixedLoopDelayFor25FPS)
+	}
+}
+
+var keyMap = make(map[uint32]bool)
+
+func handleKeyEvent(this js.Value, inputs []js.Value) interface{} {
+	if len(inputs) != 3 {
+		logger.Error("Ignoring incomplete key event", inputs)
+	}
+	event := KeyEvent{
+		key:     inputs[0].String(),
+		keyCode: inputs[1].Int(),
+		pressed: inputs[2].String() == "keydown",
+	}
+	setKeyState(&event)
+	logger.Info("Updated KeyMap %v", keyMap)
+	return nil
+}
+
+// TODO move this to a state shared with the hal
+// pass it to Hal... some how figure out how to access the hal? app.video.Hal
+func setKeyState(event *KeyEvent) {
+	logger.Info("Key Event %v", event)
+	/*
+		TODO
+		Where would the state be stored and how does the HAL access it?
+		See hal-sdl for multiple key holds handling.
+	*/
+	switch event.key {
+	case "Escape":
+		keyMap[anotherworld.KeyEsc] = event.pressed
+		return
+	case "ArrowLeft":
+		keyMap[anotherworld.KeyLeft] = event.pressed
+		return
+	case "ArrowRight":
+		keyMap[anotherworld.KeyRight] = event.pressed
+		return
+	case "ArrowUp":
+		keyMap[anotherworld.KeyUp] = event.pressed
+		return
+	case "ArrowDown":
+		keyMap[anotherworld.KeyDown] = event.pressed
+		return
+	case " ":
+		keyMap[anotherworld.KeyFire] = event.pressed
+		return
+	case "p", "P":
+		keyMap[anotherworld.KeyPause] = event.pressed
+		return
+	case "s", "S":
+		keyMap[anotherworld.KeySave] = event.pressed
+		return
+	case "l", "L":
+		keyMap[anotherworld.KeyLoad] = event.pressed
+		return
 	}
 }
 

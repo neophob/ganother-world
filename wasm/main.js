@@ -63,16 +63,15 @@
   }
 
   function initializeKeyEventListner() {
-    document.addEventListener('keydown', handleKeyEvent);
-    document.addEventListener('keyup', handleKeyEvent);
+    document.addEventListener('keydown', forwardKeyEvent);
+    document.addEventListener('keyup', forwardKeyEvent);
   }
 
-  function handleKeyEvent(event) {
+  function forwardKeyEvent(event) {
     if (event.repeat) {
       return; //Ignore repeat, only up and down is important.
     }
-    console.info('key event', event);
-    // TODO send to go
+    handleKeyEvent(event.key, event.keyCode, event.type);
   }
 
   function parseParameters() {
