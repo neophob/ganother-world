@@ -15,6 +15,11 @@ const (
 var app anotherworld.GotherWorld
 var shutdownChannel chan bool
 
+type Engine struct {
+	app             anotherworld.GotherWorld
+	shutdownChannel chan bool
+}
+
 func init() {
 	logger.SetLogLevel(logger.LEVEL_INFO)
 	logger.DisableColors()
@@ -22,13 +27,18 @@ func init() {
 }
 
 func main() {
-	RegisterCallbacks()
+	engine := Engine{
+		shutdownChannel: make(chan bool),
+	}
+	RegisterCallbacks(&engine)
 
+	// TODO remove
 	shutdownChannel = make(chan bool)
 	<-shutdownChannel
+	// <-engine.shutdownChannel
 }
 
-// TODO part of engine?
+// TODO make function of engine
 func startMainLoop() {
 	// TODO sync this with request animation frame
 	for i := 0; app.ExitRequested() == false; i++ {

@@ -18,18 +18,27 @@ const (
 // TODO should be part of hal or engine...
 var keyMap = make(map[uint32]bool)
 
-func RegisterCallbacks() {
-	// TODO init should return app and set it on engine
-	js.Global().Set("initGameFromURI", js.FuncOf(initGameJSWrapper))
-	js.Global().Set("startGameFromPart", js.FuncOf(startGameFromPartWrapper))
-	// TODO this should set the keyMap on the engine
-	js.Global().Set("handleKeyEvent", js.FuncOf(handleKeyEventWrapper))
-	// TODO this should act on the engine's channel
-	js.Global().Set("shutdown", js.FuncOf(shutdownJSWrapper))
+func RegisterCallbacks(engine *Engine) {
+	js.Global().Set("initGameFromURI", js.FuncOf(func(this js.Value, inputs []js.Value) interface{} {
+		initGameJSWrapper(engine, inputs)
+		return nil
+	}))
+	js.Global().Set("startGameFromPart", js.FuncOf(func(this js.Value, inputs []js.Value) interface{} {
+		startGameFromPartWrapper(engine, inputs)
+		return nil
+	}))
+	js.Global().Set("handleKeyEvent", js.FuncOf(func(this js.Value, inputs []js.Value) interface{} {
+		startGameFromPartWrapper(engine, inputs)
+		return nil
+	}))
+	js.Global().Set("shutdown", js.FuncOf(func(this js.Value, inputs []js.Value) interface{} {
+		shutdownJSWrapper(engine)
+		return nil
+	}))
 	js.Global().Set("setLogLevel", js.FuncOf(setLogLevelWrapper))
 }
 
-func initGameJSWrapper(this js.Value, inputs []js.Value) interface{} {
+func initGameJSWrapper(engine *Engine, inputs []js.Value) interface{} {
 	expectedInputs := expectedBankAssets + 1
 	if len(inputs) != expectedInputs {
 		logger.Error("Expecting %v arguments, 1 for memlist the rest for banks got: %v", expectedInputs, len(inputs))
@@ -46,12 +55,13 @@ func initGameJSWrapper(this js.Value, inputs []js.Value) interface{} {
 	memlist := copyBytesFromJS(jsMemlist)
 	bankFilesMap := copyBankMap(jsBankFiles)
 
+	// TODO init should return app and set it on engine
 	app = InitGame(memlist, bankFilesMap)
 
 	return nil
 }
 
-func startGameFromPartWrapper(this js.Value, inputs []js.Value) interface{} {
+func startGameFromPartWrapper(engine *Engine, inputs []js.Value) interface{} {
 	startPartId := defaultStartPart
 	if len(inputs) == 1 && inputs[0].Type() != js.TypeUndefined {
 		startPartId += parseGamePartOffset(inputs[0])
@@ -60,6 +70,7 @@ func startGameFromPartWrapper(this js.Value, inputs []js.Value) interface{} {
 	nonDefaultPartLoadingIsNeeded := startPartId != defaultStartPart
 	if nonDefaultPartLoadingIsNeeded {
 		logger.Info("Loading game from %v", startPartId)
+		// TODO call this from engine.app
 		app.LoadGamePart(startPartId)
 	}
 
@@ -68,7 +79,7 @@ func startGameFromPartWrapper(this js.Value, inputs []js.Value) interface{} {
 	return nil
 }
 
-func handleKeyEventWrapper(this js.Value, inputs []js.Value) interface{} {
+func handleKeyEventWrapper(engine *Engine, inputs []js.Value) interface{} {
 	if len(inputs) != 3 {
 		logger.Error("Ignoring incomplete key event", inputs)
 	}
@@ -77,6 +88,7 @@ func handleKeyEventWrapper(this js.Value, inputs []js.Value) interface{} {
 		keyCode: inputs[1].Int(),
 		pressed: inputs[2].String() == "keydown",
 	}
+	// TODO this should be bassed to engine
 	setKeyState(&event)
 	logger.Info("Updated KeyMap %v", keyMap)
 	return nil
@@ -90,11 +102,11 @@ func setLogLevelWrapper(this js.Value, inputs []js.Value) interface{} {
 	return nil
 }
 
-func shutdownJSWrapper(this js.Value, inputs []js.Value) interface{} {
+func shutdownJSWrapper(engine *Engine) {
 	logger.Info("Shutting down")
+	// TODO use engine.app and engine.shutDown...
 	app.Shutdown()
 	shutdownChannel <- true
-	return nil
 }
 
 // TODO move this to a state shared with the hal
