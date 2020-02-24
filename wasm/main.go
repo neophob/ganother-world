@@ -11,10 +11,6 @@ const (
 	fixedLoopDelayFor25FPS = 20 * time.Millisecond
 )
 
-// TODO avoid globals by creating an Engine struct and passing it to functions that need it.
-var app anotherworld.GotherWorld
-var shutdownChannel chan bool
-
 type Engine struct {
 	app             anotherworld.GotherWorld
 	shutdownChannel chan bool
@@ -31,18 +27,13 @@ func main() {
 		shutdownChannel: make(chan bool),
 	}
 	RegisterCallbacks(&engine)
-
-	// TODO remove
-	shutdownChannel = make(chan bool)
-	<-shutdownChannel
-	// <-engine.shutdownChannel
+	<-engine.shutdownChannel
 }
 
-// TODO make function of engine
-func startMainLoop() {
+func (engine *Engine) startMainLoop() {
 	// TODO sync this with request animation frame
-	for i := 0; app.ExitRequested() == false; i++ {
-		app.MainLoop(i)
+	for i := 0; engine.app.ExitRequested() == false; i++ {
+		engine.app.MainLoop(i)
 		time.Sleep(fixedLoopDelayFor25FPS)
 	}
 }

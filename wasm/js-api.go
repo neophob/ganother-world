@@ -51,13 +51,10 @@ func initGameJSWrapper(engine *Engine, inputs []js.Value) interface{} {
 
 	jsMemlist := inputs[0]
 	jsBankFiles := inputs[1:]
-
 	memlist := copyBytesFromJS(jsMemlist)
 	bankFilesMap := copyBankMap(jsBankFiles)
 
-	// TODO init should return app and set it on engine
-	app = InitGame(memlist, bankFilesMap)
-
+	engine.app = InitGame(memlist, bankFilesMap)
 	return nil
 }
 
@@ -70,11 +67,11 @@ func startGameFromPartWrapper(engine *Engine, inputs []js.Value) interface{} {
 	nonDefaultPartLoadingIsNeeded := startPartId != defaultStartPart
 	if nonDefaultPartLoadingIsNeeded {
 		logger.Info("Loading game from %v", startPartId)
-		// TODO call this from engine.app
-		app.LoadGamePart(startPartId)
+		engine.app.LoadGamePart(startPartId)
 	}
 
-	go startMainLoop()
+	// TODO should be a function on engine....
+	go engine.startMainLoop()
 
 	return nil
 }
@@ -104,9 +101,8 @@ func setLogLevelWrapper(this js.Value, inputs []js.Value) interface{} {
 
 func shutdownJSWrapper(engine *Engine) {
 	logger.Info("Shutting down")
-	// TODO use engine.app and engine.shutDown...
-	app.Shutdown()
-	shutdownChannel <- true
+	engine.app.Shutdown()
+	engine.shutdownChannel <- true
 }
 
 // TODO move this to a state shared with the hal
