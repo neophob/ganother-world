@@ -13,7 +13,7 @@ const (
 
 type Engine struct {
 	app             anotherworld.GotherWorld
-	videoDriver     anotherworld.Video
+	hal             anotherworld.HAL
 	keyMap          map[uint32]bool
 	shutdownChannel chan bool
 }
@@ -28,12 +28,12 @@ func InitEngine() Engine {
 	return Engine{
 		shutdownChannel: make(chan bool),
 		keyMap:          make(map[uint32]bool),
-		videoDriver:     anotherworld.Video{Hal: buildWASMHAL()},
+		hal:             buildWASMHAL(),
 	}
 }
 
 func (engine *Engine) initGame(memlist []byte, bankFilesMap map[int][]byte) {
-	engine.app = anotherworld.InitGotherWorld(memlist, bankFilesMap, engine.videoDriver)
+	engine.app = anotherworld.InitGotherWorld(memlist, bankFilesMap, anotherworld.Video{Hal: engine.hal})
 }
 
 func (engine *Engine) startMainLoop() {
@@ -44,41 +44,33 @@ func (engine *Engine) startMainLoop() {
 	}
 }
 
-// pass it to Hal... some how figure out how to access the hal? app.video.Hal
 func (engine *Engine) setKeyState(event *KeyEvent) {
-	logger.Info("Key Event %v", event)
-	/*
-		TODO
-		Where would the state be stored and how does the HAL access it?
-		See hal-sdl for multiple key holds handling.
-	*/
-	switch event.key {
+	anotherKey := mapKeyToAnotherworld(event.key)
+	engine.keyMap[anotherKey] = event.pressed
+	logger.Debug("Updated KeyMap with %v %v", event, engine.keyMap)
+	engine.hal.(*WASMHAL).updateKeyStateFrom(&engine.keyMap)
+}
+
+func mapKeyToAnotherworld(key string) uint32 {
+	switch key {
 	case "Escape":
-		engine.keyMap[anotherworld.KeyEsc] = event.pressed
-		return
+		return anotherworld.KeyEsc
 	case "ArrowLeft":
-		engine.keyMap[anotherworld.KeyLeft] = event.pressed
-		return
+		return anotherworld.KeyLeft
 	case "ArrowRight":
-		engine.keyMap[anotherworld.KeyRight] = event.pressed
-		return
+		return anotherworld.KeyRight
 	case "ArrowUp":
-		engine.keyMap[anotherworld.KeyUp] = event.pressed
-		return
+		return anotherworld.KeyUp
 	case "ArrowDown":
-		engine.keyMap[anotherworld.KeyDown] = event.pressed
-		return
+		return anotherworld.KeyDown
 	case " ":
-		engine.keyMap[anotherworld.KeyFire] = event.pressed
-		return
+		return anotherworld.KeyFire
 	case "p", "P":
-		engine.keyMap[anotherworld.KeyPause] = event.pressed
-		return
+		return anotherworld.KeyPause
 	case "s", "S":
-		engine.keyMap[anotherworld.KeySave] = event.pressed
-		return
+		return anotherworld.KeySave
 	case "l", "L":
-		engine.keyMap[anotherworld.KeyLoad] = event.pressed
-		return
+		return anotherworld.KeyLoad
 	}
+	return anotherworld.KeyNone
 }

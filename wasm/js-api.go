@@ -78,7 +78,6 @@ func handleKeyEventWrapper(engine *Engine, inputs []js.Value) {
 		pressed: inputs[2].String() == "keydown",
 	}
 	engine.setKeyState(&event)
-	logger.Info("Updated KeyMap %v", engine.keyMap)
 }
 
 func setLogLevelWrapper(this js.Value, inputs []js.Value) interface{} {
