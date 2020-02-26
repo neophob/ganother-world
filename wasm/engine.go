@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/neophob/ganother-world/anotherworld"
+	"github.com/neophob/ganother-world/logger"
 )
 
 const (
@@ -12,17 +13,28 @@ const (
 
 type Engine struct {
 	app             anotherworld.GotherWorld
-	keyMap map[uint32]bool
+	videoDriver     anotherworld.Video
+	keyMap          map[uint32]bool
 	shutdownChannel chan bool
+}
+
+type KeyEvent struct {
+	key     string
+	keyCode int
+	pressed bool
 }
 
 func InitEngine() Engine {
 	return Engine{
 		shutdownChannel: make(chan bool),
-		keyMap: make(map[uint32]bool),
+		keyMap:          make(map[uint32]bool),
+		videoDriver:     anotherworld.Video{Hal: buildWASMHAL()},
 	}
 }
 
+func (engine *Engine) initGame(memlist []byte, bankFilesMap map[int][]byte) {
+	engine.app = anotherworld.InitGotherWorld(memlist, bankFilesMap, engine.videoDriver)
+}
 
 func (engine *Engine) startMainLoop() {
 	// TODO sync this with request animation frame

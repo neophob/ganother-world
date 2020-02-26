@@ -15,9 +15,6 @@ const (
 	minStartPartOffset = 0
 )
 
-// TODO should be part of hal or engine...
-var keyMap = make(map[uint32]bool)
-
 func RegisterCallbacks(engine *Engine) {
 	js.Global().Set("initGameFromURI", js.FuncOf(func(this js.Value, inputs []js.Value) interface{} {
 		initGameJSWrapper(engine, inputs)
@@ -38,27 +35,25 @@ func RegisterCallbacks(engine *Engine) {
 	js.Global().Set("setLogLevel", js.FuncOf(setLogLevelWrapper))
 }
 
-func initGameJSWrapper(engine *Engine, inputs []js.Value) interface{} {
+func initGameJSWrapper(engine *Engine, inputs []js.Value) {
 	expectedInputs := expectedBankAssets + 1
 	if len(inputs) != expectedInputs {
 		logger.Error("Expecting %v arguments, 1 for memlist the rest for banks got: %v", expectedInputs, len(inputs))
-		return nil
+		return
 	}
 	if inputs[0].Type() != js.TypeObject {
 		logger.Error("Argument 1 for InitGameWrapper(memlist, ...banks) must be a %v not %v", js.TypeObject, inputs[0].Type())
-		return nil
+		return
 	}
 
 	jsMemlist := inputs[0]
 	jsBankFiles := inputs[1:]
 	memlist := copyBytesFromJS(jsMemlist)
 	bankFilesMap := copyBankMap(jsBankFiles)
-
-	engine.app = InitGame(memlist, bankFilesMap)
-	return nil
+	engine.initGame(memlist, bankFilesMap)
 }
 
-func startGameFromPartWrapper(engine *Engine, inputs []js.Value) interface{} {
+func startGameFromPartWrapper(engine *Engine, inputs []js.Value) {
 	startPartId := defaultStartPart
 	if len(inputs) == 1 && inputs[0].Type() != js.TypeUndefined {
 		startPartId += parseGamePartOffset(inputs[0])
@@ -70,13 +65,10 @@ func startGameFromPartWrapper(engine *Engine, inputs []js.Value) interface{} {
 		engine.app.LoadGamePart(startPartId)
 	}
 
-	// TODO should be a function on engine....
 	go engine.startMainLoop()
-
-	return nil
 }
 
-func handleKeyEventWrapper(engine *Engine, inputs []js.Value) interface{} {
+func handleKeyEventWrapper(engine *Engine, inputs []js.Value) {
 	if len(inputs) != 3 {
 		logger.Error("Ignoring incomplete key event", inputs)
 	}
@@ -87,7 +79,6 @@ func handleKeyEventWrapper(engine *Engine, inputs []js.Value) interface{} {
 	}
 	engine.setKeyState(&event)
 	logger.Info("Updated KeyMap %v", engine.keyMap)
-	return nil
 }
 
 func setLogLevelWrapper(this js.Value, inputs []js.Value) interface{} {

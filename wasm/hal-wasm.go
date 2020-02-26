@@ -11,12 +11,6 @@ type WASMHAL struct {
 	holdKeys map[uint32]bool
 }
 
-type KeyEvent struct {
-	key     string
-	keyCode int
-	pressed bool
-}
-
 func buildWASMHAL() *WASMHAL {
 	return &WASMHAL{
 		holdKeys: make(map[uint32]bool),
