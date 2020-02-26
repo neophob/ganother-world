@@ -28,7 +28,7 @@ func RegisterCallbacks(engine *Engine) {
 		return nil
 	}))
 	js.Global().Set("handleKeyEvent", js.FuncOf(func(this js.Value, inputs []js.Value) interface{} {
-		startGameFromPartWrapper(engine, inputs)
+		handleKeyEventWrapper(engine, inputs)
 		return nil
 	}))
 	js.Global().Set("shutdown", js.FuncOf(func(this js.Value, inputs []js.Value) interface{} {
@@ -85,9 +85,8 @@ func handleKeyEventWrapper(engine *Engine, inputs []js.Value) interface{} {
 		keyCode: inputs[1].Int(),
 		pressed: inputs[2].String() == "keydown",
 	}
-	// TODO this should be bassed to engine
-	setKeyState(&event)
-	logger.Info("Updated KeyMap %v", keyMap)
+	engine.setKeyState(&event)
+	logger.Info("Updated KeyMap %v", engine.keyMap)
 	return nil
 }
 
@@ -103,46 +102,6 @@ func shutdownJSWrapper(engine *Engine) {
 	logger.Info("Shutting down")
 	engine.app.Shutdown()
 	engine.shutdownChannel <- true
-}
-
-// TODO move this to a state shared with the hal
-// pass it to Hal... some how figure out how to access the hal? app.video.Hal
-func setKeyState(event *KeyEvent) {
-	logger.Info("Key Event %v", event)
-	/*
-		TODO
-		Where would the state be stored and how does the HAL access it?
-		See hal-sdl for multiple key holds handling.
-	*/
-	switch event.key {
-	case "Escape":
-		keyMap[anotherworld.KeyEsc] = event.pressed
-		return
-	case "ArrowLeft":
-		keyMap[anotherworld.KeyLeft] = event.pressed
-		return
-	case "ArrowRight":
-		keyMap[anotherworld.KeyRight] = event.pressed
-		return
-	case "ArrowUp":
-		keyMap[anotherworld.KeyUp] = event.pressed
-		return
-	case "ArrowDown":
-		keyMap[anotherworld.KeyDown] = event.pressed
-		return
-	case " ":
-		keyMap[anotherworld.KeyFire] = event.pressed
-		return
-	case "p", "P":
-		keyMap[anotherworld.KeyPause] = event.pressed
-		return
-	case "s", "S":
-		keyMap[anotherworld.KeySave] = event.pressed
-		return
-	case "l", "L":
-		keyMap[anotherworld.KeyLoad] = event.pressed
-		return
-	}
 }
 
 func parseGamePartOffset(gamePartOffset js.Value) int {
