@@ -24,7 +24,7 @@ type KeyEvent struct {
 	pressed bool
 }
 
-func InitEngine() Engine {
+func buildEngine() Engine {
 	return Engine{
 		shutdownChannel: make(chan bool),
 		keyMap:          make(map[uint32]bool),

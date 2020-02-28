@@ -11,7 +11,7 @@ func init() {
 }
 
 func main() {
-	engine := InitEngine()
+	engine := buildEngine()
 	RegisterCallbacks(&engine)
 	<-engine.shutdownChannel
 }
