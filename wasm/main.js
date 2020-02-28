@@ -5,14 +5,7 @@
   const go = new Go();
   const params = parseParameters();
 
-  console.info('Loading assets and...');
-  const assetsPromise = Promise.all([
-    loadGoWasm('lib.wasm'),
-    loadFileAsBytes(`${ASSETS_PATH}/memlist.bin`),
-    loadBankAssets()
-  ]);
-
-  assetsPromise
+  loadAllAssets()
     .then(([gotherworld, memList, banks]) => {
       console.info('Assets loaded:', {memList, banks});
       go.run(gotherworld.instance);
@@ -22,9 +15,18 @@
         setLogLevel(params.logLevel);
       }
 
+      initializeKeyEventListner();
       initGameFromURI(memList, ...banks);
       startGameFromPart(params.gamePart);
     });
+
+  function loadAllAssets() {
+    return Promise.all([
+      loadGoWasm('lib.wasm'),
+      loadFileAsBytes(`${ASSETS_PATH}/memlist.bin`),
+      loadBankAssets()
+    ]);
+  }
 
   function loadGoWasm(filename) {
     return fetch(filename)
@@ -58,6 +60,18 @@
     return fetch(filename)
       .then((response) => response.arrayBuffer())
       .then((buffer) => new Uint8Array(buffer));
+  }
+
+  function initializeKeyEventListner() {
+    document.addEventListener('keydown', forwardKeyEvent);
+    document.addEventListener('keyup', forwardKeyEvent);
+  }
+
+  function forwardKeyEvent(event) {
+    if (event.repeat) {
+      return; //Ignore repeat, only up and down is important.
+    }
+    handleKeyEvent(event.key, event.keyCode, event.type);
   }
 
   function parseParameters() {

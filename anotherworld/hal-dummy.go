@@ -2,6 +2,8 @@ package anotherworld
 
 import "github.com/neophob/ganother-world/logger"
 
+const MAX_FRAME_COUNT = 128
+
 //DummyHAL implementation, text output
 type DummyHAL struct {
 }
@@ -10,11 +12,13 @@ func (render DummyHAL) BlitPage(buffer [WIDTH * HEIGHT]Color, posX, posY int) {
 	logger.Info(">VID: BLITPAGE %d %d", posX, posY)
 }
 
+//Outputs framecount, sends escape after MAX_FRAME_COUNT frames and ends the game
 func (render DummyHAL) EventLoop(frameCount int) uint32 {
-	logger.Info(">VID: EVENTLOOP %d", frameCount)
-	if frameCount < 128 {
-		return 0
+	logger.Info(">EVNT: EVENTLOOP %d", frameCount)
+	if frameCount < MAX_FRAME_COUNT {
+		return KeyNone
 	}
+	logger.Info(">EVNT: Max frameCount reached (%d) triggering KeyEsc", frameCount)
 	return KeyEsc
 }
 

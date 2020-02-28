@@ -2,6 +2,7 @@ package anotherworld
 
 //Virtual Key mapping
 const (
+	KeyNone  uint32 = 0
 	KeyEsc   uint32 = 0x1
 	KeyLeft  uint32 = 0x2
 	KeyRight uint32 = 0x4
