@@ -27,15 +27,13 @@ func (render *WASMHAL) updateKeyStateFrom(keyMap *map[uint32]bool) {
 }
 
 func (render *WASMHAL) BlitPage(buffer [anotherworld.WIDTH * anotherworld.HEIGHT]anotherworld.Color, posX, posY int) {
-	logger.Info(">VID: BLITPAGE %d %d", posX, posY)
+	logger.Debug(">VID: BLITPAGE %d %d", posX, posY)
 }
 
 //Outputs framecount, sends escape after MAX_FRAME_COUNT frames and ends the game
 func (render *WASMHAL) EventLoop(frameCount int) uint32 {
-	logger.Info(">EVNT: EVENTLOOP %d, KeyCombo state: %v", frameCount, render.keyCombo)
-	if frameCount >= MAX_FRAME_COUNT {
-		logger.Info(">EVNT: Max frameCount reached (%d) triggering KeyEsc", frameCount)
-		return anotherworld.KeyEsc
+	if render.keyCombo != 0 {
+		logger.Info(">EVNT: EVENTLOOP %d, KeyCombo state: %v", frameCount, render.keyCombo)
 	}
 	return render.keyCombo
 }
