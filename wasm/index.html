@@ -3,10 +3,24 @@
     <title>Gother World</title>
     <meta charset="utf-8"/>
     <script src="wasm_exec.js"></script>
+    <style>
+      h1 {
+        text-align: center;
+      }
+      #gotherworld {
+        /* TODO width/height might be ok if set in go */
+        width: 320px;
+        height:200px;
+        display: block;
+        margin-left:auto;
+        margin-right:auto;
+      }
+    </style>
   </head>
   <body>
     <!-- TODO use fancy webworkers for caching all the assets... -->
     <h1><img src="logo.png" alt="Gother World"></h1>
+    <canvas id="gotherworld"/>
     <script src="main.js"></script>
   </body>
 </html>

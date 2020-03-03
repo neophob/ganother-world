@@ -39,7 +39,6 @@ func buildSDLHAL() *SDLHAL {
 		panic(err)
 	}
 	renderer.SetLogicalSize(anotherworld.WIDTH, anotherworld.HEIGHT)
-	//renderer.SetLogicalSize(WIDTH*2, HEIGHT*2)
 	renderer.Clear()
 	renderer.Present()
 
