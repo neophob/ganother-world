@@ -30,7 +30,11 @@ func (render *WASMHAL) updateKeyStateFrom(keyMap *map[uint32]bool) {
 
 func (render *WASMHAL) BlitPage(buffer [anotherworld.WIDTH * anotherworld.HEIGHT]anotherworld.Color, posX, posY int) {
 	logger.Debug(">VID: BLITPAGE %d %d", posX, posY)
-	// TODO draw points passing x, y and color
+	// TODO implement color handling in js-canvas.go
+	// TODO draw points passing x, y and color see hal-sdl.go
+	x := posX
+	y := posY
+	render.canvas.DrawPoint(buffer[0], x, y)
 }
 
 //Outputs framecount, sends escape after MAX_FRAME_COUNT frames and ends the game

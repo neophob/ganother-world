@@ -2,6 +2,8 @@ package main
 
 import (
 	"syscall/js"
+
+	"github.com/neophob/ganother-world/anotherworld"
 )
 
 type Canvas struct {
@@ -19,6 +21,19 @@ func GetCanvas(domElementId string) Canvas {
 	return canvas
 }
 
-func (c Canvas) FillRect() {
-	c.context2d.Call("fillRect", 130, 190, 40, 60)
+// Consider drawImage, if we can generate the correct format to output in 1 call.
+// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
+
+func (c Canvas) DrawPoint(color anotherworld.Color, x, y int) {
+	// TODO convert color to hex RGB
+	// c.fillStyle(#rgbColor)
+	c.fillRect(x, y, 1, 1)
+}
+
+func (c Canvas) fillStyle(style string) {
+	c.context2d.Set("fillStyle", style)
+}
+
+func (c Canvas) fillRect(x, y, length, width int) {
+	c.context2d.Call("fillRect", x, y, length, width)
 }
