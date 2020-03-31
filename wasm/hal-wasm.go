@@ -8,12 +8,15 @@ import (
 const MAX_FRAME_COUNT = 32
 
 type WASMHAL struct {
-	keyCombo uint32
+	keyCombo     uint32
+	canvas       Canvas
+	lastSetColor anotherworld.Color
 }
 
 func buildWASMHAL() *WASMHAL {
 	return &WASMHAL{
 		keyCombo: anotherworld.KeyNone,
+		canvas:   GetCanvas("gotherworld"),
 	}
 }
 
@@ -27,10 +30,19 @@ func (render *WASMHAL) updateKeyStateFrom(keyMap *map[uint32]bool) {
 }
 
 func (render *WASMHAL) BlitPage(buffer [anotherworld.WIDTH * anotherworld.HEIGHT]anotherworld.Color, posX, posY int) {
-	logger.Debug(">VID: BLITPAGE %d %d", posX, posY)
+	// logger.Debug(">VID: BLITPAGE %d %d", posX, posY)
+	for y := 0; y < int(anotherworld.HEIGHT); y++ {
+		for x := 0; x < int(anotherworld.WIDTH); x++ {
+			offset := y*int(anotherworld.WIDTH) + x
+			if color := buffer[offset]; color != render.lastSetColor {
+				render.canvas.SetColor(color)
+				render.lastSetColor = color
+			}
+			render.canvas.DrawPoint(x+posX, y+posY)
+		}
+	}
 }
 
-//Outputs framecount, sends escape after MAX_FRAME_COUNT frames and ends the game
 func (render *WASMHAL) EventLoop(frameCount int) uint32 {
 	if render.keyCombo != 0 {
 		logger.Info(">EVNT: EVENTLOOP %d, KeyCombo state: %v", frameCount, render.keyCombo)
