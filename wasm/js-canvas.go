@@ -12,8 +12,8 @@ type Canvas struct {
 }
 
 func GetCanvas(domElementId string) Canvas {
-	canvasEl := js.Global().Get("document").Call("getElementById", domElementId)
-	canvas2d := canvasEl.Call("getContext", "2d")
+	canvasElement := js.Global().Get("document").Call("getElementById", domElementId)
+	canvas2d := canvasElement.Call("getContext", "2d")
 
 	canvas := Canvas{
 		context2d: canvas2d,
@@ -35,7 +35,7 @@ func GetCanvas(domElementId string) Canvas {
 //  pixels[3] = 255
 
 func (c Canvas) SetColor(color anotherworld.Color) {
-	c.fillStyle(fmt.Sprintf("#%X%X%X", color.R, color.G, color.B))
+	c.context2d.Set("fillStyle", fmt.Sprintf("#%X%X%X", color.R, color.G, color.B))
 }
 
 func (c Canvas) DrawPoint(x, y int) {
