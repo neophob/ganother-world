@@ -16,6 +16,7 @@ type Engine struct {
 	hal             anotherworld.HAL
 	keyMap          map[uint32]bool
 	shutdownChannel chan bool
+	counter         int
 }
 
 type KeyEvent struct {
@@ -36,12 +37,9 @@ func (engine *Engine) initGame(memlist []byte, bankFilesMap map[int][]byte) {
 	engine.app = anotherworld.InitGotherWorld(memlist, bankFilesMap, anotherworld.Video{Hal: engine.hal})
 }
 
-func (engine *Engine) startMainLoop() {
-	// TODO sync this with request animation frame
-	for i := 0; engine.app.ExitRequested() == false; i++ {
-		engine.app.MainLoop(i)
-		time.Sleep(fixedLoopDelayFor25FPS)
-	}
+func (engine *Engine) mainLoop() {
+	engine.app.MainLoop(engine.counter)
+	engine.counter += 1
 }
 
 func (engine *Engine) setKeyState(event *KeyEvent) {
