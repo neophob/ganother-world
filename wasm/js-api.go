@@ -10,7 +10,7 @@ import (
 
 const (
 	expectedBankAssets = 13
-	defaultStartPart   = anotherworld.GAME_PART_ID_1
+	defaultStartPart   = anotherworld.GAME_PART_ID_2
 	maxStartPartOffset = 9
 	minStartPartOffset = 0
 )
@@ -59,11 +59,8 @@ func startGameFromPartWrapper(engine *Engine, inputs []js.Value) {
 		startPartId += parseGamePartOffset(inputs[0])
 	}
 
-	nonDefaultPartLoadingIsNeeded := startPartId != defaultStartPart
-	if nonDefaultPartLoadingIsNeeded {
-		logger.Info("Loading game from %v", startPartId)
-		engine.app.LoadGamePart(startPartId)
-	}
+	logger.Info("Loading game from %v", startPartId)
+	engine.app.LoadGamePart(startPartId)
 
 	go engine.startMainLoop()
 }

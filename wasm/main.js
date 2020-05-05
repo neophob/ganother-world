@@ -17,11 +17,6 @@
 
       initializeKeyEventListner();
       initGameFromURI(memList, ...banks);
-
-      if (!params.gamePart) {
-        console.info('load default intro part');
-        params.gamePart = 1;
-      }
       startGameFromPart(params.gamePart);
     });
 
