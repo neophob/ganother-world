@@ -35,7 +35,7 @@ func GetCanvas(domElementId string) Canvas {
 //  pixels[3] = 255
 
 func (c Canvas) SetColor(color anotherworld.Color) {
-	c.context2d.Set("fillStyle", fmt.Sprintf("#%X%X%X", color.R, color.G, color.B))
+	c.context2d.Set("fillStyle", fmt.Sprintf("rgb(%d, %d, %d)", color.R, color.G, color.B))
 }
 
 func (c Canvas) DrawPoint(x, y int) {
