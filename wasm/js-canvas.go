@@ -13,10 +13,10 @@ type Canvas struct {
 
 func GetCanvas(domElementId string) Canvas {
 	canvasElement := js.Global().Get("document").Call("getElementById", domElementId)
-	canvas2d := canvasElement.Call("getContext", "2d")
+	context2d := canvasElement.Call("getContext", "2d")
 
 	canvas := Canvas{
-		context2d: canvas2d,
+		context2d: context2d,
 	}
 
 	return canvas
