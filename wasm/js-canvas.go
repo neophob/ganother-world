@@ -25,7 +25,14 @@ func GetCanvas(domElementId string) Canvas {
 // Notes:
 // Consider drawImage, if we can generate the correct format to output in 1 call.
 // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
-// Also find out if we can do double buffering with canvas
+// OR
+// access the canvas pixel data directly might be faster - at least for unscaled output
+//  var id = ctx.getImageData(0, 0, canvasWidth, canvasHeight)
+//  var pixels = id.data
+//  pixels[0] = 0
+//  pixels[1] = 255
+//  pixels[2] = 255
+//  pixels[3] = 255
 
 func (c Canvas) SetColor(color anotherworld.Color) {
 	c.fillStyle(fmt.Sprintf("#%X%X%X", color.R, color.G, color.B))
