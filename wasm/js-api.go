@@ -65,7 +65,6 @@ func startGameFromPartWrapper(engine *Engine, inputs []js.Value) {
 		engine.app.LoadGamePart(startPartId)
 	}
 
-	engine.app.LoadGamePart(anotherworld.GAME_PART_ID_2)
 	go engine.startMainLoop()
 }
 
