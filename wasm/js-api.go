@@ -74,9 +74,11 @@ func startGameFromPartWrapper(engine *Engine, inputs []js.Value) {
 	js.Global().Call("requestAnimationFrame", renderFrame)
 }
 
+//TODO move to hal-wasm
 func handleKeyEventWrapper(engine *Engine, inputs []js.Value) {
 	if len(inputs) != 3 {
 		logger.Error("Ignoring incomplete key event", inputs)
+		return
 	}
 	event := KeyEvent{
 		key:     inputs[0].String(),
