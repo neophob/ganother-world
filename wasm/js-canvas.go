@@ -46,6 +46,6 @@ func (c Canvas) fillStyle(style string) {
 	c.context2d.Set("fillStyle", style)
 }
 
-func (c Canvas) fillRect(x, y, length, width int) {
-	c.context2d.Call("fillRect", x, y, length, width)
+func (c Canvas) fillRect(x, y, width, height int) {
+	c.context2d.Call("fillRect", x, y, width, height)
 }
