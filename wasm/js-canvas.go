@@ -28,11 +28,11 @@ func GetCanvas(domElementId string) Canvas {
 // Also find out if we can do double buffering with canvas
 
 func (c Canvas) SetColor(color anotherworld.Color) {
-	c.fillStyle(getHexColorFrom(color))
+	c.fillStyle(fmt.Sprintf("#%X%X%X", color.R, color.G, color.B))
 }
 
 func (c Canvas) DrawPoint(x, y int) {
-	c.fillRect(x, y, 1, 1)
+	c.context2d.Call("fillRect", x, y, 1, 1)
 }
 
 func (c Canvas) fillStyle(style string) {
@@ -41,8 +41,4 @@ func (c Canvas) fillStyle(style string) {
 
 func (c Canvas) fillRect(x, y, length, width int) {
 	c.context2d.Call("fillRect", x, y, length, width)
-}
-
-func getHexColorFrom(color anotherworld.Color) string {
-	return fmt.Sprintf("#%X%X%X", color.R, color.G, color.B)
 }
