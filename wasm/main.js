@@ -15,10 +15,10 @@
     buffer.forEach((pixel) => {
       if (pixel !== lastPixel) {
         lastPixel = pixel;
-        ctx.fillStyle = '#' + pixel.toString(16);
+        ctx.fillStyle = '#' + pixel.toString(16).padStart(6, '0') + 'FF';
       }
       const x = offset % 320;
-      const y = offset / 320;
+      const y = parseInt(offset / 320, 10);
       ctx.fillRect(x, y, 1, 1)
       offset++;
     });
