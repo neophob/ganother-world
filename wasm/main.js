@@ -9,21 +9,7 @@
   const ctx = canvas.getContext('2d');
   let lastBlitSum;
 
-  function checksum(buffer) {
-    let sum = 0;
-    buffer.forEach((pixel) => {
-      sum = (sum + pixel) & 0x7FFFFFFF;
-    });
-    return sum;
-  }
-
   ctx.blit = function(buffer) {
-    const currentChecksum = checksum(buffer);
-    if (lastBlitSum === currentChecksum) {
-      //screen did not change, do not render it!
-      return;
-    }
-    lastBlitSum = currentChecksum;
     let offset = 0;
     let lastPixel = '';
     buffer.forEach((pixel) => {
