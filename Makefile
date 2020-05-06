@@ -23,12 +23,13 @@ build: build-native build-wasm
 
 ## build-native: build go SDL binary
 build-native:
-	@echo "  >  BUILD"
+	@echo "  >  BUILD SDL version"
 	@go build -o "$(DISTDIR)/main" $(SDLDIR)
+	@echo "  DONE! run main in the dist directory"
 
 ## build-wasm: builds the wasm app
 build-wasm:
-	@echo "  >  BUILD-WASM"
+	@echo "  >  BUILD WASM version"
 	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" $(WASMDIR)
 	@cp wasm/index.html $(DISTDIR)
 	@cp wasm/main.js $(DISTDIR)
@@ -36,10 +37,13 @@ build-wasm:
 	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
 	@cp -r ./assets $(DISTDIR)
 	@cp -r ./logo.png $(DISTDIR)
+	@echo "  DONE! run devserver in the dist directory"
 
 ## build-release: build release build, could be compressed with UPX
 build-release:
+	@echo "  >  BUILD SDL release version"
 	@env go build -o "$(DISTDIR)/main.release" $(RELEASE) $(SDLDIR)
+	@echo "  DONE! run main.release in the dist directory"
 
 ## format: format code using go fmt
 format:

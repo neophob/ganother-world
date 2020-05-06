@@ -10,7 +10,7 @@ import (
 
 const (
 	expectedBankAssets = 13
-	defaultStartPart   = anotherworld.GAME_PART_ID_1
+	defaultStartPart   = anotherworld.GAME_PART_ID_2
 	maxStartPartOffset = 9
 	minStartPartOffset = 0
 )
@@ -59,18 +59,26 @@ func startGameFromPartWrapper(engine *Engine, inputs []js.Value) {
 		startPartId += parseGamePartOffset(inputs[0])
 	}
 
-	nonDefaultPartLoadingIsNeeded := startPartId != defaultStartPart
-	if nonDefaultPartLoadingIsNeeded {
-		logger.Info("Loading game from %v", startPartId)
-		engine.app.LoadGamePart(startPartId)
-	}
+	logger.Info("Loading game from %v", startPartId)
+	engine.app.LoadGamePart(startPartId)
 
-	go engine.startMainLoop()
+	var renderFrame js.Func
+
+	renderFrame = js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		engine.mainLoop()
+		js.Global().Call("requestAnimationFrame", renderFrame)
+		return nil
+	})
+
+	// Start running
+	js.Global().Call("requestAnimationFrame", renderFrame)
 }
 
+//TODO move to hal-wasm
 func handleKeyEventWrapper(engine *Engine, inputs []js.Value) {
 	if len(inputs) != 3 {
 		logger.Error("Ignoring incomplete key event", inputs)
+		return
 	}
 	event := KeyEvent{
 		key:     inputs[0].String(),

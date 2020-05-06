@@ -31,14 +31,17 @@ func (render *WASMHAL) updateKeyStateFrom(keyMap *map[uint32]bool) {
 
 func (render *WASMHAL) BlitPage(buffer [anotherworld.WIDTH * anotherworld.HEIGHT]anotherworld.Color, posX, posY int) {
 	// logger.Debug(">VID: BLITPAGE %d %d", posX, posY)
+	render.canvas.SetColor(buffer[0])
+	render.lastSetColor = buffer[0]
+	offset := 0
 	for y := 0; y < int(anotherworld.HEIGHT); y++ {
 		for x := 0; x < int(anotherworld.WIDTH); x++ {
-			offset := y*int(anotherworld.WIDTH) + x
 			if color := buffer[offset]; color != render.lastSetColor {
 				render.canvas.SetColor(color)
 				render.lastSetColor = color
 			}
 			render.canvas.DrawPoint(x+posX, y+posY)
+			offset++
 		}
 	}
 }
