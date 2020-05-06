@@ -62,7 +62,16 @@ func startGameFromPartWrapper(engine *Engine, inputs []js.Value) {
 	logger.Info("Loading game from %v", startPartId)
 	engine.app.LoadGamePart(startPartId)
 
-	go engine.startMainLoop()
+	var renderFrame js.Func
+
+	renderFrame = js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		engine.mainLoop()
+		js.Global().Call("requestAnimationFrame", renderFrame)
+		return nil
+	})
+
+	// Start running
+	js.Global().Call("requestAnimationFrame", renderFrame)
 }
 
 //TODO move to hal-wasm
