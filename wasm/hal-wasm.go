@@ -33,7 +33,7 @@ func (render *WASMHAL) updateKeyStateFrom(keyMap *map[uint32]bool) {
 func sillyChecksum(buffer [anotherworld.WIDTH * anotherworld.HEIGHT]anotherworld.Color) uint32 {
 	ret := uint32(0)
 	for i := 0; i < int(anotherworld.WIDTH*anotherworld.HEIGHT); i++ {
-		ret = uint32(ret + uint32(buffer[i].R))
+		ret = uint32(ret + uint32(buffer[i].R) + uint32(buffer[i].G))
 	}
 	return ret
 }
