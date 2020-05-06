@@ -5,6 +5,25 @@
   const go = new Go();
   const params = parseParameters();
 
+  const canvas = document.getElementById('gotherworld');
+  const ctx = canvas.getContext('2d');
+
+  ctx.blit = function(buffer) {
+    //console.log('this is foo', buffer)
+    let offset = 0;
+    let lastPixel = '';
+    buffer.forEach((pixel) => {
+      if (pixel !== lastPixel) {
+        lastPixel = pixel;
+        ctx.fillStyle = '#' + pixel.toString(16);
+      }
+      const x = offset % 320;
+      const y = offset / 320;
+      ctx.fillRect(x, y, 1, 1)
+      offset++;
+    });
+  }
+
   loadAllAssets()
     .then(([gotherworld, memList, banks]) => {
       console.info('Assets loaded:', {memList, banks});

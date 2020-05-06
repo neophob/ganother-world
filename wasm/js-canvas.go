@@ -49,3 +49,11 @@ func (c Canvas) fillStyle(style string) {
 func (c Canvas) fillRect(x, y, width, height int) {
 	c.context2d.Call("fillRect", x, y, width, height)
 }
+
+func (c Canvas) blitIt(buffer [anotherworld.WIDTH * anotherworld.HEIGHT]int) {
+	var interfaceSlice []interface{} = make([]interface{}, len(buffer))
+	for i, d := range buffer {
+		interfaceSlice[i] = d
+	}
+	c.context2d.Call("blit", interfaceSlice)
+}
