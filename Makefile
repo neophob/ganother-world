@@ -36,14 +36,13 @@ build-native-release:
 	@echo "  DONE! run main.release in the dist directory"
 
 wasm-common:
-	mkdir -p $(DISTDIR)
-	cp -f wasm/index.html $(DISTDIR)
-	cp -f wasm/main.js $(DISTDIR)
-	ls -al $(DISTDIR)
-	go build -o "$(DISTDIR)/devserver" $(RELEASE) cmd/devserver/main.go
-	cp -f "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
-	cp -fr ./assets $(DISTDIR)
-	cp -fr ./logo.png $(DISTDIR)
+	@mkdir -p $(DISTDIR)
+	@cp -f wasm/index.html $(DISTDIR)
+	@cp -f wasm/main.js $(DISTDIR)
+	@go build -o "$(DISTDIR)/devserver" $(RELEASE) cmd/devserver/main.go
+	@cp -f "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
+	@cp -fr ./assets $(DISTDIR)
+	@cp -fr ./logo.png $(DISTDIR)
 
 ## build-wasm: builds the wasm app
 build-wasm: wasm-common
