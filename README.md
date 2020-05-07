@@ -31,7 +31,6 @@
 
 - Install make (autotools on linux, xcode on OSX)
 - Install go 1.14 https://golang.org/dl/
-- optional: install tinygo
 - Check out repo
 - Run `./scripts/osx-install.sh` to install/download dependencies or make sure SDL2 (sdl2, sdl2_gfx, sdl2_image, sdl2_mixer, sdl_net) and pkg-config are installed correctly
 - Run `make` to build, if it's green you're good
