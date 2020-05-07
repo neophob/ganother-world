@@ -8,9 +8,10 @@ import (
 const MAX_FRAME_COUNT = 32
 
 type WASMHAL struct {
-	keyCombo     uint32
-	canvas       Canvas
-	lastSetColor anotherworld.Color
+	keyCombo          uint32
+	canvas            Canvas
+	lastSetColor      anotherworld.Color
+	lastSillyChecksum uint32
 }
 
 func buildWASMHAL() *WASMHAL {
@@ -29,21 +30,32 @@ func (render *WASMHAL) updateKeyStateFrom(keyMap *map[uint32]bool) {
 	}
 }
 
+func sillyChecksum(buffer [anotherworld.WIDTH * anotherworld.HEIGHT]anotherworld.Color) uint32 {
+	ret := uint32(0)
+	for i := 0; i < int(anotherworld.WIDTH*anotherworld.HEIGHT); i++ {
+		ret = uint32(ret + uint32(buffer[i].R) + uint32(buffer[i].G))
+	}
+	return ret
+}
+
 func (render *WASMHAL) BlitPage(buffer [anotherworld.WIDTH * anotherworld.HEIGHT]anotherworld.Color, posX, posY int) {
-	// logger.Debug(">VID: BLITPAGE %d %d", posX, posY)
-	render.canvas.SetColor(buffer[0])
-	render.lastSetColor = buffer[0]
+	currentCheckSum := sillyChecksum(buffer)
+	if currentCheckSum == render.lastSillyChecksum {
+		logger.Debug(">DUP FRAME")
+		return
+	}
+	render.lastSillyChecksum = currentCheckSum
+
+	//see https://github.com/golang/go/wiki/InterfaceSlice
+	var a [anotherworld.WIDTH * anotherworld.HEIGHT]int
 	offset := 0
 	for y := 0; y < int(anotherworld.HEIGHT); y++ {
 		for x := 0; x < int(anotherworld.WIDTH); x++ {
-			if color := buffer[offset]; color != render.lastSetColor {
-				render.canvas.SetColor(color)
-				render.lastSetColor = color
-			}
-			render.canvas.DrawPoint(x+posX, y+posY)
+			a[offset] = int(buffer[offset].R)<<16 + int(buffer[offset].G)<<8 + int(buffer[offset].B)
 			offset++
 		}
 	}
+	render.canvas.blitIt(a)
 }
 
 func (render *WASMHAL) EventLoop(frameCount int) uint32 {
