@@ -19,7 +19,10 @@ PACKAGES_TO_TEST := ./anotherworld
 DISTDIR := ./dist
 
 ## build: build all the things
-build: build-native build-wasm
+build: build-native build-wasm build-tiny-wasm
+
+## release: build release build, could be compressed with UPX
+release: build-native-release build-wasm-release build-tiny-wasm-release
 
 ## build-native: build go SDL binary
 build-native:
@@ -27,23 +30,36 @@ build-native:
 	@go build -o "$(DISTDIR)/main" $(SDLDIR)
 	@echo "  DONE! run main in the dist directory"
 
-## build-wasm: builds the wasm app
-build-wasm:
-	@echo "  >  BUILD WASM version"
-	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" $(WASMDIR)
+build-native-release:
+	@echo "  >  BUILD SDL release version"
+	@env go build -o "$(DISTDIR)/main.release" $(RELEASE) $(SDLDIR)
+	@echo "  DONE! run main.release in the dist directory"
+
+wasm-common:
 	@cp wasm/index.html $(DISTDIR)
 	@cp wasm/main.js $(DISTDIR)
 	@go build -o "$(DISTDIR)/devserver" cmd/devserver/main.go
 	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
 	@cp -r ./assets $(DISTDIR)
 	@cp -r ./logo.png $(DISTDIR)
+
+build-tiny-wasm: wasm-common
+	tinygo build -o "$(DISTDIR)/lib.wasm" -target wasm $(WASMDIR)
+
+build-tiny-wasm-release: wasm-common
+	tinygo build -o "$(DISTDIR)/lib.wasm" -target wasm $(WASMDIR)
+
+## build-wasm: builds the wasm app
+build-wasm: wasm-common
+	@echo "  >  BUILD WASM version"
+	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" $(WASMDIR)
 	@echo "  DONE! run devserver in the dist directory"
 
-## build-release: build release build, could be compressed with UPX
-build-release:
-	@echo "  >  BUILD SDL release version"
-	@env go build -o "$(DISTDIR)/main.release" $(RELEASE) $(SDLDIR)
-	@echo "  DONE! run main.release in the dist directory"
+## build-wasm: builds the wasm app
+build-wasm-release: wasm-common
+	@echo "  >  BUILD WASM release version"
+	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" $(RELEASE) $(WASMDIR)
+	@echo "  DONE! run devserver in the dist directory"
 
 ## format: format code using go fmt
 format:
