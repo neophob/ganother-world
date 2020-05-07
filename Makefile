@@ -37,12 +37,11 @@ build-native-release:
 
 wasm-common:
 	mkdir -p $(DISTDIR)
-	cp -f wasm/index.html $(DISTDIR)/index.html
-	cp -f wasm/main.js $(DISTDIR)/main.js
+	cp -f wasm/index.html $(DISTDIR)
+	cp -f wasm/main.js $(DISTDIR)
 	ls -al $(DISTDIR)
 	go build -o "$(DISTDIR)/devserver" $(RELEASE) cmd/devserver/main.go
-	ls -al $(DISTDIR)
-	cp -f "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)/wasm_exec.js
+	cp -f "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
 	cp -fr ./assets $(DISTDIR)
 	cp -fr ./logo.png $(DISTDIR)
 
