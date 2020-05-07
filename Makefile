@@ -36,8 +36,8 @@ build-native-release:
 	@echo "  DONE! run main.release in the dist directory"
 
 wasm-common:
-	cp -f wasm/index.html $(DISTDIR)
-	cp -f wasm/main.js $(DISTDIR)
+	cp -f wasm/index.html $(DISTDIR)/index.html
+	cp -f wasm/main.js $(DISTDIR)/main.js
 	ls -al $(DISTDIR)
 	go build -o "$(DISTDIR)/devserver" $(RELEASE) cmd/devserver/main.go
 	ls -al $(DISTDIR)
