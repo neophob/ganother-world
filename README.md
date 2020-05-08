@@ -3,8 +3,15 @@
 ![](assets/gow.gif)
 
 # GOAL
+
 - Learn GO and implement "something fun"
 - "something fun" - interpret the old game another world and create a web version (WASM)!
+
+## Next steps
+
+Improve WASM Performance (currently pretty bad).
+- use ImageData
+- use webworker to decouple main thread from "working"
 
 # Another World References
 
