@@ -7,23 +7,32 @@
       h1 {
         text-align: center;
       }
+      p {
+        text-align: center;
+      }
       #gotherworld {
         width: 640px;
         height: 400px;
         display: block;
         margin-left:auto;
         margin-right:auto;
-        -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
-        -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
-        box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
         image-rendering: pixelated;
       }
     </style>
   </head>
   <body>
-    <!-- TODO use fancy webworkers for caching all the assets... -->
-    <h1><img src="logo.png" alt="Gother World"></h1>
-    <canvas id="gotherworld" width="320" height="200"/>
+    <h1>
+      <img src="logo.png" alt="Gother World">
+    </h1>
+    <p>
+      <canvas id="gotherworld" width="320" height="200"/>
+    </p>
+    <p>
+      Made with <span style="color: #e25555;">&hearts;</span> in Bern. <a href="https://github.com/neophob/ganother-world">Github</a>
+    </p>
     <script src="main.js"></script>
   </body>
 </html>
+
+
+
