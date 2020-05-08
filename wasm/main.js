@@ -7,21 +7,18 @@
 
   const canvas = document.getElementById('gotherworld');
   const ctx = canvas.getContext('2d');
-  let lastBlitSum;
+  const tempImage = ctx.createImageData(320, 200);
 
   ctx.blit = function(buffer) {
-    let offset = 0;
-    let lastPixel = '';
-    buffer.forEach((pixel) => {
-      if (pixel !== lastPixel) {
-        lastPixel = pixel;
-        ctx.fillStyle = '#' + pixel.toString(16).padStart(6, '0') + 'FF';
-      }
-      const x = offset % 320;
-      const y = parseInt(offset / 320, 10);
-      ctx.fillRect(x, y, 1, 1)
-      offset++;
+    const pixel = tempImage.data;
+    let ofs = 0;
+    buffer.forEach((p) => {
+      pixel[ofs++] = (p >> 16) & 0xFF;
+      pixel[ofs++] = (p >> 8) & 0xFF;
+      pixel[ofs++] = p & 0xFF;
+      pixel[ofs++] = 255;
     });
+    ctx.putImageData(tempImage, 0, 0);
   }
 
   loadAllAssets()
