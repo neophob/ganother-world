@@ -21,29 +21,40 @@ DISTDIR := ./dist
 ## build: build all the things
 build: build-native build-wasm
 
+## release: build release build, SDL version could be compressed with UPX
+release: build-native-release build-wasm-release
+
 ## build-native: build go SDL binary
 build-native:
 	@echo "  >  BUILD SDL version"
 	@go build -o "$(DISTDIR)/main" $(SDLDIR)
 	@echo "  DONE! run main in the dist directory"
 
-## build-wasm: builds the wasm app
-build-wasm:
-	@echo "  >  BUILD WASM version"
-	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" $(WASMDIR)
-	@cp wasm/index.html $(DISTDIR)
-	@cp wasm/main.js $(DISTDIR)
-	@go build -o "$(DISTDIR)/devserver" cmd/devserver/main.go
-	@cp "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
-	@cp -r ./assets $(DISTDIR)
-	@cp -r ./logo.png $(DISTDIR)
-	@echo "  DONE! run devserver in the dist directory"
-
-## build-release: build release build, could be compressed with UPX
-build-release:
+build-native-release:
 	@echo "  >  BUILD SDL release version"
 	@env go build -o "$(DISTDIR)/main.release" $(RELEASE) $(SDLDIR)
 	@echo "  DONE! run main.release in the dist directory"
+
+wasm-common:
+	@mkdir -p $(DISTDIR)
+	@cp -f wasm/index.html $(DISTDIR)
+	@cp -f wasm/main.js $(DISTDIR)
+	@go build -o "$(DISTDIR)/devserver" $(RELEASE) cmd/devserver/main.go
+	@cp -f "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
+	@cp -fr ./assets $(DISTDIR)
+	@cp -fr ./logo.png $(DISTDIR)
+
+## build-wasm: builds the wasm app
+build-wasm: wasm-common
+	@echo "  >  BUILD WASM version"
+	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" $(WASMDIR)
+	@echo "  DONE! run devserver in the dist directory"
+
+## build-wasm: builds the wasm app
+build-wasm-release: wasm-common
+	@echo "  >  BUILD WASM release version"
+	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" $(RELEASE) $(WASMDIR)
+	@echo "  DONE! run devserver in the dist directory"
 
 ## format: format code using go fmt
 format:
