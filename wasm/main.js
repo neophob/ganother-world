@@ -5,6 +5,10 @@
   const go = new Go();
   const params = parseParameters();
 
+  const SHIFT_TO_RED_BITS = 16;
+  const SHIFT_TO_GREEN_BITS = 8;
+  const FULL_ALPHA = 0xFF;
+
   const canvas = document.getElementById('gotherworld');
   const ctx = canvas.getContext('2d');
   const tempImage = ctx.createImageData(320, 200);
@@ -13,10 +17,10 @@
     const pixel = tempImage.data;
     let ofs = 0;
     buffer.forEach((p) => {
-      pixel[ofs++] = (p >> 16) & 0xFF;
-      pixel[ofs++] = (p >> 8) & 0xFF;
+      pixel[ofs++] = (p >> SHIFT_TO_RED_BITS) & 0xFF;
+      pixel[ofs++] = (p >> SHIFT_TO_GREEN_BITS) & 0xFF;
       pixel[ofs++] = p & 0xFF;
-      pixel[ofs++] = 255;
+      pixel[ofs++] = FULL_ALPHA;
     });
     ctx.putImageData(tempImage, 0, 0);
   }
