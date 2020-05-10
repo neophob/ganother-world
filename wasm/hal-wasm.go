@@ -6,6 +6,8 @@ import (
 )
 
 const MAX_FRAME_COUNT = 32
+const SHIFT_LEFT_FOR_GREEN = 8
+const SHIFT_LEFT_FOR_RED = 16
 
 type WASMHAL struct {
 	keyCombo          uint32
@@ -47,15 +49,15 @@ func (render *WASMHAL) BlitPage(buffer [anotherworld.WIDTH * anotherworld.HEIGHT
 	render.lastSillyChecksum = currentCheckSum
 
 	//see https://github.com/golang/go/wiki/InterfaceSlice
-	var a [anotherworld.WIDTH * anotherworld.HEIGHT]int
+	var imageAsIntColor [anotherworld.WIDTH * anotherworld.HEIGHT]int
 	offset := 0
 	for y := 0; y < int(anotherworld.HEIGHT); y++ {
 		for x := 0; x < int(anotherworld.WIDTH); x++ {
-			a[offset] = int(buffer[offset].R)<<16 + int(buffer[offset].G)<<8 + int(buffer[offset].B)
+			imageAsIntColor[offset] = int(buffer[offset].R)<<SHIFT_LEFT_FOR_RED + int(buffer[offset].G)<<SHIFT_LEFT_FOR_GREEN + int(buffer[offset].B)
 			offset++
 		}
 	}
-	render.canvas.blitIt(a)
+	render.canvas.blitIt(imageAsIntColor)
 }
 
 func (render *WASMHAL) EventLoop(frameCount int) uint32 {
