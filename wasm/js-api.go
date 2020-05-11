@@ -74,7 +74,6 @@ func startGameFromPartWrapper(engine *Engine, inputs []js.Value) {
 	js.Global().Call("requestAnimationFrame", renderFrame)
 }
 
-//TODO move to hal-wasm
 func handleKeyEventWrapper(engine *Engine, inputs []js.Value) {
 	if len(inputs) != 3 {
 		logger.Error("Ignoring incomplete key event", inputs)
@@ -109,7 +108,7 @@ func parseGamePartOffset(gamePartOffset js.Value) int {
 	}
 	parsedOffset := gamePartOffset.Int()
 	if parsedOffset >= minStartPartOffset && parsedOffset <= maxStartPartOffset {
-		logger.Info("Parsed gamePartOffset %v", gamePartOffset)
+		logger.Info("Parsed gamePartOffset %d", parsedOffset)
 		return parsedOffset
 	}
 	logger.Error("Out of range gamePart offset %v, using default.", parsedOffset)

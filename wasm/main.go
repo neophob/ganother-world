@@ -13,5 +13,6 @@ func init() {
 func main() {
 	engine := buildEngine()
 	RegisterCallbacks(&engine)
+	logger.Info("Registered Callbacks")
 	<-engine.shutdownChannel
 }
