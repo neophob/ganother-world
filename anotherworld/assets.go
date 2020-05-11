@@ -33,7 +33,7 @@ func (assets StaticGameAssets) LoadEntryFromBank(index int) []uint8 {
 //LoadResource return a resource
 func (assets *StaticGameAssets) LoadResource(id int) {
 	if len(assets.LoadedResources[id]) > 0 {
-		logger.Info("resource [%d] already loaded", id)
+		logger.Debug("resource [%d] already loaded", id)
 		return
 	}
 	assets.LoadedResources[id] = assets.LoadEntryFromBank(id)
