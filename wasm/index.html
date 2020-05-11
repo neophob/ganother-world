@@ -55,6 +55,8 @@
 
       //
       <a id="badge" href="#" onclick="shutdown()">STOP</a>
+      <a id="badge" href="#" onclick="handleKeyEvent('l', 76, 'keydown'); setTimeout(() => handleKeyEvent('l', 76, 'keyup'), 50);">LOAD</a>
+      <a id="badge" href="#" onclick="handleKeyEvent('s', 83, 'keydown'); setTimeout(() => handleKeyEvent('s', 83, 'keyup'), 50);">SAVE</a>
 
       // LOG
       <a id="badge" href="#" onclick="setLogLevel(0)">DEBUG</a>
