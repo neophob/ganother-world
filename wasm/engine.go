@@ -38,6 +38,10 @@ func (engine *Engine) initGame(memlist []byte, bankFilesMap map[int][]byte) {
 }
 
 func (engine *Engine) mainLoop() {
+	if engine.keyMap[anotherworld.KeyPause] == true {
+		logger.Debug("PAUSED")
+		return
+	}
 	engine.app.MainLoop(engine.counter)
 	engine.counter += 1
 }
