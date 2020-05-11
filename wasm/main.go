@@ -5,8 +5,8 @@ import (
 )
 
 func init() {
-	logger.SetLogLevel(logger.LEVEL_INFO)
 	logger.DisableColors()
+	logger.SetLogLevel(logger.LEVEL_INFO)
 	logger.Info("WASM Gother-World initializing...")
 }
 

@@ -21,7 +21,7 @@
         color: #fff;
         background-color: #000;
         display: inline-block;
-        padding: .25em .4em;
+        padding: .25em .3em;
         line-height: 1;
         border-radius: .25rem;
         font-weight: 700;
@@ -54,7 +54,14 @@
       <a id="badge" href="?gamePart=7">7</a>
 
       //
-      <a id="badge" href="#" onclick="shutdown()">EXIT</a>
+      <a id="badge" href="#" onclick="shutdown()">STOP</a>
+
+      // LOG
+      <a id="badge" href="#" onclick="setLogLevel(0)">DEBUG</a>
+      <a id="badge" href="#" onclick="setLogLevel(1)">INFO</a>
+      <a id="badge" href="#" onclick="setLogLevel(2)">WARN</a>
+      <a id="badge" href="#" onclick="setLogLevel(3)">ERROR</a>
+      <a id="badge" href="#" onclick="setLogLevel(4)">FATAL</a>
 
     </p>
     <p>
