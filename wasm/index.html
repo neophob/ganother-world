@@ -43,7 +43,11 @@
       <img src="logo.png" alt="Gother World">
     </h1>
     <p>
-      Load Game Part
+      <a id="badge" href="#" onclick="shutdown()">STOP</a>
+      <a id="badge" href="#" onclick="handleKeyEvent('l', 76, 'keydown'); setTimeout(() => handleKeyEvent('l', 76, 'keyup'), 50);">LOAD</a>
+      <a id="badge" href="#" onclick="handleKeyEvent('s', 83, 'keydown'); setTimeout(() => handleKeyEvent('s', 83, 'keyup'), 50);">SAVE</a>
+
+      // Game Part
       <a id="badge" href="?gamePart=0">0</a>
       <a id="badge" href="?gamePart=1">1</a>
       <a id="badge" href="?gamePart=2">2</a>
@@ -52,11 +56,6 @@
       <a id="badge" href="?gamePart=5">5</a>
       <a id="badge" href="?gamePart=6">6</a>
       <a id="badge" href="?gamePart=7">7</a>
-
-      //
-      <a id="badge" href="#" onclick="shutdown()">STOP</a>
-      <a id="badge" href="#" onclick="handleKeyEvent('l', 76, 'keydown'); setTimeout(() => handleKeyEvent('l', 76, 'keyup'), 50);">LOAD</a>
-      <a id="badge" href="#" onclick="handleKeyEvent('s', 83, 'keydown'); setTimeout(() => handleKeyEvent('s', 83, 'keyup'), 50);">SAVE</a>
 
       // LOG
       <a id="badge" href="#" onclick="setLogLevel(0)">DEBUG</a>
