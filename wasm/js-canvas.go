@@ -21,8 +21,8 @@ func GetCanvas(domElementId string) Canvas {
 
 func (c Canvas) blitIt(buffer [anotherworld.WIDTH * anotherworld.HEIGHT]int) {
 	var interfaceSlice []interface{} = make([]interface{}, len(buffer))
-	for i, d := range buffer {
-		interfaceSlice[i] = d
+	for index, pixelData := range buffer {
+		interfaceSlice[index] = pixelData
 	}
 	c.context2d.Call("blit", interfaceSlice)
 }
