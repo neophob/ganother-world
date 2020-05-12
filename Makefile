@@ -66,10 +66,7 @@ test:
 
 ## lint: static analyze source
 lint:
-	@go vet $(SDLDIR)
-	@go vet $(WASMDIR)
-	@go vet ./logger
-	@go vet ./anotherworld
+	@go vet ./...
 
 ## doc: create project documentation
 doc:
