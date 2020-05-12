@@ -18,13 +18,13 @@ PACKAGES := $(SDLDIR) $(WASMDIR) ./logger ./anotherworld
 PACKAGES_TO_TEST := ./anotherworld
 DISTDIR := ./dist
 
-## build: build all the things
+## build: build all the things (size unoptimized build)
 build: build-native build-wasm
 
-## release: build release build, SDL version could be compressed with UPX
-release: build-native-release build-wasm-release
+## release: release build (size optimized build)
+release: build-native-release build-wasm
 
-## build-native: build go SDL binary
+## build-native: build go SDL2 binary
 build-native:
 	@echo "  >  BUILD SDL version"
 	@go build -o "$(DISTDIR)/main" $(SDLDIR)
@@ -48,12 +48,6 @@ wasm-common:
 build-wasm: wasm-common
 	@echo "  >  BUILD WASM version"
 	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" $(WASMDIR)
-	@echo "  DONE! run devserver in the dist directory"
-
-## build-wasm: builds the wasm app
-build-wasm-release: wasm-common
-	@echo "  >  BUILD WASM release version"
-	@env GOARCH=wasm GOOS=js go build -o "$(DISTDIR)/lib.wasm" $(RELEASE) $(WASMDIR)
 	@echo "  DONE! run devserver in the dist directory"
 
 ## format: format code using go fmt
