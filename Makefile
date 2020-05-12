@@ -67,6 +67,7 @@ format:
 test:
 	@go test -cover -v $(PACKAGES_TO_TEST)
 
+## lint: static analyze source
 lint:
 	@go vet $(SDLDIR)
 	@go vet $(WASMDIR)
