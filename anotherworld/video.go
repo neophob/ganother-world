@@ -273,7 +273,7 @@ func (video *Video) PlaySound(resNum, freq, vol, channel int) {
 		return
 	}
 
-	logger.Info("playSound resNum %d", resNum)
+	logger.Debug("playSound resNum %d", resNum)
 	video.Hal.PlaySound(resNum, freq, vol, channel)
 }
 
