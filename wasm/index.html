@@ -17,7 +17,7 @@
         text-align: center;
         font-family: "Monaco", "Andale Mono", "Lucida Console", "FreeMono", monospace;
       }
-      #badge {
+      .badge {
         color: #fff;
         background-color: #000;
         display: inline-block;
@@ -43,26 +43,26 @@
       <img src="logo.png" alt="Gother World">
     </h1>
     <p>
-      <a id="badge" href="#" onclick="shutdown()">STOP</a>
-      <a id="badge" href="#" onclick="handleKeyEvent('l', 76, 'keydown'); setTimeout(() => handleKeyEvent('l', 76, 'keyup'), 50);">LOAD</a>
-      <a id="badge" href="#" onclick="handleKeyEvent('s', 83, 'keydown'); setTimeout(() => handleKeyEvent('s', 83, 'keyup'), 50);">SAVE</a>
+      <a class="badge" href="#" onclick="shutdown()">STOP</a>
+      <a class="badge" href="#" onclick="handleKeyEvent('l', 76, 'keydown'); setTimeout(() => handleKeyEvent('l', 76, 'keyup'), 50);">LOAD</a>
+      <a class="badge" href="#" onclick="handleKeyEvent('s', 83, 'keydown'); setTimeout(() => handleKeyEvent('s', 83, 'keyup'), 50);">SAVE</a>
 
       // Game Part
-      <a id="badge" href="?gamePart=0">0</a>
-      <a id="badge" href="?gamePart=1">1</a>
-      <a id="badge" href="?gamePart=2">2</a>
-      <a id="badge" href="?gamePart=3">3</a>
-      <a id="badge" href="?gamePart=4">4</a>
-      <a id="badge" href="?gamePart=5">5</a>
-      <a id="badge" href="?gamePart=6">6</a>
-      <a id="badge" href="?gamePart=7">7</a>
+      <a class="badge" href="?gamePart=0">0</a>
+      <a class="badge" href="?gamePart=1">1</a>
+      <a class="badge" href="?gamePart=2">2</a>
+      <a class="badge" href="?gamePart=3">3</a>
+      <a class="badge" href="?gamePart=4">4</a>
+      <a class="badge" href="?gamePart=5">5</a>
+      <a class="badge" href="?gamePart=6">6</a>
+      <a class="badge" href="?gamePart=7">7</a>
 
       // LOG
-      <a id="badge" href="#" onclick="setLogLevel(0)">DEBUG</a>
-      <a id="badge" href="#" onclick="setLogLevel(1)">INFO</a>
-      <a id="badge" href="#" onclick="setLogLevel(2)">WARN</a>
-      <a id="badge" href="#" onclick="setLogLevel(3)">ERROR</a>
-      <a id="badge" href="#" onclick="setLogLevel(4)">FATAL</a>
+      <a class="badge" href="#" onclick="setLogLevel(0)">DEBUG</a>
+      <a class="badge" href="#" onclick="setLogLevel(1)">INFO</a>
+      <a class="badge" href="#" onclick="setLogLevel(2)">WARN</a>
+      <a class="badge" href="#" onclick="setLogLevel(3)">ERROR</a>
+      <a class="badge" href="#" onclick="setLogLevel(4)">FATAL</a>
 
     </p>
     <p>
