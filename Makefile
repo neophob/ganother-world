@@ -86,4 +86,4 @@ help: Makefile
 	@sed -n 's/^##//p' $< | column -t -s ':' |  sed -e 's/^/ /'
 	@echo
 
-.PHONY: build release build-native build-native-release wasm-common build-wasm build-wasm-release format test lint doc update-go-deps clean help
+.PHONY: build release build-native build-native-release wasm-common build-wasm format test lint doc update-go-deps clean help
