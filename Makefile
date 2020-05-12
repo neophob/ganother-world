@@ -58,10 +58,7 @@ build-wasm-release: wasm-common
 
 ## format: format code using go fmt
 format:
-	@go fmt $(SDLDIR)
-	@go fmt $(WASMDIR)
-	@go fmt ./logger
-	@go fmt ./anotherworld
+	@gofmt -w .
 
 ## test: run unit tests
 test:
@@ -81,12 +78,15 @@ doc:
 	@go doc -all ./logger
 	@go doc -all ./anotherworld
 
+## update-go-deps: update go dependencies
+update-go-deps:
+	@go get -t -v -d -u ./...
+
 ## clean: removes build files
 clean:
 	@go clean
 	@rm -fr ./dist/*
 
-.PHONY: help
 all: help
 help: Makefile
 	@echo
@@ -94,3 +94,5 @@ help: Makefile
 	@echo
 	@sed -n 's/^##//p' $< | column -t -s ':' |  sed -e 's/^/ /'
 	@echo
+
+.PHONY: build release build-native build-native-release wasm-common build-wasm build-wasm-release format test lint doc update-go-deps clean help
