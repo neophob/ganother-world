@@ -76,7 +76,7 @@ func startGameFromPartWrapper(engine *Engine, inputs []js.Value) {
 
 func handleKeyEventWrapper(engine *Engine, inputs []js.Value) {
 	if len(inputs) != 3 {
-		logger.Error("Ignoring incomplete key event", inputs)
+		logger.Error("Ignoring incomplete key event %v", inputs)
 		return
 	}
 	event := KeyEvent{
