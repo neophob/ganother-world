@@ -14,7 +14,7 @@ GOROOT := $(shell go env GOROOT)
 RELEASE := -ldflags "-s -w -X project.name=anotherworld"
 WASMDIR := ./wasm
 SDLDIR := ./sdl
-PACKAGES := $(SDLDIR) ./logger ./anotherworld
+PACKAGES := $(SDLDIR) $(WASMDIR) ./logger ./anotherworld
 PACKAGES_TO_TEST := ./anotherworld
 DISTDIR := ./dist
 
@@ -38,7 +38,7 @@ build-native-release:
 wasm-common:
 	@mkdir -p $(DISTDIR)
 	@cp -f wasm/index.html $(DISTDIR)
-	@cp -f wasm/main.js $(DISTDIR)
+	@cp -f wasm/index.js $(DISTDIR)
 	@go build -o "$(DISTDIR)/devserver" $(RELEASE) cmd/devserver/main.go
 	@cp -f "$(GOROOT)/misc/wasm/wasm_exec.js" $(DISTDIR)
 	@cp -fr ./assets $(DISTDIR)
@@ -58,11 +58,20 @@ build-wasm-release: wasm-common
 
 ## format: format code using go fmt
 format:
-	@go fmt $(PACKAGES)
+	@go fmt $(SDLDIR)
+	@go fmt $(WASMDIR)
+	@go fmt ./logger
+	@go fmt ./anotherworld
 
 ## test: run unit tests
 test:
 	@go test -cover -v $(PACKAGES_TO_TEST)
+
+lint:
+	@go vet $(SDLDIR)
+	@go vet $(WASMDIR)
+	@go vet ./logger
+	@go vet ./anotherworld
 
 ## doc: create project documentation
 doc:
