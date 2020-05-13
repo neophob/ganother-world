@@ -16,8 +16,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v1
       - run: make test
-      - run: |
-        pwd
-        make install-go-deps
-        make lint
+      - name: Run Linter
+        run: |
+          pwd
+          make install-go-deps
+          make lint
       - run: make build-wasm
