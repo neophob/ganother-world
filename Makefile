@@ -70,6 +70,10 @@ doc:
 	@go doc -all ./logger
 	@go doc -all ./anotherworld
 
+## install-go-deps: install go dependencies
+install-go-deps:
+	@go get -v ./...
+
 ## update-go-deps: update go dependencies
 update-go-deps:
 	@go get -t -v -d -u ./...
