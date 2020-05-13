@@ -36,6 +36,18 @@
         border: 2px solid #000;
         image-rendering: pixelated;
       }
+      #touch-controls {
+        width: 960px;
+        margin-left:auto;
+        margin-right:auto;
+      }
+      #touch-controls button {
+        width: 60px;
+        height: 60px;
+        border-radius: 5px;
+        opacity: 0.25;
+        font-size: 50px;
+      }
     </style>
   </head>
   <body>
@@ -46,6 +58,7 @@
       <a class="badge" href="#" onclick="shutdown()">STOP</a>
       <a class="badge" href="#" onclick="handleKeyEvent('l', 76, 'keydown'); setTimeout(() => handleKeyEvent('l', 76, 'keyup'), 50);">LOAD</a>
       <a class="badge" href="#" onclick="handleKeyEvent('s', 83, 'keydown'); setTimeout(() => handleKeyEvent('s', 83, 'keyup'), 50);">SAVE</a>
+      <!-- TODO toggle keyboard ⌨︎ -->
 
       // Game Part
       <a class="badge" href="?gamePart=0">0</a>
@@ -66,6 +79,14 @@
 
     </p>
     <p>
+      <div id="touch-controls">
+        <button>↑</button>
+        <button>↓</button>
+        <button>←</button>
+        <button>→</button>
+        <button>␠</button>
+        <button>␛</button>
+      </div>
       <canvas id="gotherworld" width="320" height="200"/>
     </p>
     <p>
