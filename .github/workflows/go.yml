@@ -16,9 +16,5 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v1
       - run: make test
-      - name: Run Linter
-        run: |
-          pwd
-          make install-go-deps
-          make lint
+      - run: GOARCH=wasm GOOS=js go vet ./wasm/...
       - run: make build-wasm
