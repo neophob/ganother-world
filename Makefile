@@ -60,7 +60,8 @@ test:
 
 ## lint: static analyze source
 lint:
-	@env GOARCH=wasm GOOS=js go vet ./...
+	@env GOARCH=wasm GOOS=js go vet ./wasm/...
+	@go vet ./sdl/...
 
 ## doc: create project documentation
 doc:
