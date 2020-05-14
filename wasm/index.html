@@ -9,11 +9,7 @@
         background: -webkit-linear-gradient(to top, #A1FFCE, #FAFFD1);
         background: linear-gradient(to top, #A1FFCE, #FAFFD1);
       }
-      h1 {
-        text-align: center;
-        font-family: "Monaco", "Andale Mono", "Lucida Console", "FreeMono", monospace;
-      }
-      p {
+      body, h1, p {
         text-align: center;
         font-family: "Monaco", "Andale Mono", "Lucida Console", "FreeMono", monospace;
       }
@@ -27,19 +23,26 @@
         font-weight: 700;
         text-decoration: none;
       }
+      #gotherworld-container {
+        position: relative;
+        width: 960px;
+        height: 600px;
+        margin-left:auto;
+        margin-right:auto;
+      }
       #gotherworld {
         width: 960px;
         height: 600px;
         display: block;
-        margin-left:auto;
-        margin-right:auto;
         border: 2px solid #000;
         image-rendering: pixelated;
       }
       #touch-controls {
-        width: 960px;
-        margin-left:auto;
-        margin-right:auto;
+        position: absolute;
+        bottom: 25px;
+        left: 25px;
+        width: calc(100% - 50px);
+        text-align: left;
       }
       #touch-controls button {
         width: 60px;
@@ -47,6 +50,15 @@
         border-radius: 5px;
         opacity: 0.25;
         font-size: 50px;
+      }
+      #touch-controls #key-up {
+        position: absolute;
+        left: 69px;
+        bottom: 69px;
+      }
+      #touch-controls .align-right {
+        float: right;
+        margin-right: 11px;
       }
     </style>
   </head>
@@ -78,17 +90,17 @@
       <a class="badge" href="#" onclick="setLogLevel(4)">FATAL</a>
 
     </p>
-    <p>
+    <div id="gotherworld-container">
       <div id="touch-controls">
-        <button>↑</button>
-        <button>↓</button>
-        <button>←</button>
-        <button>→</button>
-        <button>␠</button>
-        <button>␛</button>
+        <button alt="up key input" id="key-up">↑</button>
+        <button alt="left key input" id="key-left">←</button>
+        <button alt="down key input" id="key-down">↓</button>
+        <button alt="right key input" id="key-right">→</button>
+        <button alt="space key input" id="key-sp" class="align-right">␠</button>
+        <button alt="escape key input" id="key-esc" class="align-right">␛</button>
       </div>
       <canvas id="gotherworld" width="320" height="200"/>
-    </p>
+    </div>
     <p>
       Made with <span style="color: #e25555;">&hearts;</span> in Bern. <a href="https://github.com/neophob/ganother-world">Github</a>
     </p>
