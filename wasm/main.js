@@ -36,6 +36,7 @@
       }
 
       initializeKeyEventListner();
+      initializeTouchEventListners();
       initGameFromURI(memList, ...banks);
       startGameFromPart(params.gamePart);
     });
@@ -85,6 +86,30 @@
   function initializeKeyEventListner() {
     document.addEventListener('keydown', forwardKeyEvent);
     document.addEventListener('keyup', forwardKeyEvent);
+  }
+
+  function initializeTouchEventListners() {
+    const keyMappings = [
+      { id: 'key-up', key: 'ArrowUp', keyCode: 38 },
+      { id: 'key-left', key: 'ArrowLeft', keyCode: 37 },
+      { id: 'key-down', key: 'ArrowDown', keyCode: 40 },
+      { id: 'key-right', key: 'ArrowRight', keyCode: 39 },
+      { id: 'key-sp', key: ' ', keyCode: 32 },
+      { id: 'key-esc', key: 'Escape', keyCode: 27 },
+    ]
+    keyMappings.forEach(({id, key, keyCode}) => {
+      const keyButton = document.getElementById(id);
+      keyButton.addEventListener('mousedown', (e) => {
+        handleKeyEvent(key, keyCode, 'keydown');
+      });
+      // Note we have to handle both up and leave to release button
+      keyButton.addEventListener('mouseup', (e) => {
+        handleKeyEvent(key, keyCode, 'keyup');
+      });
+      keyButton.addEventListener('mouseleave', (e) => {
+        handleKeyEvent(key, keyCode, 'keyup');
+      });
+    });
   }
 
   function forwardKeyEvent(event) {
