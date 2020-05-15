@@ -23,6 +23,9 @@
         font-weight: 700;
         text-decoration: none;
       }
+      .hide {
+        display: none;
+      }
       #gotherworld-container {
         position: relative;
         width: 960px;
@@ -70,7 +73,7 @@
       <a class="badge" href="#" onclick="shutdown()">STOP</a>
       <a class="badge" href="#" onclick="handleKeyEvent('l', 76, 'keydown'); setTimeout(() => handleKeyEvent('l', 76, 'keyup'), 50);">LOAD</a>
       <a class="badge" href="#" onclick="handleKeyEvent('s', 83, 'keydown'); setTimeout(() => handleKeyEvent('s', 83, 'keyup'), 50);">SAVE</a>
-      <!-- TODO toggle keyboard ⌨︎ -->
+      <a class="badge" href="#" id="toggle-keyboard" style="min-width: 55px;">⌨︎ OFF</a>
 
       // Game Part
       <a class="badge" href="?gamePart=0">0</a>
@@ -91,7 +94,7 @@
 
     </p>
     <div id="gotherworld-container">
-      <div id="touch-controls">
+      <div id="touch-controls" class="hide">
         <button alt="up key input" id="key-up">↑</button>
         <button alt="left key input" id="key-left">←</button>
         <button alt="down key input" id="key-down">↓</button>

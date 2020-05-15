@@ -10,8 +10,11 @@
   const FULL_ALPHA = 0xFF;
 
   const canvas = document.getElementById('gotherworld');
+  const touchControls = document.getElementById('touch-controls');
   const ctx = canvas.getContext('2d');
   const tempImage = ctx.createImageData(320, 200);
+
+  let showKeyboard = false;
 
   ctx.blit = function(buffer) {
     const pixel = tempImage.data;
@@ -110,6 +113,21 @@
         handleKeyEvent(key, keyCode, 'keyup');
       });
     });
+
+    const toggleButton = document.getElementById('toggle-keyboard');
+    toggleButton.addEventListener('click', (e) => {
+      toggleKeyboard(toggleButton);
+    });
+  }
+
+  function toggleKeyboard(button) {
+    showKeyboard = !showKeyboard;
+    const changeToLabel = showKeyboard ? '⌨︎ ON' : '⌨︎ OFF';
+    console.log('toggle keyboard', changeToLabel);
+    button.text = changeToLabel;
+    document.getElementById('touch-controls').className = showKeyboard ?
+      '' :
+      'hide';
   }
 
   function forwardKeyEvent(event) {
