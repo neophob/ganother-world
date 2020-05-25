@@ -48,14 +48,14 @@
     return Promise.all([
       loadGoWasm('lib.wasm'),
       loadFileAsBytes(`${ASSETS_PATH}/memlist.bin`),
-      loadBankAssets()
+      loadBankAssets(),
     ]);
   }
 
   function loadGoWasm(filename) {
     return fetch(filename)
       .then((wasmLib) => {
-        return WebAssembly.instantiateStreaming(wasmLib, go.importObject)
+        return WebAssembly.instantiateStreaming(wasmLib, go.importObject);
       });
   }
 
@@ -122,9 +122,8 @@
 
   function toggleKeyboard(button) {
     showKeyboard = !showKeyboard;
-    const changeToLabel = showKeyboard ? '⌨︎ ON' : '⌨︎ OFF';
-    console.log('toggle keyboard', changeToLabel);
-    button.text = changeToLabel;
+    const changeToClass = showKeyboard ? 'badge badge-invert' : 'badge';
+    button.className = changeToClass;
     document.getElementById('touch-controls').className = showKeyboard ?
       '' :
       'hide';

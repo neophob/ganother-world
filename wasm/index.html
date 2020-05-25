@@ -14,14 +14,18 @@
         font-family: "Monaco", "Andale Mono", "Lucida Console", "FreeMono", monospace;
       }
       .badge {
-        color: #fff;
-        background-color: #000;
+        color: #eee;
+        background-color: #111;
         display: inline-block;
         padding: .25em .3em;
         line-height: 1;
         border-radius: .25rem;
         font-weight: 700;
         text-decoration: none;
+      }
+      .badge-invert {
+        color: #111;
+        background-color: #eee;
       }
       .hide {
         display: none;
@@ -73,7 +77,7 @@
       <a class="badge" href="#" onclick="shutdown()">STOP</a>
       <a class="badge" href="#" onclick="handleKeyEvent('l', 76, 'keydown'); setTimeout(() => handleKeyEvent('l', 76, 'keyup'), 50);">LOAD</a>
       <a class="badge" href="#" onclick="handleKeyEvent('s', 83, 'keydown'); setTimeout(() => handleKeyEvent('s', 83, 'keyup'), 50);">SAVE</a>
-      <a class="badge" href="#" id="toggle-keyboard" style="min-width: 55px;">⌨︎ OFF</a>
+      <a class="badge" href="#" id="toggle-keyboard">⌨︎</a>
 
       // Game Part
       <a class="badge" href="?gamePart=0">0</a>
