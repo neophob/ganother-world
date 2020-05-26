@@ -1,14 +1,8 @@
 package main
 
 import (
-	"time"
-
 	"github.com/neophob/ganother-world/anotherworld"
 	"github.com/neophob/ganother-world/logger"
-)
-
-const (
-	fixedLoopDelayFor25FPS = 20 * time.Millisecond
 )
 
 type Engine struct {
