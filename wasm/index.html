@@ -9,17 +9,13 @@
         background: -webkit-linear-gradient(to top, #A1FFCE, #FAFFD1);
         background: linear-gradient(to top, #A1FFCE, #FAFFD1);
       }
-      h1 {
-        text-align: center;
-        font-family: "Monaco", "Andale Mono", "Lucida Console", "FreeMono", monospace;
-      }
-      p {
+      body, h1, p {
         text-align: center;
         font-family: "Monaco", "Andale Mono", "Lucida Console", "FreeMono", monospace;
       }
       .badge {
         color: #FAFFD1;
-        background-color: #000;
+        background-color: #111;
         display: inline-block;
         padding: .25em .3em;
         line-height: 1;
@@ -27,14 +23,53 @@
         font-weight: 700;
         text-decoration: none;
       }
+      .badge-invert {
+        color: #111;
+        background-color: #eee;
+      }
+      .hide {
+        display: none;
+      }
+      #gotherworld-container {
+        position: relative;
+        width: 960px;
+        height: 600px;
+        margin-left:auto;
+        margin-right:auto;
+      }
       #gotherworld {
         width: 960px;
         height: 600px;
         display: block;
-        margin-left:auto;
-        margin-right:auto;
         border: 2px solid #000;
         image-rendering: pixelated;
+      }
+      #touch-controls {
+        position: absolute;
+        bottom: 25px;
+        left: 25px;
+        width: calc(100% - 50px);
+        text-align: left;
+      }
+      #touch-controls button {
+        width: 60px;
+        height: 60px;
+        border-radius: 5px;
+        opacity: 0.25;
+        font-size: 50px;
+      }
+      #touch-controls #key-up {
+        position: absolute;
+        left: 69px;
+        bottom: 69px;
+      }
+      #touch-controls #key-esc,
+      #touch-controls #key-sp {
+        width: auto
+      }
+      #touch-controls .align-right {
+        float: right;
+        margin-right: 11px;
       }
     </style>
   </head>
@@ -46,6 +81,7 @@
       <a class="badge" href="#" onclick="shutdown()">STOP</a>
       <a class="badge" href="#" onclick="handleKeyEvent('l', 76, 'keydown'); setTimeout(() => handleKeyEvent('l', 76, 'keyup'), 50);">LOAD</a>
       <a class="badge" href="#" onclick="handleKeyEvent('s', 83, 'keydown'); setTimeout(() => handleKeyEvent('s', 83, 'keyup'), 50);">SAVE</a>
+      <a class="badge" href="#" id="toggle-keyboard">⌨︎</a>
 
       // Game Part
       <a class="badge" href="?gamePart=0">0</a>
@@ -65,9 +101,17 @@
       <a class="badge" href="#" onclick="setLogLevel(4)">FATAL</a>
 
     </p>
-    <p>
+    <div id="gotherworld-container">
+      <div id="touch-controls" class="hide">
+        <button alt="up key input" id="key-up">↑</button>
+        <button alt="left key input" id="key-left">←</button>
+        <button alt="down key input" id="key-down">↓</button>
+        <button alt="right key input" id="key-right">→</button>
+        <button alt="escape key input" id="key-esc" class="align-right">ESC</button>
+        <button alt="space key input" id="key-sp" class="align-right">FIRE</button>
+      </div>
       <canvas id="gotherworld" width="320" height="200"/>
-    </p>
+    </div>
     <p>
       Made with <span style="color: #e25555;">&hearts;</span> in Bern. <a href="https://github.com/neophob/ganother-world">Github</a>
     </p>

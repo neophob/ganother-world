@@ -13,6 +13,8 @@
   const ctx = canvas.getContext('2d');
   const tempImage = ctx.createImageData(320, 200);
 
+  let showKeyboard = false;
+
   ctx.blit = function(buffer) {
     const pixel = tempImage.data;
     let ofs = 0;
@@ -36,6 +38,7 @@
       }
 
       initializeKeyEventListner();
+      initializeTouchEventListners();
       initGameFromURI(memList, ...banks);
       startGameFromPart(params.gamePart);
     });
@@ -44,14 +47,14 @@
     return Promise.all([
       loadGoWasm('lib.wasm'),
       loadFileAsBytes(`${ASSETS_PATH}/memlist.bin`),
-      loadBankAssets()
+      loadBankAssets(),
     ]);
   }
 
   function loadGoWasm(filename) {
     return fetch(filename)
       .then((wasmLib) => {
-        return WebAssembly.instantiateStreaming(wasmLib, go.importObject)
+        return WebAssembly.instantiateStreaming(wasmLib, go.importObject);
       });
   }
 
@@ -85,6 +88,44 @@
   function initializeKeyEventListner() {
     document.addEventListener('keydown', forwardKeyEvent);
     document.addEventListener('keyup', forwardKeyEvent);
+  }
+
+  function initializeTouchEventListners() {
+    const keyMappings = [
+      { id: 'key-up', key: 'ArrowUp', keyCode: 38 },
+      { id: 'key-left', key: 'ArrowLeft', keyCode: 37 },
+      { id: 'key-down', key: 'ArrowDown', keyCode: 40 },
+      { id: 'key-right', key: 'ArrowRight', keyCode: 39 },
+      { id: 'key-sp', key: ' ', keyCode: 32 },
+      { id: 'key-esc', key: 'Escape', keyCode: 27 },
+    ]
+    keyMappings.forEach(({id, key, keyCode}) => {
+      const keyButton = document.getElementById(id);
+      keyButton.addEventListener('mousedown', (e) => {
+        handleKeyEvent(key, keyCode, 'keydown');
+      });
+      // Note we have to handle both up and leave to release button
+      keyButton.addEventListener('mouseup', (e) => {
+        handleKeyEvent(key, keyCode, 'keyup');
+      });
+      keyButton.addEventListener('mouseleave', (e) => {
+        handleKeyEvent(key, keyCode, 'keyup');
+      });
+    });
+
+    const toggleButton = document.getElementById('toggle-keyboard');
+    toggleButton.addEventListener('click', (e) => {
+      toggleKeyboard(toggleButton);
+    });
+  }
+
+  function toggleKeyboard(button) {
+    showKeyboard = !showKeyboard;
+    const changeToClass = showKeyboard ? 'badge badge-invert' : 'badge';
+    button.className = changeToClass;
+    document.getElementById('touch-controls').className = showKeyboard ?
+      '' :
+      'hide';
   }
 
   function forwardKeyEvent(event) {
