@@ -10,7 +10,6 @@
   const FULL_ALPHA = 0xFF;
 
   const canvas = document.getElementById('gotherworld');
-  const touchControls = document.getElementById('touch-controls');
   const ctx = canvas.getContext('2d');
   const tempImage = ctx.createImageData(320, 200);
 
