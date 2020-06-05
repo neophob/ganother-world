@@ -13,6 +13,7 @@ func main() {
 
 	noVideoOutput := flag.Bool("t", false, "Use Text only output (no SDL needed)")
 	debug := flag.Bool("d", false, "Enable Debug Mode")
+	exportData := flag.Bool("e", false, "Enable Data Export")
 	startPart := flag.Int("p", 1, "Game part to start from (0-9)")
 	flag.Parse()
 
@@ -22,6 +23,11 @@ func main() {
 
 	if *debug == false {
 		logger.SetLogLevel(logger.LEVEL_INFO)
+	}
+
+	if *exportData == true {
+		logger.Info("Enable data export")
+		F00()
 	}
 
 	logger.Info("- load memlist.bin")
@@ -47,8 +53,14 @@ func main() {
 		}*/
 		app.MainLoop(i)
 
-		//game run at approx 25 fps
-		time.Sleep(20 * time.Millisecond)
+		if *exportData == true {
+
+		}
+
+		if *exportData == false {
+			//game run at approx 25 fps
+			time.Sleep(20 * time.Millisecond)
+		}
 	}
 
 	app.Shutdown()
