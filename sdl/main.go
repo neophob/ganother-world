@@ -25,9 +25,10 @@ func main() {
 		logger.SetLogLevel(logger.LEVEL_INFO)
 	}
 
+	var dataExport DataExport
 	if *exportData == true {
 		logger.Info("Enable data export")
-		F00()
+		dataExport = InitDataExport()
 	}
 
 	logger.Info("- load memlist.bin")
@@ -54,7 +55,7 @@ func main() {
 		app.MainLoop(i)
 
 		if *exportData == true {
-
+			dataExport.addDataFrame(app.Vm.Variables, app.Vm.ChannelPC)
 		}
 
 		if *exportData == false {
