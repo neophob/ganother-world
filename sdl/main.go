@@ -55,7 +55,7 @@ func main() {
 		app.MainLoop(i)
 
 		if *exportData == true {
-			dataExport.addDataFrame(app.Vm.Variables, app.Vm.ChannelPC)
+			dataExport.addDataFrame(app.Vm.Variables, app.Vm.ChannelPC, app.Vm.ChannelPaused)
 		}
 
 		if *exportData == false {
