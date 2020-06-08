@@ -56,8 +56,8 @@ func (video *Video) drawFilledPolygons(page int, vx, vy []int16, col int) {
 
 						outputOffset := yPosition * int(WIDTH)
 						for x := xPositionStart; x <= xPositionEnd; x++ {
-							color := video.getColor(col, video.WorkerPage, outputOffset+x)
-							video.rawBuffer[video.WorkerPage][outputOffset+x] = color
+							color := video.getColor(col, page, outputOffset+x)
+							video.rawBuffer[page][outputOffset+x] = color
 						}
 					}
 				}
